@@ -1,0 +1,23 @@
+.select{
+  @apply min-w-[107px] h-[40px];
+  :global{
+    .earn-select-selector{
+      @apply rounded-lg border-neutralDivider;
+    }
+    .earn-select-selection-item{
+      @apply text-base font-medium text-neutralPrimary;
+    }
+  }
+}
+
+.selectOverlay{
+  @apply rounded-lg p-0 min-w-[107px] border-neutralDivider bg-neutralWhiteBg border-[1px] border-solid shadow-none;
+  :global{
+    .earn-select-item {
+      @apply py-3 px-4 text-base text-neutralPrimary font-medium;
+    }
+    .earn-select-item-option-selected {
+      @apply !bg-[#fafafa];
+    }
+  }
+}

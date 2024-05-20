@@ -1,0 +1,7 @@
+.stack-modal { 
+  :global(.earn-form-vertical .earn-form-item-label) {
+    label[for="stack_amount"] {
+      @apply w-full;
+    }
+  }
+}

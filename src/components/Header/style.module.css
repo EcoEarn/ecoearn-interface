@@ -1,0 +1,147 @@
+/* stylelint-disable no-descending-specificity */
+.dropdown {
+  @apply !min-w-[260px];
+  :global(.aelfd-dropdown-menu) {
+    @apply rounded-[12px] border-[#EDEDED] border-solid border-[1px] shadow-none !p-0 overflow-hidden;
+  }
+  :global(.aelfd-dropdown-menu-item) {
+    transition: none !important;
+    @apply h-[48px];
+    span {
+      @apply text-[16px] font-medium text-[#1A1A1A];
+    }
+    * {
+      transition: none !important;
+    }
+
+    &:active {
+      span {
+        @apply text-[#5A9CFF];
+      }
+      svg path {
+        @apply fill-[#5A9CFF];
+      }
+    }
+  }
+}
+
+.menuModal {
+  @apply h-screen top-0 !m-0 !w-screen !max-w-[100vw] pb-0;
+  * {
+    @apply !shadow-none;
+  }
+  :global {
+    .aelfd-modal-content {
+      @apply w-full  h-full rounded-none !px-0 !py-[20px];
+    }
+    .aelfd-modal-title {
+      @apply !font-semibold;
+    }
+    .aelfd-modal-header {
+      @apply !mb-[16px] px-[16px];
+    }
+    .aelfd-modal-close {
+      @apply !top-[23px];
+    }
+  }
+}
+
+.menuItem {
+  @apply flex gap-[8px] items-center w-full px-[24px] lg:px-0;
+  &:active {
+    span {
+      @apply text-[#5A9CFF];
+    }
+    svg path {
+      @apply fill-[#5A9CFF];
+    }
+  }
+}
+
+.light {
+  @apply bg-neutralWhiteBg;
+
+  .button-my {
+    @apply border-brandDefault text-brandDefault;
+
+    svg {
+      @apply fill-brandDefault;
+    }
+  }
+
+  .header-menu {
+    @apply text-neutralTitle;
+  }
+
+  .mobile-menu-icon {
+    @apply fill-neutralTitle;
+  }
+
+  .menu-dropdown-title {
+    &:hover {
+      .menu-dropdown-arrow {
+        @apply fill-brandDefault;
+      }
+      .header-menu {
+        @apply text-brandDefault;
+      }
+    }
+    .menu-dropdown-arrow {
+      @apply fill-neutralTitle;
+    }
+  }
+
+  .testnet-warning {
+    @apply bg-[#FEEFF1];
+  }
+}
+
+.dark {
+  @apply bg-transparent;
+
+  .button-my {
+    @apply border-neutralWhiteBg text-neutralWhiteBg bg-transparent;
+
+    svg {
+      @apply fill-neutralWhiteBg;
+    }
+
+    &:hover {
+      @apply !bg-transparent !border-brandDefault !text-brandDefault;
+
+      svg {
+        @apply fill-brandDefault;
+      }
+    }
+  }
+
+  .header-menu {
+    @apply text-neutralWhiteBg;
+  }
+
+  .mobile-menu-icon {
+    @apply fill-neutralWhiteBg;
+  }
+
+  .menu-dropdown-title {
+    &:hover {
+      .menu-dropdown-arrow {
+        @apply fill-brandDefault;
+      }
+      .header-menu {
+        @apply text-brandDefault;
+      }
+    }
+    .menu-dropdown-arrow {
+      @apply fill-neutralWhiteBg;
+    }
+  }
+
+  .testnet-warning {
+    @apply bg-[#401015];
+  }
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
