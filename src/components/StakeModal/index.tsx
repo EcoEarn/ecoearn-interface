@@ -193,7 +193,6 @@ function StackModal({
 
   const periodStr = useMemo(() => {
     if (!typeIsStake && !period) return remainingTimeFormatStr;
-    // if (typeIsAdd && !isExtend) return remainingTimeFormatStr;
     if (!period) return '--';
     if (isExtend) {
       return remainingTime
@@ -319,6 +318,7 @@ function StackModal({
     const max = ZERO.plus(balance || '0').toFixed();
     const maxStr = formatNumberWithDecimalPlaces(max);
     form.setFieldValue('amount', maxStr);
+    form.validateFields(['amount']);
     setAmount(maxStr);
   }, [balance, form]);
 
