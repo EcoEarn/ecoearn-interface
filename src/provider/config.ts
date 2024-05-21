@@ -48,9 +48,9 @@ export const ANTDProviderTheme: ThemeConfig = {
       inputFontSize: 16,
     },
     Form: {
-      itemMarginBottom: 24,
+      itemMarginBottom: 16,
       labelRequiredMarkColor: '#FF703D',
-      labelFontSize: 16,
+      labelFontSize: 18,
       verticalLabelMargin: '0 0 8px',
     },
     Segmented: {

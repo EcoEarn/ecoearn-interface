@@ -13,9 +13,11 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
       poolType,
     });
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex flex-col gap-4">
-        <div className="pt-[48px] text-5xl font-semibold text-neutral-title">{title}</div>
+    <div className="flex flex-col gap-6 lg:gap-12">
+      <div className="flex flex-col gap-2 lg:gap-4">
+        <div className="pt-[32px] lg:pt-[48px] text-4xl font-semibold text-neutral-title">
+          {title}
+        </div>
         <div className="text-neutralSecondary text-base font-medium">{description}</div>
       </div>
       <div className="flex flex-col gap-6">

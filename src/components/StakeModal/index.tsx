@@ -70,6 +70,7 @@ function StackModal({
     yearlyRewards = 0,
     decimal = 8,
     rate,
+    fixedBoostFactor = '',
   } = stakeData;
   const [form] = Form.useForm();
   const [amount, setAmount] = useState<string>('');
@@ -77,8 +78,6 @@ function StackModal({
   const [aprK, setAprK] = useState<string>('');
   const [totalStaked, setTotalStaked] = useState<string>();
   const { getAprK } = useAPRK();
-  const cmsInfo = useGetCmsInfo();
-  console.log('cmsInfo', cmsInfo);
 
   const typeIsExtend = useMemo(() => type === StakeType.EXTEND, [type]);
   const typeIsStake = useMemo(() => type === StakeType.STAKE, [type]);
@@ -98,13 +97,13 @@ function StackModal({
   useEffect(() => {
     // add stake
     if (typeIsAdd && !isExtend) {
-      return setAprK(getAprK(originPeriod));
+      return setAprK(getAprK(originPeriod, fixedBoostFactor));
     }
     if (!period) return setAprK('');
-    const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + originPeriod);
+    const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + originPeriod, fixedBoostFactor);
     setAprK(aprK);
     console.log('APRK--', aprK);
-  }, [getAprK, isExtend, originPeriod, period, typeIsAdd]);
+  }, [fixedBoostFactor, getAprK, isExtend, originPeriod, period, typeIsAdd]);
 
   const apr = useMemo(() => {
     console.log('calculate--apr-amount', amount);
@@ -205,9 +204,9 @@ function StackModal({
   }, [isExtend, period, remainingTime, remainingTimeFormatStr, typeIsStake]);
 
   const originAPRStr = useMemo(() => {
-    const originAprK = originPeriod ? getAprK(originPeriod) : '--';
+    const originAprK = originPeriod ? getAprK(originPeriod, fixedBoostFactor) : '--';
     return !typeIsStake ? `${formatNumberWithDecimalPlaces(stakeApr ?? '')}%(${originAprK}x)` : '';
-  }, [getAprK, originPeriod, stakeApr, typeIsStake]);
+  }, [fixedBoostFactor, getAprK, originPeriod, stakeApr, typeIsStake]);
 
   const aprStr = useMemo(() => {
     if (apr) {
@@ -251,16 +250,18 @@ function StackModal({
   const stakeLabel = useMemo(() => {
     const _balance = typeIsExtend || isFreezeAmount ? stakedAmount : balance;
     return (
-      <div className="flex justify-between text-base w-full">
+      <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
         <span
           className={clsx(
-            'text-neutralTertiary',
+            'text-neutralTertiary font-normal',
             (typeIsExtend || isFreezeAmount) && 'text-neutralTitle mb-6',
           )}
         >
           {!typeIsExtend && !isFreezeAmount ? 'Balance: ' : ''}
-          {formatNumberWithDecimalPlaces(_balance || '0')}
+          <span className=" text-neutralPrimary font-semibold">
+            {formatNumberWithDecimalPlaces(_balance || '0')}
+          </span>
         </span>
       </div>
     );
@@ -273,29 +274,33 @@ function StackModal({
     form.resetFields(['period']);
   }, [form, isExtend]);
 
+  const disabledDurationInput = useMemo(() => typeIsAdd && !isExtend, [isExtend, typeIsAdd]);
+
   const durationLabel = useMemo(() => {
     return (
       <>
         {typeIsAdd && (
           <div className="flex items-center">
             <Checkbox checked={isExtend} onChange={onExtendChange} />
-            <span className="text-base ml-2">Extend Lock-up Period</span>
+            <span
+              className={clsx('text-base ml-2', disabledDurationInput && ' text-neutralDisable')}
+            >
+              Extend Lock-up Period
+            </span>
           </div>
         )}
         {typeIsStake && 'Lock-up Period'}
         {typeIsExtend && 'Extend Lock-up Period'}
       </>
     );
-  }, [isExtend, onExtendChange, typeIsAdd, typeIsExtend, typeIsStake]);
-
-  const disabledDurationInput = useMemo(() => typeIsAdd && !isExtend, [isExtend, typeIsAdd]);
+  }, [disabledDurationInput, isExtend, onExtendChange, typeIsAdd, typeIsExtend, typeIsStake]);
 
   const onStack = useCallback(async () => form.submit(), [form]);
 
   const footer = useMemo(() => {
     return (
       <Button
-        className="round-lg w-[260px]"
+        className="!rounded-lg w-[260px]"
         disabled={btnDisabled}
         type="primary"
         onClick={onStack}
@@ -466,7 +471,7 @@ function StackModal({
           </div>
         )}
         {maxDuration !== '0' && (
-          <FormItem label={durationLabel}>
+          <FormItem label={durationLabel} className="font-medium">
             <FormItem name="period" rules={[{ validator: validateDays }]} className="mb-[22px]">
               <InputNumberBase
                 placeholder="please enter the days"
@@ -479,8 +484,8 @@ function StackModal({
             <DaysSelect current={period} onSelect={onSelectDays} disabled={disabledDurationInput} />
           </FormItem>
         )}
-        <FormItem label="Fixed Staking Overview">
-          <div className="flex flex-col gap-4 py-6 px-6 bg-brandBg rounded-lg">
+        <FormItem label="Fixed Staking Overview" className="font-medium">
+          <div className="flex flex-col gap-4 py-6 px-6 bg-brandBg rounded-lg font-normal">
             <ViewItem label="Amount" text={amountStr} originText={originAmountStr} />
             <ViewItem
               label="Lock-up Period"
@@ -499,7 +504,7 @@ function StackModal({
           <Title level={7} fontWeight={FontWeightEnum.Bold} className="!text-neutralSecondary">
             Notes:
           </Title>
-          {notesList.map((note, index) => (
+          {notesList.map((note: string, index: number) => (
             <div key={index}>
               <Text className="!text-neutralSecondary">· {note}</Text>
             </div>

@@ -2,12 +2,12 @@
 .modal-wrap:global(.earn-modal-wrap) {
   @apply flex justify-center items-center;
   .modal:global(.earn-modal) {
-    @apply top-0;
+    @apply top-0 lg:rounded-2xl;
 
     max-width: calc(100vw - 32px);
     @apply overflow-hidden;
     :global(.earn-modal-content) {
-      @apply py-0 px-0 rounded-xl max-h-[80vh] h-auto flex flex-col overflow-hidden bg-neutralWhiteBg;
+      @apply py-0 px-0 rounded-2xl max-h-[80vh] h-auto flex flex-col overflow-hidden bg-neutralWhiteBg;
 
       :global(.earn-modal-body) {
         @apply pb-0 px-8 pb-8 box-border border-0 flex-1 overflow-y-auto pt-0;
@@ -23,9 +23,9 @@
         }
       }
       :global(.earn-modal-header) {
-        @apply px-8 py-8 rounded-none mb-0 border-b-0 bg-neutralWhiteBg;
+        @apply px-8 py-8 mb-0 border-b-0 bg-neutralWhiteBg;
         :global(.earn-modal-title) {
-          @apply min-h-[28px] text-2xl text-neutralPrimary font-semibold;
+          @apply min-h-[28px] text-2xl text-neutralTitle font-semibold;
         }
       }
       :global(.earn-modal-close) {
@@ -57,7 +57,7 @@
       }
 
       :global(.earn-modal-footer) {
-        @apply p-4 w-full flex border-t;
+        @apply p-4 w-full flex border-0 border-t border-solid border-t-neutralDivider mt-0;
         > button {
           @apply flex-1;
         }

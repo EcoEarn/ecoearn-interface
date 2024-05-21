@@ -2,6 +2,7 @@ import { Input, InputProps } from 'antd';
 import { ZERO } from 'constants/index';
 import { useCallback, useMemo } from 'react';
 import { isPotentialNumber } from 'utils/format';
+import clsx from 'clsx';
 
 interface IInputNumberBaseProps extends Omit<InputProps, 'type' | 'onChange'> {
   decimal?: number;
@@ -13,6 +14,7 @@ interface IInputNumberBaseProps extends Omit<InputProps, 'type' | 'onChange'> {
 export default function InputNumberBase({
   value,
   decimal,
+  disabled,
   onChange,
   suffixText,
   suffixClick,
@@ -24,11 +26,17 @@ export default function InputNumberBase({
 
   const suffix = useMemo(() => {
     return (
-      <span onClick={onClick} className="text-brandDefault font-medium cursor-pointer text-base">
+      <span
+        onClick={onClick}
+        className={clsx(
+          'font-medium cursor-pointer text-base',
+          disabled ? 'text-brandDisable' : 'text-brandDefault',
+        )}
+      >
         {suffixText}
       </span>
     );
-  }, [onClick, suffixText]);
+  }, [disabled, onClick, suffixText]);
 
   const onInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +62,13 @@ export default function InputNumberBase({
   );
 
   return (
-    <Input value={value} suffix={suffix} autoComplete="off" onChange={onInputChange} {...rest} />
+    <Input
+      value={value}
+      suffix={suffix}
+      autoComplete="off"
+      onChange={onInputChange}
+      disabled={disabled}
+      {...rest}
+    />
   );
 }

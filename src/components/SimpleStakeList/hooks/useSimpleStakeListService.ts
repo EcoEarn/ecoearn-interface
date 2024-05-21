@@ -218,8 +218,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
             return await tokenStake({
               poolId: stakeData?.poolId || '',
               amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
-              // period: periodInSeconds || 0,
-              period: 60,
+              period: periodInSeconds || 0,
             });
           }
         },
@@ -247,6 +246,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         return checkLogin();
       }
       showStakeModal(StakeType.STAKE, stakeData);
+      showStakeModal(StakeType.ADD, stakeData);
     },
     [checkLogin, isLogin, showStakeModal],
   );

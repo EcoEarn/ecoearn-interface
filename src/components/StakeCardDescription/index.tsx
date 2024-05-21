@@ -25,12 +25,6 @@ const Description = memo(
       return 'center';
     }, [isLG, valueTextAlign]);
 
-    const valueFlexStr = useMemo(
-      () => (isLG ? 'justify-end' : 'justify-' + flexType),
-      [flexType, isLG],
-    );
-    const labelFlexStr = useMemo(() => 'self-' + flexType, [flexType]);
-
     return (
       <div
         className={clsx(
@@ -38,7 +32,7 @@ const Description = memo(
           className,
         )}
       >
-        <div className={clsx('flex gap-2 items-center text-neutralDisable', labelFlexStr)}>
+        <div className={clsx('flex gap-2 items-center text-neutralDisable')}>
           <span>{label}</span>
           {tip && (
             <ToolTip title={tip}>
@@ -47,11 +41,11 @@ const Description = memo(
           )}
         </div>
         <div>
-          <div className={clsx('flex font-semibold text-xl', valueFlexStr)}>
+          <div className={clsx('flex font-semibold text-xl')}>
             <span className={clsx(icon && 'mr-2', isLG && 'text-right')}>{value}</span>
             {icon}
           </div>
-          <div className="text-base font-medium text-right">{extra}</div>
+          <div className="text-base font-medium text-right text-neutralSecondary">{extra}</div>
         </div>
       </div>
     );

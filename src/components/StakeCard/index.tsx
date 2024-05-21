@@ -73,8 +73,6 @@ export default function StackCard({
 
   const canClaim = useMemo(() => ZERO.plus(earned).gt(0), [earned]);
 
-  const claimTip = useMemo(() => (canClaim ? '' : 'can not claim'), [canClaim]);
-
   const unStackTip = useMemo(
     () => (!isUnLocked ? 'You cannot unlock during the lock-up period for staking.' : ''),
     [isUnLocked],
@@ -115,7 +113,7 @@ export default function StackCard({
         />
         <Description label="Earn" value={earnedSymbol || '--'} />
         <Description
-          className="lg:min-w-[150px]"
+          className="lg:min-w-[150px] items-start lg:items-end"
           valueTextAlign="right"
           label="Total Staked"
           value={formatNumberWithDecimalPlaces(divDecimals(totalStake, decimal))}
@@ -160,20 +158,18 @@ export default function StackCard({
                 </div>
               </div>
             </div>
-            <ToolTip title={claimTip}>
-              <Button
-                className="lg:w-[100px] !rounded-md"
-                type="primary"
-                ghost
-                size="medium"
-                disabled={!canClaim}
-                onClick={() => {
-                  onClaim?.(data);
-                }}
-              >
-                Claim
-              </Button>
-            </ToolTip>
+            <Button
+              className="lg:w-[100px] !rounded-md"
+              type="primary"
+              ghost
+              size="medium"
+              disabled={!canClaim}
+              onClick={() => {
+                onClaim?.(data);
+              }}
+            >
+              Claim
+            </Button>
           </div>
           <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] bg-neutralDivider"></div>
           <div className="flex flex-1 flex-col xl:flex-row justify-between md:max-w-[336px] gap-6 md:gap-4">

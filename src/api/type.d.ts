@@ -37,6 +37,7 @@ interface IStakePoolData {
   stakedInUsD?: string;
   decimal?: number;
   rate?: number | string;
+  fixedBoostFactor?: number | string;
 }
 
 type TStackPoolDataKey = keyof IStakePoolData;
