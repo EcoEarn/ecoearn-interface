@@ -53,7 +53,7 @@ function StackModalWithConfirm({
 
   const getNewUnlockTimeStamp = useCallback(
     (period: string) =>
-      dayjs(BigNumber(unlockTime).isZero() ? undefined : unlockTime)
+      dayjs(BigNumber(unlockTime || 0).isZero() ? undefined : unlockTime)
         .add(+period, 'days')
         .valueOf(),
     [unlockTime],
@@ -65,6 +65,7 @@ function StackModalWithConfirm({
 
   const setConfirmContent = useCallback(
     (amount: string, period: string) => {
+      console.log('stake--type', type);
       const _staked = divDecimals(staked, decimal).toFixed();
       if (type === StakeType.EXTEND) {
         setContent({
@@ -78,6 +79,7 @@ function StackModalWithConfirm({
       }
 
       if (type === StakeType.STAKE) {
+        console.log('unlockDateTimeStamp', getNewUnlockTimeStamp(period));
         setContent({
           amount,
           period,

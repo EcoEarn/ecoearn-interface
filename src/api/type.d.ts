@@ -149,6 +149,7 @@ interface IEarlyStakeInfo {
   yearlyRewards: number;
   chainId: ChainId;
   poolId: string;
+  fixedBoostFactor?: number | string;
 }
 
 interface IFetchStakeParams {

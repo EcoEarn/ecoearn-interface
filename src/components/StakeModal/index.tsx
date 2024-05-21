@@ -333,7 +333,7 @@ function StackModal({
       }
       if (typeIsAdd && ZERO.plus(_val).lt(0)) return Promise.reject(`amount must greater than 0`);
       if (typeIsStake && ZERO.plus(_val).lt(min))
-        return Promise.reject(`min ${min} ${stakeSymbol}`);
+        return Promise.reject(`Minimum staking ${min} ${stakeSymbol}`);
       setAmountValid(true);
       return Promise.resolve();
     },

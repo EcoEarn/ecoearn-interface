@@ -143,7 +143,7 @@ export default function useRewardsAggregation() {
       stakeModal.show({
         isFreezeAmount: true,
         type: hasHistoryStake ? StakeType.ADD : StakeType.STAKE,
-        freezeAmount: hasHistoryStake ? earlyStakeData?.staked : undefined,
+        freezeAmount: String(data?.pointsPoolAgg?.total),
         stakeData: {
           period: hasHistoryStake ? earlyStakeData?.period : undefined,
           poolId: earlyStakeData?.poolId,
@@ -152,6 +152,7 @@ export default function useRewardsAggregation() {
           stakeApr: hasHistoryStake ? earlyStakeData?.stakeApr : undefined,
           stakeSymbol: data?.pointsPoolAgg?.rewardsTokenName,
           yearlyRewards: earlyStakeData?.yearlyRewards,
+          fixedBoostFactor: earlyStakeData?.fixedBoostFactor,
         },
         onStake: async (amount, period = 0) => {
           const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
