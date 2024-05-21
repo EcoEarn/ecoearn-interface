@@ -41,7 +41,12 @@ const Description = memo(
           )}
         </div>
         <div>
-          <div className={clsx('flex font-semibold text-xl')}>
+          <div
+            className={clsx(
+              'flex font-semibold text-xl',
+              flexType === 'end' ? 'self-end' : 'self-start',
+            )}
+          >
             <span className={clsx(icon && 'mr-2', isLG && 'text-right')}>{value}</span>
             {icon}
           </div>

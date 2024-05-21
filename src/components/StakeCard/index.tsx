@@ -232,7 +232,7 @@ export default function StackCard({
             </div>
             <ToolTip title={stakingExpiredTip}>
               <Button
-                className="!rounded-md xl:w-[160px]"
+                className="!rounded-md xl:w-[100px]"
                 type="primary"
                 size="medium"
                 ghost

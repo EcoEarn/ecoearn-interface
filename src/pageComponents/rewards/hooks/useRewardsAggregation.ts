@@ -139,6 +139,7 @@ export default function useRewardsAggregation() {
   const pointsState = useCallback(async () => {
     try {
       const hasHistoryStake = !BigNumber(earlyStakeData?.staked || 0).isZero();
+      console.log('earlyStakeData', earlyStakeData);
       stakeModal.show({
         isFreezeAmount: true,
         type: hasHistoryStake ? StakeType.ADD : StakeType.STAKE,
@@ -175,12 +176,7 @@ export default function useRewardsAggregation() {
     data?.pointsPoolAgg?.rewardsTokenName,
     data?.pointsPoolAgg?.stakeClaimIds,
     data?.pointsPoolAgg?.total,
-    earlyStakeData?.period,
-    earlyStakeData?.poolId,
-    earlyStakeData?.stakeApr,
-    earlyStakeData?.staked,
-    earlyStakeData?.unlockTime,
-    earlyStakeData?.yearlyRewards,
+    earlyStakeData,
     fetchData,
     stakeModal,
   ]);
