@@ -246,7 +246,6 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         return checkLogin();
       }
       showStakeModal(StakeType.STAKE, stakeData);
-      showStakeModal(StakeType.ADD, stakeData);
     },
     [checkLogin, isLogin, showStakeModal],
   );
