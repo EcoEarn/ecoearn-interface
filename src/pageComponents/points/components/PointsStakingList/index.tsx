@@ -67,7 +67,7 @@ export function PointsStakeItem({
   }, [formatNumberOverMillion, isLogin, item.realEarned]);
 
   const claimDisabled = useMemo(() => {
-    return BigNumber(item.realEarned).decimalPlaces(2, BigNumber.ROUND_DOWN).lte(ZERO);
+    return BigNumber(item.realEarned).lte(ZERO);
   }, [item.realEarned]);
 
   return (
