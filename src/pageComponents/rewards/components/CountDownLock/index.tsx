@@ -1,6 +1,12 @@
 import useCountDownLock from 'hooks/useCountDownLock';
-export default function CountDownLock({ targetTimeStamp }: { targetTimeStamp: number | string }) {
-  const { isUnLocked, countDisplay } = useCountDownLock(targetTimeStamp);
+export default function CountDownLock({
+  targetTimeStamp,
+  onFinish,
+}: {
+  targetTimeStamp: number | string;
+  onFinish?: () => void;
+}) {
+  const { isUnLocked, countDisplay } = useCountDownLock({ targetTimeStamp, onFinish });
 
   return (
     <>

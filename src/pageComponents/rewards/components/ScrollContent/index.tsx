@@ -8,10 +8,11 @@ interface IContentProps {
   emptyText?: ReactNode;
   loading: boolean;
   dataList: IRewardListItem[];
+  onCountDownFinish?: () => void;
 }
 
 function ScrollContent(props: IContentProps) {
-  const { loading, dataList } = props;
+  const { loading, dataList, onCountDownFinish } = props;
   const { showLoading, closeLoading } = useLoading();
 
   useEffect(() => {
@@ -31,6 +32,7 @@ function ScrollContent(props: IContentProps) {
               <ItemCard
                 key={index}
                 item={item}
+                onCountDownFinish={onCountDownFinish}
                 className={clsx(dataList && index === dataList?.length - 1 && 'border-none')}
               />
             );

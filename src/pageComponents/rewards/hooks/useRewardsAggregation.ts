@@ -63,7 +63,7 @@ export default function useRewardsAggregation() {
   }, [data?.pointsPoolAgg]);
 
   const pointsEarlyStakeDisabled = useMemo(() => {
-    if (BigNumber(data?.pointsPoolAgg?.total || 0).isZero()) {
+    if (BigNumber(pointsPoolsAmount.stakeTotal || 0).lt(10)) {
       return true;
     }
 
@@ -72,7 +72,7 @@ export default function useRewardsAggregation() {
     } else {
       return false;
     }
-  }, [data?.pointsPoolAgg?.total, earlyStakeData?.staked, earlyStakeData?.unlockTime]);
+  }, [earlyStakeData?.staked, earlyStakeData?.unlockTime, pointsPoolsAmount.stakeTotal]);
 
   const tokenPoolsAmount = useMemo(() => {
     const { rewardsTotal, rewardsTotalInUsd, rewardsTokenName, decimal } = data?.tokenPoolAgg || {};
@@ -98,30 +98,34 @@ export default function useRewardsAggregation() {
     };
   }, [data?.lpPoolAgg]);
 
-  const fetchData = useCallback(async () => {
-    if (!isLogin) return;
-    showLoading();
-    try {
-      const data = await getPoolRewards({ address: wallet.address || '' });
-      if (data) {
-        setData(data);
-        const rewardsTokenName = data?.pointsPoolAgg?.rewardsTokenName || '';
-        const stakeTotal = data?.pointsPoolAgg?.total || 0;
-        if (rewardsTokenName && !BigNumber(stakeTotal).isZero()) {
-          const earlyStakeData = await getEarlyStakeInfo({
-            tokenName: rewardsTokenName,
-            address: wallet.address || '',
-            chainId: curChain!,
-          });
-          setEarlyStakeData(earlyStakeData || {});
+  const fetchData = useCallback(
+    async (props?: { needLoading?: boolean }) => {
+      const { needLoading = true } = props || {};
+      if (!isLogin) return;
+      needLoading && showLoading();
+      try {
+        const data = await getPoolRewards({ address: wallet.address || '' });
+        if (data) {
+          setData(data);
+          const rewardsTokenName = data?.pointsPoolAgg?.rewardsTokenName || '';
+          const stakeTotal = data?.pointsPoolAgg?.total || 0;
+          if (rewardsTokenName && !BigNumber(stakeTotal).isZero()) {
+            const earlyStakeData = await getEarlyStakeInfo({
+              tokenName: rewardsTokenName,
+              address: wallet.address || '',
+              chainId: curChain!,
+            });
+            setEarlyStakeData(earlyStakeData || {});
+          }
         }
+      } catch (error) {
+        console.error('getPoolRewards error', error);
+      } finally {
+        needLoading && closeLoading();
       }
-    } catch (error) {
-      console.error('getPoolRewards error', error);
-    } finally {
-      closeLoading();
-    }
-  }, [closeLoading, curChain, isLogin, showLoading, wallet.address]);
+    },
+    [closeLoading, curChain, isLogin, showLoading, wallet.address],
+  );
 
   useEffect(() => {
     fetchData();
@@ -326,5 +330,6 @@ export default function useRewardsAggregation() {
     confirmModalVisible,
     confirmModalType,
     pointsEarlyStakeDisabled,
+    fetchData,
   };
 }

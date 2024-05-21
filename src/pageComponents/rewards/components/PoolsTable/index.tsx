@@ -21,6 +21,7 @@ export default function PoolsTable({
   totalCount,
   onPaginationChange,
   onChange,
+  onCountDownFinish,
 }: {
   page: number;
   pageSize: number;
@@ -29,6 +30,7 @@ export default function PoolsTable({
   loading: boolean;
   onPaginationChange: (params: { page?: number; pageSize?: number }) => void;
   onChange: (pagination: any, filters: Record<string, any>, sorter: any) => void;
+  onCountDownFinish?: () => void;
 }) {
   const columns: TableColumnsType<IRewardListItem> = useMemo(() => {
     return [
@@ -46,7 +48,9 @@ export default function PoolsTable({
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
           if (item.poolType === 'Points') {
-            return <div className="text-base text-neutralPrimary">{item.tokenName}</div>;
+            return (
+              <div className="text-xl font-semibold text-neutralPrimary">{item.tokenName}</div>
+            );
           } else {
             return (
               <StakeToken
@@ -116,7 +120,7 @@ export default function PoolsTable({
           </div>
         ),
         render: (text, item) => {
-          return <CountDownLock targetTimeStamp={text} />;
+          return <CountDownLock targetTimeStamp={text} onFinish={onCountDownFinish} />;
         },
       },
     ];

@@ -83,7 +83,7 @@ export function PointsStakeItem({
           justify={isMD ? 'space-between' : 'start'}
           className="w-full md:w-fit"
         >
-          <span className="text-2xl font-semibold text-neutralTitle">{item.poolName}</span>
+          <span className="text-xl font-semibold text-neutralTitle">{item.poolName}</span>
           {showHighYieldTag && (
             <span className="rounded-[4px] border-brandDisable bg-brandFooterBg border-solid border-[1px] text-brandDefault text-xs font-medium px-[6px]">
               High Rewards

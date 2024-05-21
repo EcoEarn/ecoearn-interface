@@ -4,8 +4,10 @@ import { useEffect } from 'react';
 
 export default function RewardListPC({
   updateHasHistoryDate,
+  onCountDownFinish,
 }: {
   updateHasHistoryDate: (value: boolean) => void;
+  onCountDownFinish?: () => void;
 }) {
   const {
     page,
@@ -32,6 +34,7 @@ export default function RewardListPC({
       onPaginationChange={onPaginationChange}
       loading={loading}
       totalCount={totalCount}
+      onCountDownFinish={onCountDownFinish}
     />
   );
 }

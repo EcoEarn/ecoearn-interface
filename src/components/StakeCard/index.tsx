@@ -57,7 +57,7 @@ export default function StackCard({
     rate,
   } = data;
 
-  const { isUnLocked, countDisplay } = useCountDownLock(unlockTime || '');
+  const { isUnLocked, countDisplay } = useCountDownLock({ targetTimeStamp: unlockTime || '' });
 
   const showStackInfo = useMemo(
     () => !BigNumber(data?.staked || '').isZero() && isLogin,
