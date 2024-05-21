@@ -48,7 +48,9 @@ export default function PoolsTable({
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
           if (item.poolType === 'Points') {
-            return <div className="text-base text-neutralPrimary">{item.tokenName}</div>;
+            return (
+              <div className="text-xl font-semibold text-neutralPrimary">{item.tokenName}</div>
+            );
           } else {
             return (
               <StakeToken
