@@ -99,7 +99,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
             }}
           >
             <ExitIcon />
-            <span>Disconnect Wallet</span>
+            <span>Log Out</span>
           </Flex>
         ),
       },

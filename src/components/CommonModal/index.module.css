@@ -42,7 +42,7 @@
   .modal-mobile:global(.earn-modal) {
     :global(.earn-modal-content) {
       :global(.earn-modal-header) {
-        @apply px-[24px] py-[24px];
+        @apply px-[24px] py-0 h-[60px] flex items-center;
         :global(.earn-modal-title) {
           @apply text-xl;
         }
@@ -57,7 +57,7 @@
       }
 
       :global(.earn-modal-footer) {
-        @apply p-4 w-full flex border-0 border-t border-solid border-t-neutralDivider mt-0;
+        @apply px-4 w-full flex mt-0;
         > button {
           @apply flex-1;
         }
@@ -75,6 +75,18 @@
       :global(.earn-modal-header) {
         @apply border-0 border-b border-solid border-neutralBorder;
       }
+
+      :global(.earn-modal-footer) {
+        @apply p-4;
+      }
+    }
+  }
+}
+
+.modal-no-title{
+  :global{
+    .earn-modal-title{
+      @apply hidden;
     }
   }
 }

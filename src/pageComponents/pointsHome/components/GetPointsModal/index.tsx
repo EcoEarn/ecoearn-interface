@@ -2,6 +2,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { Button } from 'aelf-design';
 import CommonModal from 'components/CommonModal';
 import useResponsive from 'utils/useResponsive';
+import styles from './style.module.css';
 
 export interface IPointsModalProps {
   icon: string;
@@ -24,11 +25,11 @@ function GetPointsModal({
   const { isLG } = useResponsive();
   return (
     <CommonModal
-      title="How do I earn points?"
+      className={styles.pointsModal}
       open={modal.visible}
       onCancel={modal.hide}
       footer={
-        <div className="pt-6 w-full">
+        <div className="lg:pt-6 w-full">
           <Button
             type="primary"
             block={isLG}

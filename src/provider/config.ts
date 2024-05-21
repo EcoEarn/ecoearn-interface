@@ -17,7 +17,7 @@ export const AELFDProviderTheme: ThemeConfig = {
       headerSplitColor: 'var(--brand-bg)',
       headerBg: 'var(--brand-bg)',
       colorBgContainer: 'var(--brand-bg)',
-      rowHoverBg: 'var(--neutral-white-bg)',
+      rowHoverBg: 'var(--brand-footer-bg)',
     },
     Layout: {
       bodyBg: 'var(--neutral-white-bg)',
@@ -28,9 +28,9 @@ export const AELFDProviderTheme: ThemeConfig = {
       borderRadius: 4,
     },
     Button: {
-      borderColorDisabled: 'var(--neutral-hover-bg)',
-      colorTextDisabled: 'var(--neutral-disable)',
-      colorBgContainerDisabled: 'var(--neutral-hover-bg)',
+      // borderColorDisabled: 'var(--brand-disable)',
+      // colorTextDisabled: '#fff',
+      // colorBgContainerDisabled: 'var(--brand-disable)',
       borderRadius: 12,
     },
   },

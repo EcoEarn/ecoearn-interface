@@ -48,7 +48,7 @@ export default function PoolsAmount() {
     <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-4 md:gap-[24px]">
       {/* Points */}
       <div className="col-span-1 md:col-span-2 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg">
-        <div className="text-2xl text-neutralPrimary font-semibold">XPSGR Points Pools</div>
+        <div className="text-2xl text-neutralTitle font-semibold">XPSGR Points Pools</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           <div className="p-4 bg-brandBg rounded-xl">
             <div className="flex gap-1 items-center">
@@ -95,7 +95,6 @@ export default function PoolsAmount() {
             </div>
             <Button
               size="medium"
-              ghost
               block={isMD}
               type="primary"
               className="mt-6 !min-w-[120px] !rounded-md !mx-auto"
@@ -109,7 +108,7 @@ export default function PoolsAmount() {
       </div>
       {/* SGR */}
       <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg">
-        <div className="text-2xl text-neutralPrimary font-semibold">SGR Pool</div>
+        <div className="text-2xl text-neutralTitle font-semibold">SGR Pool</div>
         <div className="p-4 bg-brandBg rounded-xl mt-4">
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium text-neutralTertiary">
@@ -130,7 +129,6 @@ export default function PoolsAmount() {
           <Button
             size="medium"
             block={isMD}
-            ghost
             type="primary"
             className="mt-6 !min-w-[120px] !mx-auto !rounded-md"
             disabled={tokenWithdrawDisabled}
@@ -142,7 +140,7 @@ export default function PoolsAmount() {
       </div>
       {/* Lp */}
       <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg">
-        <div className="text-2xl text-neutralPrimary font-semibold">LP Pool</div>
+        <div className="text-2xl text-neutralTitle font-semibold">LP Pool</div>
         <div className="p-4 bg-brandBg rounded-xl mt-4">
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium text-neutralTertiary">
@@ -165,7 +163,6 @@ export default function PoolsAmount() {
           <Button
             size="medium"
             block={isMD}
-            ghost
             type="primary"
             className="mt-6 !min-w-[120px] !mx-auto !rounded-md"
             disabled={lpWithdrawDisabled}

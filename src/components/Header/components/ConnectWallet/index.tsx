@@ -24,7 +24,7 @@ export default function ConnectWallet() {
       type="primary"
       className="!rounded-sm lg:!rounded-lg"
     >
-      Connect Wallet
+      Log in
     </Button>
   );
 }

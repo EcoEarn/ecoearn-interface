@@ -83,7 +83,7 @@ export default function DappList({
                   src={item.icon}
                 />
               )}
-              <span className="text-sm font-medium md:text-base text-neutralPrimary cursor-pointer">
+              <span className="text-sm font-medium md:text-base text-neutralTitle cursor-pointer">
                 {text}
               </span>
             </div>
@@ -104,7 +104,7 @@ export default function DappList({
         dataIndex: 'tvl',
         render: (text: string) => {
           return (
-            <span className="font-medium text-base text-neutralPrimary">
+            <span className="font-medium text-base text-neutralTitle">
               {formatNumber(text, { formatMin: 1000000 })}
             </span>
           );
@@ -117,7 +117,7 @@ export default function DappList({
         dataIndex: 'stakingAddress',
         render: (text: string) => {
           return (
-            <span className="font-medium text-base text-neutralPrimary">
+            <span className="font-medium text-base text-neutralTitle">
               {formatNumber(text, { formatMin: 1000000 })}
             </span>
           );
