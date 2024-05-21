@@ -4,10 +4,10 @@ import BigNumber from 'bignumber.js';
 import ConfirmModal from 'components/ConfirmModal';
 import { ZERO } from 'constants/index';
 import useRewardsAggregation from 'pageComponents/rewards/hooks/useRewardsAggregation';
-import { useMemo } from 'react';
+import { forwardRef, useImperativeHandle, useMemo } from 'react';
 import useResponsive from 'utils/useResponsive';
 
-export default function PoolsAmount() {
+export default forwardRef(function PoolsAmount(props, ref) {
   const {
     pointsState,
     pointsWithdraw,
@@ -25,7 +25,14 @@ export default function PoolsAmount() {
     confirmModalOnClose,
     confirmModalOnConfirm,
     pointsEarlyStakeDisabled,
+    fetchData,
   } = useRewardsAggregation();
+
+  useImperativeHandle(ref, () => ({
+    refresh: () => {
+      fetchData({ needLoading: false });
+    },
+  }));
 
   const { isSM, isMD } = useResponsive();
 
@@ -208,4 +215,4 @@ export default function PoolsAmount() {
       />
     </div>
   );
-}
+});

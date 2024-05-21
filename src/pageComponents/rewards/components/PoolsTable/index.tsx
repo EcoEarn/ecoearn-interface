@@ -21,6 +21,7 @@ export default function PoolsTable({
   totalCount,
   onPaginationChange,
   onChange,
+  onCountDownFinish,
 }: {
   page: number;
   pageSize: number;
@@ -29,6 +30,7 @@ export default function PoolsTable({
   loading: boolean;
   onPaginationChange: (params: { page?: number; pageSize?: number }) => void;
   onChange: (pagination: any, filters: Record<string, any>, sorter: any) => void;
+  onCountDownFinish?: () => void;
 }) {
   const columns: TableColumnsType<IRewardListItem> = useMemo(() => {
     return [
@@ -116,7 +118,7 @@ export default function PoolsTable({
           </div>
         ),
         render: (text, item) => {
-          return <CountDownLock targetTimeStamp={text} />;
+          return <CountDownLock targetTimeStamp={text} onFinish={onCountDownFinish} />;
         },
       },
     ];

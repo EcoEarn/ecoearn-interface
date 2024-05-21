@@ -1,17 +1,19 @@
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import PoolsAmount from './components/PoolsAmount';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Empty from '../../components/Empty';
 import useResponsive from 'utils/useResponsive';
 import RewardsListMobile from './components/RewardsListMobile';
 import RewardListPC from './components/RewardListPC';
 import clsx from 'clsx';
+import React from 'react';
 
 export default function Rewards() {
   const { isLogin } = useGetLoginStatus();
   const router = useRouter();
   const [hasHistoryData, setHasHistoryData] = useState(false);
+  const rewardDataRef = useRef<{ refresh: () => void }>();
 
   const updateHasHistoryDate = useCallback((value: boolean) => {
     setHasHistoryData(value);
@@ -33,6 +35,10 @@ export default function Rewards() {
     />
   );
 
+  const onCountFinish = useCallback(() => {
+    rewardDataRef.current?.refresh();
+  }, []);
+
   return (
     <>
       <h2 className="text-4xl lg:text-5xl font-semibold text-neutralTitle pt-8 lg:pt-10">
@@ -51,13 +57,19 @@ export default function Rewards() {
       {isLogin && (
         <div className={clsx(!hasHistoryData && 'invisible h-0')}>
           <div className="mt-6 sm:mt-8 lg:mt-12">
-            <PoolsAmount />
+            <PoolsAmount ref={rewardDataRef} />
           </div>
           <div className="mt-4 sm:mt-6">
             {isMD ? (
-              <RewardsListMobile updateHasHistoryDate={updateHasHistoryDate} />
+              <RewardsListMobile
+                updateHasHistoryDate={updateHasHistoryDate}
+                onCountDownFinish={onCountFinish}
+              />
             ) : (
-              <RewardListPC updateHasHistoryDate={updateHasHistoryDate} />
+              <RewardListPC
+                updateHasHistoryDate={updateHasHistoryDate}
+                onCountDownFinish={onCountFinish}
+              />
             )}
           </div>
         </div>

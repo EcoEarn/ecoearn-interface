@@ -6,8 +6,10 @@ import styles from './index.module.css';
 
 export default function RewardsListMobile({
   updateHasHistoryDate,
+  onCountDownFinish,
 }: {
   updateHasHistoryDate: (value: boolean) => void;
+  onCountDownFinish?: () => void;
 }) {
   const { currentSelect, handleChange, selectOptions, dataSource, hasHistoryData, loading } =
     useRewardsListMobileService();
@@ -26,7 +28,11 @@ export default function RewardsListMobile({
         options={selectOptions}
       />
       <div className="mt-4">
-        <ScrollContent dataList={dataSource || []} loading={loading} />
+        <ScrollContent
+          dataList={dataSource || []}
+          loading={loading}
+          onCountDownFinish={onCountDownFinish}
+        />
       </div>
     </div>
   );

@@ -13,8 +13,10 @@ import clsx from 'clsx';
 export default function ItemCard({
   item,
   className,
+  onCountDownFinish,
 }: {
   item: IRewardListItem;
+  onCountDownFinish?: () => void;
   className?: string;
 }) {
   const renderSymbol = useMemo(() => {
@@ -78,7 +80,12 @@ export default function ItemCard({
           </ToolTip>
         </Flex>
         <span className="text-neutralPrimary text-base font-semibold">
-          <CountDownLock targetTimeStamp={item.lockUpPeriod} />
+          <CountDownLock
+            targetTimeStamp={item.lockUpPeriod}
+            onFinish={() => {
+              onCountDownFinish?.();
+            }}
+          />
         </span>
       </Flex>
     </Flex>

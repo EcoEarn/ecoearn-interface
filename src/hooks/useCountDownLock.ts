@@ -1,14 +1,21 @@
 import { useCountDown } from 'ahooks';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-export default function useCountDownLock(targetTimeStamp: string | number) {
-  const [countdown, { days, hours, minutes, seconds, milliseconds }] = useCountDown({
+export default function useCountDownLock({
+  targetTimeStamp,
+  onFinish,
+}: {
+  targetTimeStamp: number | string;
+  onFinish?: () => void;
+}) {
+  const [isUnLocked, setIsUnLocked] = useState(false);
+  const [countdown, { days, hours, minutes }] = useCountDown({
     targetDate: Number(targetTimeStamp),
+    onEnd: () => {
+      setIsUnLocked(true);
+      onFinish?.();
+    },
   });
-
-  const isUnLocked = useMemo(() => {
-    return days === 0 && hours === 0 && minutes === 0 && seconds === 0 && milliseconds === 0;
-  }, [days, hours, milliseconds, minutes, seconds]);
 
   const countDisplay = useMemo(() => {
     if (days < 1) {
