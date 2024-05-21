@@ -80,10 +80,8 @@ function ConfirmModal(props: IConfirmModalProps) {
   const { explorerUrl } = useGetCmsInfo() || {};
 
   const renderTitle = useMemo(() => {
-    if (status === 'success') {
-      return 'Transaction Sent';
-    } else if (status === 'error') {
-      return 'Failure to confirm a transaction';
+    if (status !== 'normal') {
+      return undefined;
     }
     if (type === ConfirmModalTypeEnum.Claim) {
       return 'Claim';
@@ -108,15 +106,15 @@ function ConfirmModal(props: IConfirmModalProps) {
 
   const renderResult = useMemo(() => {
     return (
-      <Flex vertical gap={8} className="text-center" align="center">
+      <Flex vertical gap={16} className="text-center" align="center">
         {status === 'success' ? <SuccessIcon /> : <ErrorIcon />}
-        <div className="text-xl font-medium text-neutralPrimary mt-6">
+        <div className="text-xl lg:text-2xl font-semibold text-neutralTitle mt-4">
           {status === 'success'
             ? 'Transaction sent, waiting for on-chain confirmation'
             : 'Transaction confirmation failed'}
         </div>
         {status === 'success' && (
-          <div className="text-sm font-normal text-neutralSecondary mt-6">
+          <div className="text-base font-normal lg:text-lg lg:font-medium text-neutralSecondary">
             On-chain transaction is being packaged. There may be delays in data updates
           </div>
         )}
@@ -365,12 +363,13 @@ function ConfirmModal(props: IConfirmModalProps) {
 
   return (
     <CommonModal
+      closable={status === 'normal'}
       destroyOnClose
       open={visible}
       onCancel={handleClose}
-      width={580}
       title={renderTitle}
       footer={renderFooter}
+      disableMobileLayout={status !== 'normal'}
     >
       {renderContent}
     </CommonModal>

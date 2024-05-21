@@ -48,22 +48,20 @@ export default function Intro({ dappName }: { dappName: string }) {
               Gain points
             </span>
             <RightOutlined
-              className={clsx(
-                'w-[14px] h-[14px] md:w-4 text-sm md:text-base leading-[100%] md:h-4 text-brandDefault ml-2',
-              )}
-              width={isMD ? 14 : 20}
-              height={isMD ? 14 : 20}
+              className={clsx('w-[14px] h-[14px] text-sm leading-[14px] text-brandDefault ml-2')}
+              width={14}
+              height={14}
             />
           </Button>
         )}
       </div>
     ) : null;
-  }, [dappInfo?.desc, dappInfo?.link, isMD]);
+  }, [dappInfo?.desc, dappInfo?.link]);
 
   return (
     <>
       <div className="flex md:flex-row flex-col gap-x-4">
-        <span className="text-4xl md:text-5xl font-semibold text-neutralPrimary">
+        <span className="text-4xl md:text-5xl font-semibold text-neutralTitle">
           {dappInfo?.name}
         </span>
         <div className="flex gap-2 items-center">

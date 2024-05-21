@@ -17,7 +17,7 @@ export const CompassText = (props: { title?: string; schema?: string }) => {
     <span
       className={clsx(
         styles['header-menu'],
-        `!rounded-[12px] text-lg ${
+        `!rounded-[12px] text-base ${
           isCurrent ? '!text-brandDefault' : ''
         } hover:text-brandHover cursor-pointer font-medium`,
       )}

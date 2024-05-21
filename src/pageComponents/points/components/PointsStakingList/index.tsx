@@ -82,9 +82,9 @@ export function PointsStakeItem({
           justify={isMD ? 'space-between' : 'start'}
           className="w-full md:w-fit"
         >
-          <span className="text-2xl font-semibold text-neutralPrimary">{item.poolName}</span>
+          <span className="text-2xl font-semibold text-neutralTitle">{item.poolName}</span>
           {showHighYieldTag && (
-            <span className="rounded-[4px] border-brandDisable bg-white md:bg-brandFooterBg border-solid border-[1px] text-brandDefault text-[10px] leading-[18px] font-semibold md:text-xs md:font-medium py-[2px] px-2 md:px-[6px]">
+            <span className="rounded-[4px] border-brandDisable bg-brandFooterBg border-solid border-[1px] text-brandDefault text-xs font-medium px-[6px]">
               High Rewards
             </span>
           )}
@@ -101,7 +101,11 @@ export function PointsStakeItem({
           <span className="flex items-center text-sm font-medium text-brandDefault">
             {dailyRewards} {item.rewardsTokenName}
             <ToolTip title="It indicates daily rewards obtained by staking 10,000 points.">
-              <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
+              <QuestionIconComp
+                className="w-4 h-4 ml-1 cursor-pointer fill-brandDefault"
+                width={16}
+                height={16}
+              />
             </ToolTip>
           </span>
         </Flex>
@@ -148,7 +152,7 @@ export function PointsStakeItem({
               </ToolTip>
             </Flex>
             <Flex gap={8} align="center">
-              <span className="font-semibold text-lg text-neutralPrimary">{staked}</span>
+              <span className="font-semibold text-lg text-neutralTitle">{staked}</span>
               <span className="text-base font-normal text-neutralPrimary">{item.symbolName}</span>
             </Flex>
           </Flex>
@@ -161,7 +165,7 @@ export function PointsStakeItem({
           <Flex vertical gap={8}>
             <span className="text-base font-medium text-neutralPrimary">Earned</span>
             <Flex gap={8} align="center">
-              <span className="font-semibold text-lg text-neutralPrimary">{earned}</span>
+              <span className="font-semibold text-lg text-neutralTitle">{earned}</span>
               <span className="text-base font-normal text-neutralPrimary">
                 {item.rewardsTokenName}
               </span>
@@ -177,7 +181,6 @@ export function PointsStakeItem({
               type="primary"
               className="!rounded-md"
               onClick={handleClaim}
-              ghost
               disabled={claimDisabled || !isLogin}
             >
               Claim
@@ -268,6 +271,7 @@ export default function PointsStakingList() {
       <Segmented
         className={clsx('mt-6 lg:mt-12', styles.segmented)}
         size="large"
+        block={isLG}
         value={currentList}
         defaultValue={ListTypeEnum.All}
         onChange={handleSegmentChange}

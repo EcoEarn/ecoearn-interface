@@ -15,7 +15,7 @@ function CommonModal(props: ModalProps) {
     title,
     subTitle,
     wrapClassName,
-    width = 800,
+    width = 630,
     disableMobileLayout = false,
   } = props;
 
@@ -32,7 +32,7 @@ function CommonModal(props: ModalProps) {
       {...props}
       className={`${styles.modal} ${isLG && styles['modal-mobile']} ${
         isLG && !disableMobileLayout && styles['modal-full-screen']
-      } ${className || ''}`}
+      } ${className || ''} ${!title && styles['modal-no-title']}`}
       wrapClassName={`${styles['modal-wrap']} ${wrapClassName}`}
       title={
         <div>

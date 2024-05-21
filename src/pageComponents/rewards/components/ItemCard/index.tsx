@@ -54,7 +54,7 @@ export default function ItemCard({
             divDecimals(item.rewards, item.rewardsTokenDecimal || 8),
             { decimalPlaces: 2 },
           )} ${item.rewardsToken}`}</span>
-          <span className="text-neutralPrimary mt-1 font-medium">
+          <span className="text-neutralSecondary mt-1 font-medium">
             {formatUSDPrice(item.rewardsInUsd, { decimalPlaces: 2 })}
           </span>
         </Flex>

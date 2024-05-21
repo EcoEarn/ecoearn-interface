@@ -38,7 +38,7 @@ export default function Empty({
           onClick();
         }}
       >
-        {isLogin ? emptyBtnText : 'Connect Wallet'}
+        {isLogin ? emptyBtnText : 'Log in'}
       </Button>
     </div>
   );

@@ -77,7 +77,7 @@ export default function PoolsTable({
                 divDecimals(text, item.rewardsTokenDecimal || 8),
                 { decimalPlaces: 2 },
               )} ${item.rewardsToken}`}</span>
-              <span className="text-sm text-neutralPrimary mt-2 font-medium">
+              <span className="text-sm text-neutralSecondary mt-2 font-medium">
                 {formatUSDPrice(item.rewardsInUsd, { decimalPlaces: 2 })}
               </span>
             </Flex>
@@ -106,6 +106,7 @@ export default function PoolsTable({
       {
         key: 'Look-up Period',
         dataIndex: 'lockUpPeriod',
+        align: 'right',
         title: (
           <div className="flex items-center">
             <span>Lock-up period</span>
