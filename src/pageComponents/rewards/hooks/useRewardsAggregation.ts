@@ -63,7 +63,7 @@ export default function useRewardsAggregation() {
   }, [data?.pointsPoolAgg]);
 
   const pointsEarlyStakeDisabled = useMemo(() => {
-    if (BigNumber(data?.pointsPoolAgg?.total || 0).isZero()) {
+    if (BigNumber(pointsPoolsAmount.stakeTotal || 0).lt(10)) {
       return true;
     }
 
@@ -72,7 +72,7 @@ export default function useRewardsAggregation() {
     } else {
       return false;
     }
-  }, [data?.pointsPoolAgg?.total, earlyStakeData?.staked, earlyStakeData?.unlockTime]);
+  }, [earlyStakeData?.staked, earlyStakeData?.unlockTime, pointsPoolsAmount.stakeTotal]);
 
   const tokenPoolsAmount = useMemo(() => {
     const { rewardsTotal, rewardsTotalInUsd, rewardsTokenName, decimal } = data?.tokenPoolAgg || {};

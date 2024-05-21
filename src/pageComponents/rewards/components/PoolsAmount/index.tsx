@@ -2,6 +2,7 @@ import { Button, ToolTip } from 'aelf-design';
 import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import BigNumber from 'bignumber.js';
 import ConfirmModal from 'components/ConfirmModal';
+import { ZERO } from 'constants/index';
 import useRewardsAggregation from 'pageComponents/rewards/hooks/useRewardsAggregation';
 import { useMemo } from 'react';
 import useResponsive from 'utils/useResponsive';
@@ -33,7 +34,7 @@ export default function PoolsAmount() {
   }, [pointsPoolsAmount.rewardsTotal]);
 
   const pointsStakeDisabled = useMemo(() => {
-    return BigNumber(pointsPoolsAmount.stakeTotal).isZero();
+    return BigNumber(pointsPoolsAmount.stakeTotal || 0).lt(10);
   }, [pointsPoolsAmount.stakeTotal]);
 
   const tokenWithdrawDisabled = useMemo(() => {
@@ -43,6 +44,21 @@ export default function PoolsAmount() {
   const lpWithdrawDisabled = useMemo(() => {
     return BigNumber(LpPoolsAmount.rewardsTotal).isZero();
   }, [LpPoolsAmount.rewardsTotal]);
+
+  const stakeDisabledTip = useMemo(() => {
+    return pointsStakeDisabled
+      ? BigNumber(pointsPoolsAmount.stakeTotal || 0).gt(ZERO)
+        ? `Minimum staking 10 ${pointsPoolsAmount.rewardsTokenName}`
+        : undefined
+      : pointsEarlyStakeDisabled
+      ? 'Stake has expired, please unlock'
+      : undefined;
+  }, [
+    pointsEarlyStakeDisabled,
+    pointsPoolsAmount.rewardsTokenName,
+    pointsPoolsAmount.stakeTotal,
+    pointsStakeDisabled,
+  ]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-4 md:gap-[24px]">
@@ -65,16 +81,8 @@ export default function PoolsAmount() {
             <div className="mt-1 text-xs text-neutralPrimary font-normal break-all">
               {pointsPoolsAmount.stakeTotalUSD}
             </div>
-            <ToolTip
-              title={
-                pointsStakeDisabled
-                  ? undefined
-                  : pointsEarlyStakeDisabled
-                  ? 'Stake has expired, please unlock'
-                  : undefined
-              }
-            >
-              <div className="pt-6 mt-auto">
+            <div className="pt-6 mt-auto">
+              <ToolTip title={stakeDisabledTip}>
                 <Button
                   onClick={pointsState}
                   block={isMD}
@@ -85,8 +93,8 @@ export default function PoolsAmount() {
                 >
                   Stake
                 </Button>
-              </div>
-            </ToolTip>
+              </ToolTip>
+            </div>
           </div>
           <div className="p-4 bg-brandBg rounded-xl">
             <div className="flex gap-1 items-center">
