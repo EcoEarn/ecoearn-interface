@@ -66,6 +66,7 @@ interface IPointsPoolItem {
   poolDailyRewards: number;
   totalStake: number;
   earned: number;
+  realEarned: number | string;
   symbolName: string;
   staked: number;
   decimal: number;

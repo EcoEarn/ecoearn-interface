@@ -65,17 +65,27 @@ export default function PoolsAmount() {
             <div className="mt-1 text-xs text-neutralPrimary font-normal break-all">
               {pointsPoolsAmount.stakeTotalUSD}
             </div>
-            <ToolTip title={pointsStakeDisabled ? undefined : 'Stake has expired, please unlock'}>
-              <Button
-                onClick={pointsState}
-                block={isMD}
-                size="medium"
-                type="primary"
-                className="mt-6 !min-w-[120px] !rounded-md !mx-auto"
-                disabled={pointsEarlyStakeDisabled}
-              >
-                Stake
-              </Button>
+            <ToolTip
+              title={
+                pointsStakeDisabled
+                  ? undefined
+                  : pointsEarlyStakeDisabled
+                  ? 'Stake has expired, please unlock'
+                  : undefined
+              }
+            >
+              <div className="pt-6 mt-auto">
+                <Button
+                  onClick={pointsState}
+                  block={isMD}
+                  size="medium"
+                  type="primary"
+                  className="!min-w-[120px] !rounded-md !mx-auto"
+                  disabled={pointsEarlyStakeDisabled}
+                >
+                  Stake
+                </Button>
+              </div>
             </ToolTip>
           </div>
           <div className="p-4 bg-brandBg rounded-xl">
@@ -93,23 +103,25 @@ export default function PoolsAmount() {
             <div className="mt-1 text-xs text-neutralPrimary font-normal break-all">
               {pointsPoolsAmount.rewardsTotalUSD}
             </div>
-            <Button
-              size="medium"
-              block={isMD}
-              type="primary"
-              className="mt-6 !min-w-[120px] !rounded-md !mx-auto"
-              disabled={pointsWithdrawDisabled}
-              onClick={pointsWithdraw}
-            >
-              Withdraw
-            </Button>
+            <div className="mt-auto  pt-6">
+              <Button
+                size="medium"
+                block={isMD}
+                type="primary"
+                className="!min-w-[120px] !rounded-md !mx-auto"
+                disabled={pointsWithdrawDisabled}
+                onClick={pointsWithdraw}
+              >
+                Withdraw
+              </Button>
+            </div>
           </div>
         </div>
       </div>
       {/* SGR */}
-      <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg">
+      <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg flex flex-col">
         <div className="text-2xl text-neutralTitle font-semibold">SGR Pool</div>
-        <div className="p-4 bg-brandBg rounded-xl mt-4">
+        <div className="p-4 bg-brandBg rounded-xl mt-4 flex-1 flex flex-col">
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium text-neutralTertiary">
               Withdrawable {tokenPoolsAmount.rewardsTokenName} Rewards
@@ -126,22 +138,24 @@ export default function PoolsAmount() {
           <div className="mt-1 text-xs text-neutralPrimary font-normal break-all">
             {tokenPoolsAmount.rewardsTotalUSD}
           </div>
-          <Button
-            size="medium"
-            block={isMD}
-            type="primary"
-            className="mt-6 !min-w-[120px] !mx-auto !rounded-md"
-            disabled={tokenWithdrawDisabled}
-            onClick={tokenWithdraw}
-          >
-            Withdraw
-          </Button>
+          <div className="pt-6 mt-auto">
+            <Button
+              size="medium"
+              block={isMD}
+              type="primary"
+              className="!min-w-[120px] !mx-auto !rounded-md"
+              disabled={tokenWithdrawDisabled}
+              onClick={tokenWithdraw}
+            >
+              Withdraw
+            </Button>
+          </div>
         </div>
       </div>
       {/* Lp */}
-      <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg">
+      <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg flex flex-col">
         <div className="text-2xl text-neutralTitle font-semibold">LP Pool</div>
-        <div className="p-4 bg-brandBg rounded-xl mt-4">
+        <div className="p-4 bg-brandBg rounded-xl mt-4 flex-1 flex flex-col">
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium text-neutralTertiary">
               Withdrawable {LpPoolsAmount.rewardsTokenName} Rewards
@@ -160,16 +174,18 @@ export default function PoolsAmount() {
           <div className="mt-1 text-xs text-neutralPrimary font-normal break-all">
             {LpPoolsAmount.rewardsTotalUSD}
           </div>
-          <Button
-            size="medium"
-            block={isMD}
-            type="primary"
-            className="mt-6 !min-w-[120px] !mx-auto !rounded-md"
-            disabled={lpWithdrawDisabled}
-            onClick={LPWithdraw}
-          >
-            Withdraw
-          </Button>
+          <div className="pt-6 mt-auto">
+            <Button
+              size="medium"
+              block={isMD}
+              type="primary"
+              className="!min-w-[120px] !mx-auto !rounded-md items-end"
+              disabled={lpWithdrawDisabled}
+              onClick={LPWithdraw}
+            >
+              Withdraw
+            </Button>
+          </div>
         </div>
       </div>
       <ConfirmModal
