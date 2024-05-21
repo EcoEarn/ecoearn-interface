@@ -108,7 +108,7 @@ export default function PoolsTable({
         dataIndex: 'lockUpPeriod',
         align: 'right',
         title: (
-          <div className="flex items-center">
+          <div className="flex items-center justify-end">
             <span>Lock-up period</span>
             <ToolTip title="It indicates the lock-up period before rewards can be claimed.">
               <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />

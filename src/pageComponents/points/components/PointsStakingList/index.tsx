@@ -16,6 +16,7 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
 import Empty from 'components/Empty';
+import { ZERO } from 'constants/index';
 
 const formatMin = 1000000;
 
@@ -62,12 +63,12 @@ export function PointsStakeItem({
   }, [formatNumberOverMillion, isLogin, item.decimal, item.staked]);
 
   const earned = useMemo(() => {
-    return isLogin && item.earned ? formatNumberOverMillion(item.earned) : '--';
-  }, [formatNumberOverMillion, isLogin, item.earned]);
+    return isLogin && item.realEarned ? formatNumberOverMillion(item.realEarned) : '--';
+  }, [formatNumberOverMillion, isLogin, item.realEarned]);
 
   const claimDisabled = useMemo(() => {
-    return BigNumber(item.earned).isZero();
-  }, [item.earned]);
+    return BigNumber(item.realEarned).lte(ZERO);
+  }, [item.realEarned]);
 
   return (
     <div className="rounded-lg md:rounded-[24px] px-4 py-6 md:p-6 border-[1px] border-solid border-neutralBorder bg-white relative">
@@ -256,7 +257,7 @@ export default function PointsStakingList() {
     <>
       <ConfirmModal
         type={ConfirmModalTypeEnum.Claim}
-        content={{ amount: curItem?.earned || 0, tokenSymbol: curItem?.rewardsTokenName }}
+        content={{ amount: curItem?.realEarned || 0, tokenSymbol: curItem?.rewardsTokenName }}
         status={status}
         loading={loading}
         visible={modalVisible}

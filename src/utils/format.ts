@@ -37,14 +37,19 @@ export function formatTokenPrice(
   toFixedProps?: {
     decimalPlaces?: number;
     roundingMode?: BigNumber.RoundingMode;
+    minValue?: number;
   },
 ) {
-  const { decimalPlaces = 4, roundingMode = BigNumber.ROUND_DOWN } = toFixedProps || {};
+  const {
+    decimalPlaces = 2,
+    roundingMode = BigNumber.ROUND_DOWN,
+    minValue = 0.01,
+  } = toFixedProps || {};
   const priceBig: BigNumber = BigNumber.isBigNumber(price) ? price : new BigNumber(price);
   if (priceBig.isNaN()) return `${price}`;
 
-  if (!priceBig.isEqualTo(0) && priceBig.lt(0.0001)) {
-    return '< 0.0001';
+  if (!priceBig.isEqualTo(0) && priceBig.lt(minValue)) {
+    return `< ${minValue}`;
   }
 
   const priceFixed = priceBig.toFixed(decimalPlaces, roundingMode);
@@ -57,9 +62,14 @@ export function formatUSDPrice(
   toFixedProps?: {
     decimalPlaces?: number;
     roundingMode?: BigNumber.RoundingMode;
+    minValue?: number;
   },
 ) {
-  const { decimalPlaces = 4, roundingMode = BigNumber.ROUND_DOWN } = toFixedProps || {};
+  const {
+    decimalPlaces = 2,
+    roundingMode = BigNumber.ROUND_DOWN,
+    minValue = 0.01,
+  } = toFixedProps || {};
   const priceBig: BigNumber = BigNumber.isBigNumber(price) ? price : new BigNumber(price);
   if (priceBig.isNaN()) return `${price}`;
   const priceFixed = priceBig.toFixed(decimalPlaces, roundingMode);
@@ -69,8 +79,8 @@ export function formatUSDPrice(
     return '$ 0';
   }
 
-  if (priceFixedBig.comparedTo(0.0001) === -1) {
-    return '<$ 0.0001';
+  if (priceFixedBig.comparedTo(minValue) === -1) {
+    return `<$ ${minValue}`;
   }
 
   return `$ ${priceFixedBig.toFormat()}`;
@@ -102,30 +112,45 @@ export function formatNumber(
   const abs = numberBig.abs();
   if (abs.gt(TUnit) && abs.gte(formatMin)) {
     return (
-      BigNumber(numberBig.div(TUnit).toFixed(decimalPlaces, roundingMode)).toFormat() +
+      formatTokenPrice(BigNumber(numberBig.div(TUnit).toFixed(decimalPlaces, roundingMode)), {
+        decimalPlaces,
+        minValue: 0.01,
+      }) +
       // .replace(regexp, '$1'),
       'T'
     );
   } else if (abs.gte(BUnit) && abs.gte(formatMin)) {
     return (
-      BigNumber(numberBig.div(BUnit).toFixed(decimalPlaces, roundingMode)).toFormat() +
+      formatTokenPrice(BigNumber(numberBig.div(BUnit).toFixed(decimalPlaces, roundingMode)), {
+        decimalPlaces,
+        minValue: 0.01,
+      }) +
       // .replace(regexp, '$1')
       'B'
     );
   } else if (abs.gte(MUnit) && abs.gte(formatMin)) {
     return (
-      BigNumber(numberBig.div(MUnit).toFixed(decimalPlaces, roundingMode)).toFormat() +
+      formatTokenPrice(BigNumber(numberBig.div(MUnit).toFixed(decimalPlaces, roundingMode)), {
+        decimalPlaces,
+        minValue: 0.01,
+      }) +
       // .replace(regexp, '$1')
       'M'
     );
   } else if (abs.gte(KUnit) && abs.gte(formatMin)) {
     return (
-      BigNumber(numberBig.div(KUnit).toFixed(decimalPlaces, roundingMode)).toFormat() +
+      formatTokenPrice(BigNumber(numberBig.div(KUnit).toFixed(decimalPlaces, roundingMode)), {
+        decimalPlaces,
+        minValue: 0.01,
+      }) +
       // .replace(regexp, '$1')
       'K'
     );
   } else {
-    return BigNumber(numberBig.toFixed(decimalPlaces, roundingMode)).toFormat();
+    return formatTokenPrice(BigNumber(numberBig.toFixed(decimalPlaces, roundingMode)), {
+      decimalPlaces,
+      minValue: 0.01,
+    });
   }
 }
 
