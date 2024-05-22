@@ -16,6 +16,7 @@ import { divDecimals } from 'utils/calculate';
 import useCountDownLock from 'hooks/useCountDownLock';
 import { PoolType } from 'types/stack';
 import { MAX_STAKE_PERIOD } from 'constants/stake';
+import Renewal from 'components/Renewal';
 
 interface IStackCardProps {
   type: PoolType | string;
