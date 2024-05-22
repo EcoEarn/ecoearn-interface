@@ -28,7 +28,7 @@ export default function Rewards() {
   const renderEmpty = (
     <Empty
       emptyBtnText="Stake"
-      emptyText="You have not claimed the rewards"
+      emptyText="You have not claimed the rewards."
       onClick={() => {
         router.push('/simple');
       }}

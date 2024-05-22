@@ -111,11 +111,11 @@ function ConfirmModal(props: IConfirmModalProps) {
         <div className="text-xl lg:text-2xl font-semibold text-neutralTitle mt-4">
           {status === 'success'
             ? 'Transaction sent, waiting for on-chain confirmation'
-            : 'Transaction confirmation failed'}
+            : 'Transaction confirmation failed.'}
         </div>
         {status === 'success' && (
           <div className="text-base font-normal lg:text-lg lg:font-medium text-neutralSecondary">
-            On-chain transaction is being packaged. There may be delays in data updates
+            On-chain transaction is being packaged. There may be delays in data updates.
           </div>
         )}
       </Flex>

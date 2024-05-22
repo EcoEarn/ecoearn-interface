@@ -71,6 +71,7 @@ interface IPointsPoolItem {
   staked: number;
   decimal: number;
   rewardsTokenName: string;
+  stakeTokenName: string;
 }
 
 interface IStakingClaimParams {

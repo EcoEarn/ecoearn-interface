@@ -103,7 +103,7 @@ export default function DappList({
         render: (text: string) => {
           return (
             <span className="font-medium text-base text-neutralTitle">
-              {formatNumber(text, { formatMin: 1000000 })}
+              {text ? formatNumber(text, { formatMin: 1000000 }) : '--'}
             </span>
           );
         },
@@ -116,7 +116,7 @@ export default function DappList({
         render: (text: string) => {
           return (
             <span className="font-medium text-base text-neutralTitle">
-              {formatNumber(text, { formatMin: 1000000 })}
+              {text ? formatNumber(text, { formatMin: 1000000 }) : '--'}
             </span>
           );
         },
