@@ -1,7 +1,6 @@
 import { Button, ToolTip } from 'aelf-design';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Flex, Segmented } from 'antd';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import clsx from 'clsx';
 import styles from './style.module.css';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
@@ -17,6 +16,7 @@ import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
 import Empty from 'components/Empty';
 import { ZERO } from 'constants/index';
+import CommonTooltip from 'components/CommonTooltip';
 
 const formatMin = 1000000;
 
@@ -101,13 +101,10 @@ export function PointsStakeItem({
           </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
             {dailyRewards} {item.rewardsTokenName}
-            <ToolTip title="It indicates daily rewards obtained by staking 10,000 points.">
-              <QuestionIconComp
-                className="w-4 h-4 ml-1 cursor-pointer fill-brandDefault"
-                width={16}
-                height={16}
-              />
-            </ToolTip>
+            <CommonTooltip
+              title="It indicates daily rewards obtained by staking 10,000 points."
+              className="ml-1 fill-brandDefault"
+            />
           </span>
         </Flex>
       </Flex>
@@ -148,9 +145,10 @@ export function PointsStakeItem({
           <Flex vertical gap={8}>
             <Flex align="center">
               <span className="text-base font-medium text-neutralPrimary">Staked</span>
-              <ToolTip title="The platform will take a snapshot of your points at 0:00 each day and automatically stake the snapshot amount at 0:00 on the previous day.">
-                <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
-              </ToolTip>
+              <CommonTooltip
+                className="ml-1"
+                title="The platform will take a snapshot of your points at 0:00 each day and automatically stake the snapshot amount at 0:00 on the previous day."
+              />
             </Flex>
             <Flex gap={8} align="center">
               <span className="font-semibold text-lg text-neutralTitle">{staked}</span>

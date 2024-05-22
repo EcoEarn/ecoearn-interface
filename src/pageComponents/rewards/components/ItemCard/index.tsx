@@ -1,6 +1,4 @@
-import { ToolTip } from 'aelf-design';
 import { Flex } from 'antd';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import dayjs from 'dayjs';
 import { divDecimals } from 'utils/calculate';
 import { formatTokenPrice, formatUSDPrice } from 'utils/format';
@@ -9,6 +7,7 @@ import { useMemo } from 'react';
 import StakeToken from 'components/StakeToken';
 import { PoolType } from 'types/stack';
 import clsx from 'clsx';
+import { CommonTooltip } from '@portkey/did-ui-react';
 
 export default function ItemCard({
   item,
@@ -47,9 +46,7 @@ export default function ItemCard({
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
           <span className="font-medium text-neutralSecondary">Rewards</span>
-          <ToolTip title="Claimed rewards">
-            <QuestionIconComp className="w-4 h-4 ml-2 cursor-pointer" width={16} height={16} />
-          </ToolTip>
+          <CommonTooltip title="Claimed rewards" className="ml-2" />
         </Flex>
         <Flex vertical align="end" className="text-base">
           <span className="text-neutralPrimary font-semibold">{`${formatTokenPrice(
@@ -64,9 +61,7 @@ export default function ItemCard({
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
           <span className="font-medium text-neutralSecondary">Date</span>
-          <ToolTip title="time for rewards claim">
-            <QuestionIconComp className="w-4 h-4 ml-2 cursor-pointer" width={16} height={16} />
-          </ToolTip>
+          <CommonTooltip title="time for rewards claim" className="ml-2" />
         </Flex>
         <span className="text-neutralPrimary text-base font-semibold">
           {dayjs(Number(item.date)).format('YYYY.MM.DD HH:mm')}
@@ -75,17 +70,22 @@ export default function ItemCard({
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
           <span className="font-medium text-neutralSecondary">Lock-up period</span>
-          <ToolTip title="A lockup period in which you have to wait to claim the proceeds">
-            <QuestionIconComp className="w-4 h-4 ml-2 cursor-pointer" width={16} height={16} />
-          </ToolTip>
-        </Flex>
-        <span className="text-neutralPrimary text-base font-semibold">
-          <CountDownLock
-            targetTimeStamp={item.lockUpPeriod}
-            onFinish={() => {
-              onCountDownFinish?.();
-            }}
+          <CommonTooltip
+            title="A lockup period in which you have to wait to claim the proceeds"
+            className="ml-2"
           />
+        </Flex>
+        <span className="text-neutralTitle text-base font-semibold">
+          {dayjs(item.lockUpPeriod).isBefore(dayjs()) ? (
+            <span className="text-base font-semibold text-neutralTitle">Unlocked</span>
+          ) : (
+            <CountDownLock
+              targetTimeStamp={item.lockUpPeriod}
+              onFinish={() => {
+                onCountDownFinish?.();
+              }}
+            />
+          )}
         </span>
       </Flex>
     </Flex>

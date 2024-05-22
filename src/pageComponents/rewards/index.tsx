@@ -47,8 +47,9 @@ export default function Rewards() {
       <div className="text-base text-neutralPrimary font-medium flex flex-col gap-1 mt-2 lg:mt-4">
         <p>
           There is a lock-up period for rewards you claimed, and the period varies among different
-          mining pools. The rewards can only be withdrawn after the lock-up period is ended.
+          mining pools.
         </p>
+        <p>The rewards can only be withdrawn after the lock-up period is ended.</p>
         <p>
           After staking points in the XPSGR mining pool, the SGR rewards claimed can be staked
           again, including SGR rewards during the lock-up period.
