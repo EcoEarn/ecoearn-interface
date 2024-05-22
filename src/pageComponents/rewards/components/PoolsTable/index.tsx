@@ -120,11 +120,14 @@ export default function PoolsTable({
           </div>
         ),
         render: (text, item) => {
+          if (dayjs(text).isBefore(dayjs())) {
+            return <span className="text-base font-medium text-functionalSuccess">Unlocked</span>;
+          }
           return <CountDownLock targetTimeStamp={text} onFinish={onCountDownFinish} />;
         },
       },
     ];
-  }, []);
+  }, [onCountDownFinish]);
 
   return (
     <AELFDProvider
