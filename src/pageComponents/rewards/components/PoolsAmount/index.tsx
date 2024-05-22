@@ -58,7 +58,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
         ? `Minimum staking 10 ${pointsPoolsAmount.rewardsTokenName}`
         : undefined
       : pointsEarlyStakeDisabled
-      ? 'Stake has expired, please unlock'
+      ? 'Stake has expired, cannot be added stake. Please renew the staking first.'
       : undefined;
   }, [
     pointsEarlyStakeDisabled,

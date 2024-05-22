@@ -17,6 +17,8 @@ import useCountDownLock from 'hooks/useCountDownLock';
 import { PoolType } from 'types/stack';
 import { MAX_STAKE_PERIOD } from 'constants/stake';
 import Renewal from 'components/Renewal';
+import { useModal } from '@ebay/nice-modal-react';
+import RenewalModal from 'components/RenewalModal';
 
 interface IStackCardProps {
   type: PoolType | string;
@@ -59,6 +61,8 @@ export default function StackCard({
   } = data;
 
   const { isUnLocked, countDisplay } = useCountDownLock({ targetTimeStamp: unlockTime || '' });
+
+  const renewalModal = useModal(RenewalModal);
 
   const showStackInfo = useMemo(
     () => !BigNumber(data?.staked || '').isZero() && isLogin,
