@@ -13,6 +13,7 @@ export default function useAPRK() {
         ? MAX_STAKE_PERIOD
         : period2Days;
       const ratio = ZERO.plus(realPeriod).div(aprX);
+      console.log('get-APK-period', period);
       console.log('get-APK-period2Days', period2Days);
       console.log('get-APK-realPeriod', realPeriod);
       console.log('get-APK-ratio', ratio);

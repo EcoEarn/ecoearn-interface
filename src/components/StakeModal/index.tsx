@@ -100,22 +100,28 @@ function StackModal({
       return setAprK(getAprK(originPeriod, fixedBoostFactor));
     }
     if (!period) return setAprK('');
+    console.log('period', period, ONE_DAY_IN_SECONDS, originPeriod);
     const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + originPeriod, fixedBoostFactor);
     setAprK(aprK);
     console.log('APRK--', aprK);
   }, [fixedBoostFactor, getAprK, isExtend, originPeriod, period, typeIsAdd]);
 
+  const stakedAmount = useMemo(() => divDecimals(staked, decimal).toFixed(), [decimal, staked]);
+
   const apr = useMemo(() => {
-    console.log('calculate--apr-amount', amount);
+    console.log('calculate--apr-amount', amount, freezeAmount);
     console.log('calculate--apr-yearlyRewards', yearlyRewards);
     console.log('calculate--apr-totalStaked', totalStaked);
     console.log('calculate--apr-k', aprK);
     let currentTotal;
     if (!yearlyRewards || !totalStaked || !aprK) return '';
-    if (typeIsExtend || isFreezeAmount) {
+    if (isFreezeAmount) {
+      const addAmount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : 0;
+      currentTotal = getTotalStakedWithAdd(totalStaked, addAmount, aprK, decimal);
+    } else if (typeIsExtend) {
       currentTotal = ZERO.plus(totalStaked);
-    } else if (amount) {
-      currentTotal = getTotalStakedWithAdd(totalStaked, amount, aprK, decimal);
+    } else if (typeIsAdd || typeIsStake) {
+      currentTotal = amount ? getTotalStakedWithAdd(totalStaked, amount, aprK, decimal) : '';
     }
 
     if (!currentTotal) return '';
@@ -123,7 +129,18 @@ function StackModal({
     const ownerApr = getOwnerAprK(yearlyRewards, currentTotal, aprK);
     console.log('ownerApr', ownerApr);
     return ownerApr;
-  }, [amount, aprK, decimal, isFreezeAmount, totalStaked, typeIsExtend, yearlyRewards]);
+  }, [
+    amount,
+    aprK,
+    decimal,
+    freezeAmount,
+    isFreezeAmount,
+    totalStaked,
+    typeIsAdd,
+    typeIsExtend,
+    typeIsStake,
+    yearlyRewards,
+  ]);
 
   const btnDisabled = useMemo(() => !amountValid || !periodValid, [amountValid, periodValid]);
 
@@ -140,15 +157,12 @@ function StackModal({
     }
   }, [rate, stakeSymbol, type]);
 
-  const stakedAmount = useMemo(() => divDecimals(staked, decimal).toFixed(), [decimal, staked]);
-
   const amountStr = useMemo(() => {
     let _amount;
     const inputAmount = amount.replaceAll(',', '');
+
     if (isFreezeAmount) {
-      _amount = freezeAmount
-        ? ZERO.plus(stakedAmount).plus(divDecimals(freezeAmount, decimal))
-        : stakedAmount;
+      _amount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : stakedAmount;
     } else if (typeIsStake) {
       _amount = inputAmount;
     } else if (typeIsAdd) {
@@ -157,6 +171,7 @@ function StackModal({
     } else {
       _amount = stakedAmount;
     }
+
     return formatNumberWithDecimalPlaces(_amount) || '--';
   }, [amount, decimal, freezeAmount, isFreezeAmount, stakedAmount, typeIsAdd, typeIsStake]);
 

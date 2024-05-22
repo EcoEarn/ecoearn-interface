@@ -144,7 +144,7 @@ export default function StackCard({
           </ToolTip>
 
           <div className="flex flex-1 flex-col xl:flex-row justify-between md:max-w-[336px] gap-6 md:gap-4">
-            <div className="flex justify-between md:flex-col md:flex-start md:gap-2">
+            <div className="flex justify-between md:flex-col md:justify-start md:gap-2">
               <div className="text-base text-neutralSecondary font-medium">
                 <span>Earned</span>
                 <span className="ml-2 text-sm">{earnedSymbol}</span>
@@ -173,7 +173,7 @@ export default function StackCard({
           </div>
           <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] bg-neutralDivider"></div>
           <div className="flex flex-1 flex-col xl:flex-row justify-between md:max-w-[336px] gap-6 md:gap-4">
-            <div className="flex justify-between md:flex-col md:flex-start md:gap-2">
+            <div className="flex justify-between md:flex-col md:justify-start md:gap-2">
               <div className="text-base text-neutralSecondary font-medium">Staked</div>
               <div className="flex flex-col gap-1">
                 <div className="flex gap-1 text-base font-semibold text-neutralTitle flex-grow-0">
