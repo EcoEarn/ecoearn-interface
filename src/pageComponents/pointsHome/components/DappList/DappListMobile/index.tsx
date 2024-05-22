@@ -1,12 +1,11 @@
-import { ToolTip } from 'aelf-design';
 import { Button, Flex } from 'antd';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { formatNumber } from 'utils/format';
 import { RightOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import useLoading from 'hooks/useLoading';
+import CommonTooltip from 'components/CommonTooltip';
 
 export default function DappListMobile({
   items,
@@ -53,9 +52,7 @@ export default function DappListMobile({
             <Flex className="mt-8" justify="space-between">
               <Flex align="center" gap={8} className="text-base font-medium">
                 <span className="text-neutralDisable">Points</span>
-                <ToolTip title="Total number of points Staked by all users">
-                  <QuestionIconComp className="w-5 h-5 cursor-pointer" width={20} height={20} />
-                </ToolTip>
+                <CommonTooltip title="Total number of points Staked by all users" />
               </Flex>
               <span className="text-neutralPrimary font-semibold text-base">
                 {formatNumber(item.tvl)}

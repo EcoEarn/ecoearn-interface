@@ -54,7 +54,7 @@ function GetPointsModal({
       </div>
       <div className="text-neutralPrimary font-semibold py-4 text-lg">Points Rules</div>
       {rulesContent && (
-        <div className="text-base break-all text-neutralPrimary font-normal">{rulesContent}</div>
+        <div className="text-base text-neutralPrimary font-normal">{rulesContent}</div>
       )}
     </CommonModal>
   );

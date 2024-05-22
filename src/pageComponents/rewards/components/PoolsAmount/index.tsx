@@ -1,6 +1,6 @@
 import { Button, ToolTip } from 'aelf-design';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import BigNumber from 'bignumber.js';
+import CommonTooltip from 'components/CommonTooltip';
 import ConfirmModal from 'components/ConfirmModal';
 import { ZERO } from 'constants/index';
 import useRewardsAggregation from 'pageComponents/rewards/hooks/useRewardsAggregation';
@@ -78,9 +78,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
               <span className="text-base font-medium text-neutralTertiary">
                 Stakeable {pointsPoolsAmount.rewardsTokenName} Rewards
               </span>
-              <ToolTip title="Stake XPSGR pool to earn more with all claimed SGR rewards (including those in the lock-up period).">
-                <QuestionIconComp className="w-4 h-4 cursor-pointer" width={16} height={16} />
-              </ToolTip>
+              <CommonTooltip title="Stake XPSGR pool to earn more with all claimed SGR rewards (including those in the lock-up period)." />
             </div>
             <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
               {pointsPoolsAmount.stakeTotal}
@@ -108,9 +106,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
               <span className="text-base font-medium text-neutralTertiary">
                 Withdrawable {pointsPoolsAmount.rewardsTokenName} Rewards
               </span>
-              <ToolTip title="After staking in the XPSGR pool, claimed SGR rewards can be withdrawn to the wallet after the lock-up period, while staking rewards cannot be withdrawn.">
-                <QuestionIconComp className="w-4 h-4 cursor-pointer" width={16} height={16} />
-              </ToolTip>
+              <CommonTooltip title="After staking in the XPSGR pool, claimed SGR rewards can be withdrawn to the wallet after the lock-up period, while staking rewards cannot be withdrawn." />
             </div>
             <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
               {pointsPoolsAmount.rewardsTotal}
@@ -141,11 +137,9 @@ export default forwardRef(function PoolsAmount(props, ref) {
             <span className="text-base font-medium text-neutralTertiary">
               Withdrawable {tokenPoolsAmount.rewardsTokenName} Rewards
             </span>
-            <ToolTip
+            <CommonTooltip
               title={`After staking in the ${tokenPoolsAmount.rewardsTokenName} pool, rewards can be withdrawn to the wallet after the lock-up period.`}
-            >
-              <QuestionIconComp className="w-4 h-4 cursor-pointer" width={16} height={16} />
-            </ToolTip>
+            />
           </div>
           <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
             {tokenPoolsAmount.rewardsTotal}
@@ -175,13 +169,11 @@ export default forwardRef(function PoolsAmount(props, ref) {
             <span className="text-base font-medium text-neutralTertiary">
               Withdrawable {LpPoolsAmount.rewardsTokenName} Rewards
             </span>
-            <ToolTip
+            <CommonTooltip
               title={`After staking in the ${
                 LpPoolsAmount?.rewardsTokenName || ''
               } pool, rewards can be withdrawn to the wallet after the lock-up period.`}
-            >
-              <QuestionIconComp className="w-4 h-4 cursor-pointer" width={16} height={16} />
-            </ToolTip>
+            />
           </div>
           <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
             {LpPoolsAmount.rewardsTotal}

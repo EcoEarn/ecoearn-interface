@@ -9,5 +9,12 @@
         @apply !border-b-0;
       }
     }
+    .aelfd-table-filter-column{
+      @apply justify-start;
+    }
+
+    .aelfd-table-filter-column .aelfd-table-column-title{
+      @apply flex-grow-0;
+    }
   }
 }

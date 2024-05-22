@@ -1,7 +1,6 @@
 import { Button, ToolTip } from 'aelf-design';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Flex, Segmented } from 'antd';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import clsx from 'clsx';
 import styles from './style.module.css';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
@@ -17,6 +16,7 @@ import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
 import Empty from 'components/Empty';
 import { ZERO } from 'constants/index';
+import CommonTooltip from 'components/CommonTooltip';
 
 const formatMin = 1000000;
 
@@ -62,6 +62,14 @@ export function PointsStakeItem({
     return isLogin && item.staked ? formatNumberOverMillion(item.staked, item.decimal) : '--';
   }, [formatNumberOverMillion, isLogin, item.decimal, item.staked]);
 
+  const stakeSymbol = useMemo(() => {
+    return isLogin ? item.stakeTokenName : undefined;
+  }, [isLogin, item.stakeTokenName]);
+
+  const earnSymbol = useMemo(() => {
+    return isLogin ? item.rewardsTokenName : undefined;
+  }, [isLogin, item.rewardsTokenName]);
+
   const earned = useMemo(() => {
     return isLogin && item.realEarned ? formatNumberOverMillion(item.realEarned) : '--';
   }, [formatNumberOverMillion, isLogin, item.realEarned]);
@@ -101,13 +109,10 @@ export function PointsStakeItem({
           </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
             {dailyRewards} {item.rewardsTokenName}
-            <ToolTip title="It indicates daily rewards obtained by staking 10,000 points.">
-              <QuestionIconComp
-                className="w-4 h-4 ml-1 cursor-pointer fill-brandDefault"
-                width={16}
-                height={16}
-              />
-            </ToolTip>
+            <CommonTooltip
+              title="It indicates daily rewards obtained by staking 10,000 points."
+              className="ml-1 fill-brandDefault"
+            />
           </span>
         </Flex>
       </Flex>
@@ -134,9 +139,7 @@ export function PointsStakeItem({
           gap={isMD ? 0 : 8}
         >
           Total Staked:
-          <span className="text-neutralPrimary">
-            {totalStake} {item.symbolName}
-          </span>
+          <span className="text-neutralPrimary">{totalStake}</span>
         </Flex>
       </Flex>
       <div className="mt-4 grid grid-flow-row  md:grid-flow-col gap-6 grid-cols-1 md:grid-cols-2">
@@ -148,13 +151,16 @@ export function PointsStakeItem({
           <Flex vertical gap={8}>
             <Flex align="center">
               <span className="text-base font-medium text-neutralPrimary">Staked</span>
-              <ToolTip title="The platform will take a snapshot of your points at 0:00 each day and automatically stake the snapshot amount at 0:00 on the previous day.">
-                <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
-              </ToolTip>
+              <CommonTooltip
+                className="ml-1"
+                title="The platform will take a snapshot of your points at 0:00 each day and automatically stake the snapshot amount at 0:00 on the previous day."
+              />
             </Flex>
             <Flex gap={8} align="center">
               <span className="font-semibold text-lg text-neutralTitle">{staked}</span>
-              <span className="text-base font-normal text-neutralPrimary">{item.symbolName}</span>
+              {stakeSymbol && (
+                <span className="text-base font-normal text-neutralPrimary">{stakeSymbol}</span>
+              )}
             </Flex>
           </Flex>
         </Flex>
@@ -167,12 +173,13 @@ export function PointsStakeItem({
             <span className="text-base font-medium text-neutralPrimary">Earned</span>
             <Flex gap={8} align="center">
               <span className="font-semibold text-lg text-neutralTitle">{earned}</span>
-              <span className="text-base font-normal text-neutralPrimary">
-                {item.rewardsTokenName}
-              </span>
+              {earnSymbol && (
+                <span className="text-base font-normal text-neutralPrimary">{earnSymbol}</span>
+              )}
             </Flex>
           </Flex>
           <ToolTip
+            overlayStyle={{ maxWidth: '150px' }}
             title={
               claimDisabled && isLogin ? 'Rewards are distributed at 0:00 every day.' : undefined
             }

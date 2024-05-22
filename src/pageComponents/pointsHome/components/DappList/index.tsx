@@ -1,10 +1,10 @@
-import { Button, Table, ToolTip } from 'aelf-design';
+import { Button, Table } from 'aelf-design';
 import { TableColumnsType } from 'antd/lib';
 import Link from 'next/link';
 import { formatNumber } from 'utils/format';
 import { RightOutlined } from '@ant-design/icons';
 import useResponsive from 'utils/useResponsive';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import clsx from 'clsx';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useRouter } from 'next/navigation';
@@ -12,8 +12,8 @@ import { useCheckLoginAndToken } from 'hooks/useWallet';
 import { useModal } from '@ebay/nice-modal-react';
 import GetPointsModal, { IPointsModalProps } from '../GetPointsModal';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import DappListMobile from './DappListMobile';
+import CommonTooltip from 'components/CommonTooltip';
 
 export default function DappList({
   items,
@@ -95,9 +95,7 @@ export default function DappList({
         title: (
           <div className="flex items-center">
             <span>Points</span>
-            <ToolTip title="Total points Staked by all users">
-              <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
-            </ToolTip>
+            <CommonTooltip title="Total points Staked by all users" className="ml-1" />
           </div>
         ),
         key: 'tvl',
@@ -105,7 +103,7 @@ export default function DappList({
         render: (text: string) => {
           return (
             <span className="font-medium text-base text-neutralTitle">
-              {formatNumber(text, { formatMin: 1000000 })}
+              {text ? formatNumber(text, { formatMin: 1000000 }) : '--'}
             </span>
           );
         },
@@ -118,7 +116,7 @@ export default function DappList({
         render: (text: string) => {
           return (
             <span className="font-medium text-base text-neutralTitle">
-              {formatNumber(text, { formatMin: 1000000 })}
+              {text ? formatNumber(text, { formatMin: 1000000 }) : '--'}
             </span>
           );
         },

@@ -1,6 +1,5 @@
 import { Pagination, Table, ToolTip } from 'aelf-design';
 import { Flex, TableColumnsType } from 'antd';
-import { ReactComponent as QuestionIconComp } from 'assets/img/questionCircleOutlined.svg';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import CountDownLock from '../CountDownLock';
@@ -12,6 +11,8 @@ import { AELFDProvider } from 'aelf-design';
 import { theme } from './config';
 import { AELFDProviderTheme } from 'provider/config';
 import styles from './style.module.css';
+import CommonTooltip from 'components/CommonTooltip';
+import { DownOutlined } from '@ant-design/icons';
 
 export default function PoolsTable({
   page,
@@ -45,6 +46,7 @@ export default function PoolsTable({
           { text: 'SGR', value: 'Token' },
           { text: 'LP', value: 'Lp' },
         ],
+        filterIcon: <DownOutlined />,
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
           if (item.poolType === 'Points') {
@@ -69,9 +71,7 @@ export default function PoolsTable({
         title: (
           <div className="flex items-center">
             <span>Rewards</span>
-            <ToolTip title="Claimed Rewards">
-              <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
-            </ToolTip>
+            <CommonTooltip title="Claimed Rewards" className="ml-1" />
           </div>
         ),
         render: (text, item) => {
@@ -94,9 +94,7 @@ export default function PoolsTable({
         title: (
           <div className="flex items-center">
             <span>Date</span>
-            <ToolTip title="Time of claiming rewards">
-              <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
-            </ToolTip>
+            <CommonTooltip title="Time of claiming rewards" className="ml-1" />
           </div>
         ),
         render: (text, item) => {
@@ -114,17 +112,21 @@ export default function PoolsTable({
         title: (
           <div className="flex items-center justify-end">
             <span>Lock-up period</span>
-            <ToolTip title="It indicates the lock-up period before rewards can be claimed.">
-              <QuestionIconComp className="w-4 h-4 ml-1 cursor-pointer" width={16} height={16} />
-            </ToolTip>
+            <CommonTooltip
+              title="It indicates the lock-up period before rewards can be claimed."
+              className="ml-1"
+            />
           </div>
         ),
         render: (text, item) => {
+          if (dayjs(text).isBefore(dayjs())) {
+            return <span className="text-base font-semibold text-neutralTitle">Unlocked</span>;
+          }
           return <CountDownLock targetTimeStamp={text} onFinish={onCountDownFinish} />;
         },
       },
     ];
-  }, []);
+  }, [onCountDownFinish]);
 
   return (
     <AELFDProvider

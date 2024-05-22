@@ -9,12 +9,8 @@ export default function CountDownLock({
   const { isUnLocked, countDisplay } = useCountDownLock({ targetTimeStamp, onFinish });
 
   return (
-    <>
-      {isUnLocked ? (
-        <span className="text-base font-medium text-functionalSuccess">Unlocked</span>
-      ) : (
-        <span className="text-brandDefault text-base font-medium">{countDisplay}</span>
-      )}
-    </>
+    <span className="text-base font-semibold text-neutralTitle">
+      {isUnLocked ? 'Unlocked' : countDisplay}
+    </span>
   );
 }
