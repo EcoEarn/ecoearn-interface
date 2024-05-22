@@ -110,7 +110,7 @@ export default function Header() {
             <img
               src={require('assets/img/logo.svg').default}
               alt="logo"
-              className="w-[120px] h-[24px] lg:w-[160px] lg:h-[32px]"
+              className="w-[138px] h-[24px] lg:w-[184px] lg:h-[32px]"
               onClick={() => router.replace('/')}
             />
           }
