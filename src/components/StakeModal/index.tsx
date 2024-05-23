@@ -282,14 +282,12 @@ function StackModal({
   ]);
 
   const targetPeriod = useMemo(() => {
-    if (isExtend) {
-      return formatNumberWithDecimalPlaces(ZERO.plus(remainingTime).plus(period), 1);
-    } else if (typeIsRenew) {
+    if (typeIsRenew) {
       return curStakingPeriod;
     } else {
       return period;
     }
-  }, [curStakingPeriod, isExtend, period, remainingTime, typeIsRenew]);
+  }, [curStakingPeriod, period, typeIsRenew]);
 
   const originAPRStr = useMemo(() => {
     const originAprK = originPeriod ? getAprK(originPeriod, fixedBoostFactor) : '--';
