@@ -199,7 +199,7 @@ function ConfirmModal(props: IConfirmModalProps) {
             )}
             {content?.unlockDateTimeStamp ? (
               <Flex justify="space-between">
-                <span>Unlock on</span>
+                <span className="text-neutralSecondary">Unlock on</span>
                 <span>
                   {dayjs(Number(content?.unlockDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
                 </span>

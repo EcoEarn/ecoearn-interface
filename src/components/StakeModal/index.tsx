@@ -183,12 +183,10 @@ function StackModal({
 
     if (isFreezeAmount) {
       if (earlyAmount) {
-        _amount = divDecimals(
-          BigNumber(freezeAmount || 0)
-            .plus(BigNumber(earlyAmount))
-            .toNumber(),
-          decimal,
-        ).toFixed();
+        _amount = divDecimals(BigNumber(freezeAmount || 0), decimal)
+          .plus(divDecimals(BigNumber(earlyAmount || 0), decimal))
+          .toNumber()
+          .toFixed(2);
       } else {
         _amount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : stakedAmount;
       }
@@ -219,20 +217,11 @@ function StackModal({
         return formatNumberWithDecimalPlaces(divDecimals(freezeAmount, decimal).toFixed());
       return formatNumberWithDecimalPlaces(stakedAmount);
     }
-    if (typeIsRenew && earlyAmount) {
-      return formatNumberWithDecimalPlaces(divDecimals(earlyAmount, decimal).toFixed());
+    if (earlyAmount) {
+      return formatNumberWithDecimalPlaces(divDecimals(earlyAmount, decimal).toFixed(2));
     }
     return '';
-  }, [
-    amount,
-    decimal,
-    earlyAmount,
-    freezeAmount,
-    isFreezeAmount,
-    stakedAmount,
-    typeIsAdd,
-    typeIsRenew,
-  ]);
+  }, [amount, decimal, earlyAmount, freezeAmount, isFreezeAmount, stakedAmount, typeIsAdd]);
 
   const remainingTime = useMemo(() => {
     if (!unlockTime) return '';

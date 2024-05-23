@@ -96,9 +96,9 @@ function StackModalWithConfirm({
       }
 
       setContent({
-        amount: earlyAmount ? BigNumber(earlyAmount).plus(BigNumber(amount)).toString() : amount,
+        amount,
         period,
-        oldAmount: earlyAmount || _staked,
+        oldAmount: earlyAmount ? divDecimals(earlyAmount, decimal || 8).toNumber() : _staked,
         unlockDateTimeStamp: period ? '' : unlockTime,
         oldDateTimeStamp: unlockTime,
         newDateTimeStamp: getNewUnlockTimeStamp(period),
