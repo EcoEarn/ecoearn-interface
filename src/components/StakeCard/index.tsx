@@ -231,7 +231,7 @@ export default function StackCard({
                   {isUnLocked ? 'Unlockable' : countDisplay}
                 </div>
                 <div className="text-sm font-medium text-neutralDisable">
-                  Unlock on {dayjs(unlockTime).format('YYYY-MM-DD HH:mm:ss')}
+                  Unlock on {dayjs(unlockTime).format('YYYY-MM-DD HH:mm')}
                 </div>
               </div>
             </div>

@@ -197,8 +197,7 @@ function StackModal({
   const remainingTimeFormatStr = useMemo(() => {
     if (!remainingTime) return '';
     if (ZERO.plus(remainingTime).lt(0.1)) return '< 0.1 Days';
-
-    return ZERO.plus(remainingTime).toFixed(1) + 'Days';
+    return `${ZERO.plus(remainingTime).toFixed(1)} Days`;
   }, [remainingTime]);
 
   const originPeriodStr = useMemo(
@@ -319,7 +318,7 @@ function StackModal({
         type="primary"
         onClick={onStack}
       >
-        {typeIsAdd ? 'Add Stake' : 'Stake'}
+        {typeIsAdd ? 'Add' : 'Stake'}
       </Button>
     );
   }, [btnDisabled, onStack, typeIsAdd]);
@@ -369,7 +368,7 @@ function StackModal({
   const onSelectDays = useCallback(
     (val: string) => {
       if (disabledDurationInput) return;
-      if (ZERO.plus(val).gt(maxDuration)) return singleMessage.warning(`max ${maxDuration} Days`);
+      if (ZERO.plus(val).gt(maxDuration)) return;
       form.setFieldValue('period', val);
       form.validateFields(['period']);
       setPeriod(val);
@@ -468,7 +467,7 @@ function StackModal({
           >
             <InputNumberBase
               decimal={2}
-              placeholder={`Enter ${stakeSymbol} amount`}
+              placeholder={`Please enter ${stakeSymbol} amount`}
               suffixText="Max"
               suffixClick={getMaxAmount}
               allowClear
@@ -489,7 +488,7 @@ function StackModal({
           <FormItem label={durationLabel} className="font-medium">
             <FormItem name="period" rules={[{ validator: validateDays }]} className="mb-[22px]">
               <InputNumberBase
-                placeholder="please enter the days"
+                placeholder="Please enter the days"
                 suffixText="Days"
                 decimal={0}
                 allowClear

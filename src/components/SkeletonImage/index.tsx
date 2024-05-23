@@ -30,7 +30,6 @@ function SkeletonImage(props: ISkeletonImage) {
     setLoading(false);
   }, []);
 
-  console.log('fallback', fallback);
   return (
     <div
       className={clsx(

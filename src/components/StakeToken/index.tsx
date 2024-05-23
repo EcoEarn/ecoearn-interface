@@ -57,7 +57,7 @@ const StackToken = memo(
           </Flex>
         )}
         <div className="flex flex-col flex-1">
-          <div className="flex items-center justify-between lg:justify-start gap-4 text-2xl font-semibold text-neutralTitle">
+          <div className="flex items-center justify-between lg:justify-start gap-4 text-xl font-semibold text-neutralTitle">
             <span>{tokenName || '--'}</span>
             {!!rate && <RateTag value={Number(rate) * 100} />}
           </div>
