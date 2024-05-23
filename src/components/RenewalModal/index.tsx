@@ -1,8 +1,13 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { Button } from 'aelf-design';
+import clsx from 'clsx';
 import CommonModal from 'components/CommonModal';
 
-export default NiceModal.create(function RenewalModal() {
+export default NiceModal.create(function RenewalModal({
+  renewText,
+}: {
+  renewText: Array<IRenewText>;
+}) {
   const modal = useModal();
   return (
     <CommonModal
@@ -24,21 +29,16 @@ export default NiceModal.create(function RenewalModal() {
       }}
     >
       <div className="text-base font-normal text-neutralPrimary">
-        <p>
-          {` To enhance user capital efficiency, after the funds in the "locked staking" reach
-          maturity, there will be a certain duration of the "unlocking period." During the unlocking
-          period, users can perform the following actions:`}
-        </p>
-        <p>
-          · Unlock: By unlocking assets and rewards, you will immediately receive all staked assets
-          and unclaimed rewards (with a locking period);
-        </p>
-        <p>· Renew: By renewing the staking, you can restake the currently locked assets;</p>
-        <p className="mt-4">
-          If you do not perform any action on the pool during the unlocking period, the pool will
-          enter a new round of the locking period. The new locking duration will be the same as the
-          most recent locking period, and it will have the same mining rate.
-        </p>
+        {renewText.map((item, index) => {
+          return (
+            <div key={index} className={clsx(index !== 0 && 'mt-4')}>
+              <p>{item.textWord}</p>
+              {item.childTextNodes.map((childTextItem, index) => {
+                return <p key={index}>{childTextItem.textWord}</p>;
+              })}
+            </div>
+          );
+        })}
       </div>
     </CommonModal>
   );

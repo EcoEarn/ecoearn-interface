@@ -8,7 +8,7 @@ export interface IStakeListProps {
 }
 
 export default function SimpleStakeList({ title, description, poolType }: IStakeListProps) {
-  const { stakeData, onClaim, onUnlock, onExtend, onAdd, onStake, isLogin } =
+  const { stakeData, onClaim, onUnlock, onExtend, onAdd, onStake, isLogin, onRenewal, renewText } =
     useSimpleStakeListService({
       poolType,
     });
@@ -33,6 +33,8 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
               onAdd={onAdd}
               onUnlock={onUnlock}
               onExtend={onExtend}
+              onRenewal={onRenewal}
+              renewText={renewText || []}
             />
           );
         })}

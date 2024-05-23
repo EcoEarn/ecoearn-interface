@@ -37,6 +37,7 @@ export interface ICMSInfo {
   stakeNotes: string[];
   addStakeNotes: string[];
   extendStakeNotes: string[];
+  renewStakeNotes: string[];
   [key: string]: any;
 }
 

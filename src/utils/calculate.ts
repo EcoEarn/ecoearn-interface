@@ -38,6 +38,7 @@ export function getAPR(totalStaked: number, rewards: number) {
 
 export function getTotalStakedWithAdd(
   total: string | number | BigNumber,
+  boostedAmount: string | number,
   addAmount: number | string,
   aprK: string | number,
   tokenDecimal: string | number,
@@ -45,7 +46,7 @@ export function getTotalStakedWithAdd(
   if (!total || !addAmount || !aprK) return '';
   const amount = typeof addAmount === 'string' ? addAmount.replaceAll(',', '') : addAmount;
   const virtualAmount = timesDecimals(amount, tokenDecimal).times(aprK);
-  return ZERO.plus(total).plus(virtualAmount);
+  return ZERO.plus(total).minus(boostedAmount).plus(virtualAmount);
 }
 
 export function getOwnerAprK(

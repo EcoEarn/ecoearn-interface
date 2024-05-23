@@ -103,6 +103,14 @@ export const tokenStake = async (
   options?: IContractOptions,
 ): Promise<ISendResult> => await tokenStakingContractRequest('Stake', params, options);
 
+export const Renew = async (
+  params: {
+    poolId: string;
+    period?: number | string;
+  },
+  options?: IContractOptions,
+): Promise<ISendResult> => await tokenStakingContractRequest('Renew', params, options);
+
 export const tokenClaim = async (
   params: string,
   options?: IContractOptions,

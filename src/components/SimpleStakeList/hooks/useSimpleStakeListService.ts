@@ -6,7 +6,7 @@ import { useModal } from '@ebay/nice-modal-react';
 import ClaimModal from 'components/ClaimModal';
 import { singleMessage } from '@portkey/did-ui-react';
 import { StakeType } from 'types/stack';
-import { GetReward, tokenStake } from 'contract/tokenStaking';
+import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
 import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
 import { fetchStackingPoolsData } from 'api/request';
@@ -29,6 +29,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const { isLogin } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
   const [stakeData, setStakeData] = useState<Array<IStakePoolData>>([]);
+  const [renewText, setRenewText] = useState<Array<IRenewText>>();
   const stakeModal = useModal(StakeModalWithConfirm);
   const claimModal = useModal(ClaimModal);
   const unlockModal = useModal(UnlockModal);
@@ -47,7 +48,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       const { withLoading = true } = props || {};
       withLoading && showLoading();
       try {
-        const data = await fetchStackingPoolsData({
+        const { pools, textNodes } = await fetchStackingPoolsData({
           poolType,
           sorting: '',
           name: '',
@@ -56,7 +57,8 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           address: wallet.address || '',
           chainId: curChain!,
         });
-        setStakeData(data || []);
+        setStakeData(pools || []);
+        setRenewText(textNodes || []);
       } catch (error) {
         console.error('getStakeData error', error);
       } finally {
@@ -170,56 +172,70 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         return;
       }
       let symbolBalance = '';
-      try {
-        showLoading();
-        let balance = 0;
-        const balanceParams = {
-          symbol: stakeSymbol,
-          owner: wallet.address,
-        };
-        if (poolType === 'Lp') {
-          balance = (
-            await GetLpBalance(balanceParams, getLpTokenContractAddress(rate as TFeeType) || '')
-          ).amount;
-        } else {
-          balance = (await GetBalance(balanceParams)).balance;
+      if (type !== StakeType.RENEW) {
+        try {
+          showLoading();
+          let balance = 0;
+          const balanceParams = {
+            symbol: stakeSymbol,
+            owner: wallet.address,
+          };
+          if (poolType === 'Lp') {
+            balance = (
+              await GetLpBalance(balanceParams, getLpTokenContractAddress(rate as TFeeType) || '')
+            ).amount;
+          } else {
+            balance = (await GetBalance(balanceParams)).balance;
+          }
+          symbolBalance = divDecimals(balance, decimal).toFixed(4);
+        } catch (error) {
+          singleMessage.error('get balance error.');
+          console.error('GetBalance error', error);
+          return;
+        } finally {
+          closeLoading();
         }
-        symbolBalance = divDecimals(balance, decimal).toFixed(4);
-      } catch (error) {
-        singleMessage.error('get balance error.');
-        console.error('GetBalance error', error);
-        return;
-      } finally {
-        closeLoading();
       }
       stakeModal.show({
+        isFreezeAmount: type === StakeType.RENEW ? true : false,
+        isFreezePeriod: type === StakeType.RENEW ? true : false,
+        freezePeriod: type === StakeType.RENEW ? stakeData.period : undefined,
+        freezeAmount: type === StakeType.RENEW ? String(stakeData.staked) : undefined,
         type,
         stakeData,
         balance: symbolBalance,
         onStake: async (amount, period) => {
-          await checkApproveParams(rate as TFeeType);
-          let checked = false;
-          try {
-            checked = await checkAllowanceAndApprove({
-              spender: tokensContractAddress || '',
-              address: wallet.address,
-              chainId: curChain,
-              symbol: stakeSymbol,
-              decimals: decimal,
-              amount: String(amount),
-              contractType: poolType === 'Lp' ? 'Lp' : 'Token',
-              contractAddress: getLpTokenContractAddress(rate as TFeeType),
-            });
-          } catch (error) {
-            throw new Error('approve failed');
-          }
-          if (checked) {
+          if (type === StakeType.RENEW) {
             const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-            return await tokenStake({
+            return await Renew({
               poolId: stakeData?.poolId || '',
-              amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
               period: periodInSeconds || 0,
             });
+          } else {
+            await checkApproveParams(rate as TFeeType);
+            let checked = false;
+            try {
+              checked = await checkAllowanceAndApprove({
+                spender: tokensContractAddress || '',
+                address: wallet.address,
+                chainId: curChain,
+                symbol: stakeSymbol,
+                decimals: decimal,
+                amount: String(amount),
+                contractType: poolType === 'Lp' ? 'Lp' : 'Token',
+                contractAddress: getLpTokenContractAddress(rate as TFeeType),
+              });
+            } catch (error) {
+              throw new Error('approve failed');
+            }
+            if (checked) {
+              const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+              return await tokenStake({
+                poolId: stakeData?.poolId || '',
+                amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
+                period: periodInSeconds || 0,
+              });
+            }
           }
         },
         onSuccess: () => getStakeData(),
@@ -264,6 +280,13 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     [showStakeModal],
   );
 
+  const onRenewal = useCallback(
+    (stakeData: IStakePoolData) => {
+      showStakeModal(StakeType.RENEW, stakeData);
+    },
+    [showStakeModal],
+  );
+
   return {
     stakeData,
     onClaim,
@@ -272,5 +295,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     onAdd,
     onStake,
     isLogin,
+    onRenewal,
+    renewText,
   };
 }

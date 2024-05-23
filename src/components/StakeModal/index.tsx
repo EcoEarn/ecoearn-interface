@@ -24,6 +24,7 @@ import useAPRK from 'hooks/useAPRK';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { getTotalStakedWithAdd, getOwnerAprK, divDecimals } from 'utils/calculate';
 import RateTag from 'components/RateTag';
+import BigNumber from 'bignumber.js';
 
 const FormItem = Form.Item;
 const { Title, Text } = Typography;
@@ -40,7 +41,10 @@ function StakeTitle({ text, rate }: { text: string; rate?: string | number }) {
 interface IStackModalProps {
   type?: StakeType;
   isFreezeAmount?: boolean;
+  isFreezePeriod?: boolean;
+  freezePeriod?: number | string;
   freezeAmount?: number | string;
+  earlyAmount?: number | string;
   visible: boolean;
   balance?: string;
   min?: number; // min balance
@@ -53,7 +57,9 @@ function StackModal({
   visible,
   type = StakeType.STAKE,
   isFreezeAmount = false,
+  isFreezePeriod = false,
   freezeAmount,
+  earlyAmount,
   balance,
   min = MIN_STAKE_AMOUNT,
   stakeData,
@@ -71,6 +77,7 @@ function StackModal({
     decimal = 8,
     rate,
     fixedBoostFactor = '',
+    boostedAmount = 0,
   } = stakeData;
   const [form] = Form.useForm();
   const [amount, setAmount] = useState<string>('');
@@ -81,6 +88,7 @@ function StackModal({
 
   const typeIsExtend = useMemo(() => type === StakeType.EXTEND, [type]);
   const typeIsStake = useMemo(() => type === StakeType.STAKE, [type]);
+  const typeIsRenew = useMemo(() => type === StakeType.RENEW, [type]);
   const typeIsAdd = useMemo(() => type === StakeType.ADD, [type]);
 
   const [isExtend, setIsExtend] = useState(typeIsExtend);
@@ -92,11 +100,12 @@ function StackModal({
     stakeNotes = [],
     addStakeNotes = [],
     extendStakeNotes = [],
+    renewStakeNotes = [],
   } = useGetCmsInfo() || {};
 
   useEffect(() => {
     // add stake
-    if (typeIsAdd && !isExtend) {
+    if ((typeIsAdd || typeIsRenew) && !isExtend) {
       return setAprK(getAprK(originPeriod, fixedBoostFactor));
     }
     if (!period) return setAprK('');
@@ -104,7 +113,7 @@ function StackModal({
     const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + originPeriod, fixedBoostFactor);
     setAprK(aprK);
     console.log('APRK--', aprK);
-  }, [fixedBoostFactor, getAprK, isExtend, originPeriod, period, typeIsAdd]);
+  }, [fixedBoostFactor, getAprK, isExtend, originPeriod, period, typeIsAdd, typeIsRenew]);
 
   const stakedAmount = useMemo(() => divDecimals(staked, decimal).toFixed(), [decimal, staked]);
 
@@ -115,13 +124,18 @@ function StackModal({
     console.log('calculate--apr-k', aprK);
     let currentTotal;
     if (!yearlyRewards || !totalStaked || !aprK) return '';
+    if (typeIsRenew) {
+      return '';
+    }
     if (isFreezeAmount) {
       const addAmount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : 0;
-      currentTotal = getTotalStakedWithAdd(totalStaked, addAmount, aprK, decimal);
+      currentTotal = getTotalStakedWithAdd(totalStaked, boostedAmount, addAmount, aprK, decimal);
     } else if (typeIsExtend) {
       currentTotal = ZERO.plus(totalStaked);
     } else if (typeIsAdd || typeIsStake) {
-      currentTotal = amount ? getTotalStakedWithAdd(totalStaked, amount, aprK, decimal) : '';
+      currentTotal = amount
+        ? getTotalStakedWithAdd(totalStaked, boostedAmount, amount, aprK, decimal)
+        : '';
     }
 
     if (!currentTotal) return '';
@@ -132,12 +146,14 @@ function StackModal({
   }, [
     amount,
     aprK,
+    boostedAmount,
     decimal,
     freezeAmount,
     isFreezeAmount,
     totalStaked,
     typeIsAdd,
     typeIsExtend,
+    typeIsRenew,
     typeIsStake,
     yearlyRewards,
   ]);
@@ -152,6 +168,8 @@ function StackModal({
         return <StakeTitle text={`Add Staking ${stakeSymbol}`} rate={rate} />;
       case StakeType.EXTEND:
         return <StakeTitle text="Extend Lock-up Period" rate={rate} />;
+      case StakeType.RENEW:
+        return <StakeTitle text="Renew" rate={rate} />;
       default:
         return '';
     }
@@ -162,7 +180,16 @@ function StackModal({
     const inputAmount = amount.replaceAll(',', '');
 
     if (isFreezeAmount) {
-      _amount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : stakedAmount;
+      if (earlyAmount) {
+        _amount = divDecimals(
+          BigNumber(freezeAmount || 0)
+            .plus(BigNumber(earlyAmount))
+            .toNumber(),
+          decimal,
+        ).toFixed();
+      } else {
+        _amount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : stakedAmount;
+      }
     } else if (typeIsStake) {
       _amount = inputAmount;
     } else if (typeIsAdd) {
@@ -173,7 +200,16 @@ function StackModal({
     }
 
     return formatNumberWithDecimalPlaces(_amount) || '--';
-  }, [amount, decimal, freezeAmount, isFreezeAmount, stakedAmount, typeIsAdd, typeIsStake]);
+  }, [
+    amount,
+    decimal,
+    earlyAmount,
+    freezeAmount,
+    isFreezeAmount,
+    stakedAmount,
+    typeIsAdd,
+    typeIsStake,
+  ]);
 
   const originAmountStr = useMemo(() => {
     if (typeIsAdd && amount) {
@@ -181,8 +217,20 @@ function StackModal({
         return formatNumberWithDecimalPlaces(divDecimals(freezeAmount, decimal).toFixed());
       return formatNumberWithDecimalPlaces(stakedAmount);
     }
+    if (typeIsRenew && earlyAmount) {
+      return formatNumberWithDecimalPlaces(divDecimals(earlyAmount, decimal).toFixed());
+    }
     return '';
-  }, [amount, decimal, freezeAmount, isFreezeAmount, stakedAmount, typeIsAdd]);
+  }, [
+    amount,
+    decimal,
+    earlyAmount,
+    freezeAmount,
+    isFreezeAmount,
+    stakedAmount,
+    typeIsAdd,
+    typeIsRenew,
+  ]);
 
   const remainingTime = useMemo(() => {
     if (!unlockTime) return '';
@@ -216,18 +264,32 @@ function StackModal({
     return `${period} Days`;
   }, [isExtend, period, remainingTime, remainingTimeFormatStr, typeIsStake]);
 
+  const targetPeriod = useMemo(() => {
+    if (isExtend) {
+      return formatNumberWithDecimalPlaces(ZERO.plus(remainingTime).plus(period), 1);
+    }
+    return period;
+  }, [isExtend, period, remainingTime]);
+
   const originAPRStr = useMemo(() => {
     const originAprK = originPeriod ? getAprK(originPeriod, fixedBoostFactor) : '--';
-    return !typeIsStake ? `${formatNumberWithDecimalPlaces(stakeApr ?? '')}%(${originAprK}x)` : '';
+    const originAprKDisplay = BigNumber(originAprK).toFixed(2, BigNumber.ROUND_DOWN);
+    return !typeIsStake
+      ? `${formatNumberWithDecimalPlaces(stakeApr ?? '')}%(${originAprKDisplay}x)`
+      : '';
   }, [fixedBoostFactor, getAprK, originPeriod, stakeApr, typeIsStake]);
 
   const aprStr = useMemo(() => {
+    const aprKDisplay = BigNumber(aprK).toFixed(2, BigNumber.ROUND_DOWN);
     if (apr) {
-      return `${formatNumberWithDecimalPlaces(apr)}%(${aprK ? aprK : '--'}x)`;
+      return `${formatNumberWithDecimalPlaces(apr)}%(${aprK ? aprKDisplay : '--'}x)`;
+    }
+    if (typeIsRenew) {
+      return `${formatNumberWithDecimalPlaces(stakeApr ?? '')}%(${aprKDisplay}x)`;
     }
     if (typeIsAdd || typeIsExtend) return originAPRStr;
     return '--';
-  }, [apr, aprK, originAPRStr, typeIsAdd, typeIsExtend]);
+  }, [apr, aprK, originAPRStr, stakeApr, typeIsAdd, typeIsExtend, typeIsRenew]);
 
   const originReleaseDateStr = useMemo(() => {
     if (!unlockTime) return '--';
@@ -250,8 +312,17 @@ function StackModal({
   const notesList = useMemo(() => {
     if (typeIsStake) return stakeNotes;
     if (typeIsAdd) return addStakeNotes.concat(extendStakeNotes);
+    if (typeIsRenew) return renewStakeNotes;
     return extendStakeNotes;
-  }, [addStakeNotes, extendStakeNotes, stakeNotes, typeIsAdd, typeIsStake]);
+  }, [
+    addStakeNotes,
+    extendStakeNotes,
+    renewStakeNotes,
+    stakeNotes,
+    typeIsAdd,
+    typeIsRenew,
+    typeIsStake,
+  ]);
 
   const maxDuration = useMemo(() => {
     if (typeIsStake) return MAX_STAKE_PERIOD;
@@ -279,6 +350,19 @@ function StackModal({
       </div>
     );
   }, [balance, isFreezeAmount, stakedAmount, typeIsExtend]);
+
+  const periodLabel = useMemo(() => {
+    return (
+      <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
+        <span>Lock duration</span>
+        <span className={clsx('font-normal text-neutralTitle mb-6')}>
+          <span className=" text-neutralPrimary font-semibold">
+            {dayjs.duration(Number(period), 'second').days()}
+          </span>
+        </span>
+      </div>
+    );
+  }, [period]);
 
   const onExtendChange = useCallback(() => {
     setIsExtend(!isExtend);
@@ -345,7 +429,7 @@ function StackModal({
       if (ZERO.plus(balance || 0).lt(_val)) {
         return Promise.reject(`insufficient ${stakeSymbol} balance`);
       }
-      if (typeIsAdd && ZERO.plus(_val).lt(0)) return Promise.reject(`amount must greater than 0`);
+      if (typeIsAdd && ZERO.plus(_val).lte(0)) return Promise.reject(`amount must greater than 0`);
       if (typeIsStake && ZERO.plus(_val).lt(min))
         return Promise.reject(`Minimum staking ${min} ${stakeSymbol}`);
       setAmountValid(true);
@@ -398,9 +482,9 @@ function StackModal({
     (values: any) => {
       console.log('finish', values);
       const _amount = typeIsExtend || isFreezeAmount ? stakedAmount ?? '' : amount;
-      onConfirm?.(_amount.replaceAll(',', ''), period);
+      onConfirm?.(_amount.replaceAll(',', ''), targetPeriod);
     },
-    [amount, isFreezeAmount, onConfirm, period, stakedAmount, typeIsExtend],
+    [amount, isFreezeAmount, onConfirm, stakedAmount, targetPeriod, typeIsExtend],
   );
 
   const displayGainToken = useMemo(() => {
@@ -484,7 +568,9 @@ function StackModal({
             </div>
           </div>
         )}
-        {maxDuration !== '0' && (
+        {isFreezePeriod ? (
+          <>{periodLabel}</>
+        ) : maxDuration !== '0' ? (
           <FormItem label={durationLabel} className="font-medium">
             <FormItem name="period" rules={[{ validator: validateDays }]} className="mb-[22px]">
               <InputNumberBase
@@ -497,7 +583,7 @@ function StackModal({
             </FormItem>
             <DaysSelect current={period} onSelect={onSelectDays} disabled={disabledDurationInput} />
           </FormItem>
-        )}
+        ) : null}
         <FormItem label="Fixed Staking Overview" className="font-medium">
           <div className="flex flex-col gap-4 py-6 px-6 bg-brandBg rounded-lg font-normal">
             <ViewItem label="Amount" text={amountStr} originText={originAmountStr} />

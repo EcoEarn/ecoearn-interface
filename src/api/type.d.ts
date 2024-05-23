@@ -38,6 +38,8 @@ interface IStakePoolData {
   decimal?: number;
   rate?: number | string;
   fixedBoostFactor?: number | string;
+  unlockWindowDuration?: number | string;
+  boostedAmount?: number | string;
 }
 
 type TStackPoolDataKey = keyof IStakePoolData;
@@ -48,6 +50,21 @@ interface IStakingItem {
   stakingAddress: number;
   isOpenStake: boolean;
   projectOwner: string;
+}
+
+interface IChildTextNode {
+  textWord: string;
+  ChildTextNodes: IChildTextNode;
+}
+
+interface IRenewText {
+  textWord: string;
+  childTextNodes: Array<IChildTextNode>;
+}
+
+interface IStakingPoolResult {
+  pools: Array<IStakePoolData>;
+  textNodes: Array<IRenewText>;
 }
 
 interface IPointsPoolParams {

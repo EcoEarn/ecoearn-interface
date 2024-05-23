@@ -2,6 +2,7 @@ export enum StakeType {
   STAKE = 'stake',
   ADD = 'add',
   EXTEND = 'extend',
+  RENEW = 'renew',
 }
 
 export enum PoolType {

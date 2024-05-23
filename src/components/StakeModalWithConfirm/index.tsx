@@ -19,6 +19,9 @@ interface IStackModalProps {
   type: StakeType;
   isFreezeAmount?: boolean;
   freezeAmount: string | number;
+  isFreezePeriod?: boolean;
+  freezePeriod?: number | string;
+  earlyAmount?: number | string;
   balance?: string;
   stakeData: IStakePoolData;
   onStake: (amount: number | string, period: number | string) => Promise<ISendResult | void>;
@@ -32,6 +35,9 @@ function StackModalWithConfirm({
   stakeData,
   isFreezeAmount,
   freezeAmount,
+  isFreezePeriod,
+  freezePeriod,
+  earlyAmount,
   onStake,
   onSuccess,
   balance,
@@ -90,9 +96,9 @@ function StackModalWithConfirm({
       }
 
       setContent({
-        amount,
+        amount: earlyAmount ? BigNumber(earlyAmount).plus(BigNumber(amount)).toString() : amount,
         period,
-        oldAmount: _staked,
+        oldAmount: earlyAmount || _staked,
         unlockDateTimeStamp: period ? '' : unlockTime,
         oldDateTimeStamp: unlockTime,
         newDateTimeStamp: getNewUnlockTimeStamp(period),
@@ -100,7 +106,7 @@ function StackModalWithConfirm({
       });
       return;
     },
-    [decimal, getNewUnlockTimeStamp, stakeSymbol, staked, type, unlockTime],
+    [decimal, earlyAmount, getNewUnlockTimeStamp, stakeSymbol, staked, type, unlockTime],
   );
 
   const onStakeModalConfirm = useCallback(
@@ -153,7 +159,10 @@ function StackModalWithConfirm({
       <StackModal
         visible={modal.visible}
         isFreezeAmount={isFreezeAmount}
+        isFreezePeriod={isFreezePeriod}
+        freezePeriod={freezePeriod}
         freezeAmount={freezeAmount}
+        earlyAmount={earlyAmount}
         type={type}
         balance={balance}
         onClose={onClose}

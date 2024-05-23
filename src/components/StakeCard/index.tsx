@@ -17,29 +17,31 @@ import useCountDownLock from 'hooks/useCountDownLock';
 import { PoolType } from 'types/stack';
 import { MAX_STAKE_PERIOD } from 'constants/stake';
 import Renewal from 'components/Renewal';
-import { useModal } from '@ebay/nice-modal-react';
-import RenewalModal from 'components/RenewalModal';
 
 interface IStackCardProps {
   type: PoolType | string;
   data: IStakePoolData;
+  renewText: Array<IRenewText>;
   isLogin: boolean;
   onClaim?: (data: IStakePoolData) => void;
   onAdd?: (data: IStakePoolData) => void;
   onUnlock?: (data: IStakePoolData) => void;
   onExtend?: (data: IStakePoolData) => void;
   onStake?: (data: IStakePoolData) => void;
+  onRenewal?: (data: IStakePoolData) => void;
 }
 
 export default function StackCard({
   type,
   data,
+  renewText,
   isLogin,
   onStake,
   onAdd,
   onClaim,
   onExtend,
   onUnlock,
+  onRenewal,
 }: IStackCardProps) {
   const {
     projectOwner,
@@ -58,11 +60,10 @@ export default function StackCard({
     icons,
     decimal = 8,
     rate,
+    unlockWindowDuration,
   } = data;
 
   const { isUnLocked, countDisplay } = useCountDownLock({ targetTimeStamp: unlockTime || '' });
-
-  const renewalModal = useModal(RenewalModal);
 
   const showStackInfo = useMemo(
     () => !BigNumber(data?.staked || '').isZero() && isLogin,
@@ -84,7 +85,8 @@ export default function StackCard({
   );
 
   const stakingExpiredTip = useMemo(
-    () => (isUnLocked ? 'Stake has expired, please unlock.' : ''),
+    () =>
+      isUnLocked ? 'Stake has expired, cannot be added stake. Please renew the staking first.' : '',
     [isUnLocked],
   );
 
@@ -143,7 +145,7 @@ export default function StackCard({
           <ToolTip title="APR from Staking">
             <div className={styles['apr-tag']}>
               <span className={styles['apr-text']}>
-                APR: {formatNumberWithDecimalPlaces(stakeApr || '') || '--'}%
+                APR: {formatNumberWithDecimalPlaces(BigNumber(stakeApr || '').times(100)) || '--'}%
               </span>
             </div>
           </ToolTip>
@@ -195,7 +197,7 @@ export default function StackCard({
             <div className="flex gap-4 md:gap-3 xl:flex-col">
               <ToolTip title={stakingExpiredTip}>
                 <Button
-                  className="flex-1 lg:w-[100px] !rounded-md"
+                  className="flex-1 lg:flex-initial lg:w-[100px] !rounded-md"
                   type="primary"
                   size="medium"
                   onClick={() => {
@@ -208,7 +210,7 @@ export default function StackCard({
               </ToolTip>
               <ToolTip title={unStackTip}>
                 <Button
-                  className="flex-1 lg:w-[100px] !rounded-md"
+                  className="flex-1 lg:flex-initial lg:w-[100px] !rounded-md"
                   size="medium"
                   disabled={!isUnLocked}
                   onClick={() => {
@@ -222,33 +224,46 @@ export default function StackCard({
           </div>
           <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] bg-neutralDivider"></div>
           <div className="flex flex-1 flex-col gap-6 xl:flex-row md:gap-4 ">
-            <div className="flex flex-col gap-2 lg:min-w-[210px]">
-              <div className="text-base text-neutralSecondary font-medium">
-                Remaining Lock-up Period
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-base font-semibold text-neutralTitle">
-                  {isUnLocked ? 'Unlockable' : countDisplay}
-                </div>
-                <div className="text-sm font-medium text-neutralDisable">
-                  Unlock on {dayjs(unlockTime).format('YYYY-MM-DD HH:mm')}
-                </div>
-              </div>
-            </div>
-            <ToolTip title={stakingExpiredTip}>
-              <Button
-                className="!rounded-md xl:w-[100px]"
-                type="primary"
-                size="medium"
-                ghost
-                disabled={disabledExtendBtn}
-                onClick={() => {
-                  onExtend?.(data);
+            {isUnLocked ? (
+              <Renewal
+                unlockTimeStamp={unlockTime || ''}
+                unlockWindowDuration={unlockWindowDuration || ''}
+                renewText={renewText}
+                onRenewal={() => {
+                  onRenewal?.(data);
                 }}
-              >
-                Extend
-              </Button>
-            </ToolTip>
+              />
+            ) : (
+              <>
+                <div className="flex flex-col gap-2 lg:min-w-[210px]">
+                  <div className="text-base text-neutralSecondary font-medium">
+                    Remaining Lock-up Period
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="text-base font-semibold text-neutralTitle">
+                      {isUnLocked ? 'Unlockable' : countDisplay}
+                    </div>
+                    <div className="text-sm font-medium text-neutralDisable">
+                      Unlock on {dayjs(unlockTime).format('YYYY-MM-DD HH:mm')}
+                    </div>
+                  </div>
+                </div>
+                <ToolTip title={stakingExpiredTip}>
+                  <Button
+                    className="!rounded-md xl:w-[100px]"
+                    type="primary"
+                    size="medium"
+                    ghost
+                    disabled={disabledExtendBtn}
+                    onClick={() => {
+                      onExtend?.(data);
+                    }}
+                  >
+                    Extend
+                  </Button>
+                </ToolTip>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -148,6 +148,7 @@ export default function useRewardsAggregation() {
         isFreezeAmount: true,
         type: hasHistoryStake ? StakeType.ADD : StakeType.STAKE,
         freezeAmount: String(data?.pointsPoolAgg?.total),
+        earlyAmount: hasHistoryStake ? String(earlyStakeData?.staked) : undefined,
         stakeData: {
           period: hasHistoryStake ? earlyStakeData?.period : undefined,
           poolId: earlyStakeData?.poolId,

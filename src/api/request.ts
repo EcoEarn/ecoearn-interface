@@ -14,7 +14,7 @@ export const fetchToken = async (data: ITokenParams) => {
 
 export const fetchStackingPoolsData = async (
   data: IFetchStakeParams,
-): Promise<Array<IStakePoolData>> => {
+): Promise<IStakingPoolResult> => {
   return request.post('/app/simple/staking/pools', data);
 };
 
