@@ -5,6 +5,7 @@ import { useModal } from '@ebay/nice-modal-react';
 import RenewalModal from 'components/RenewalModal';
 import { useCountDown } from 'ahooks';
 import { Flex } from 'antd';
+import { useMemo } from 'react';
 
 interface IRenewalProps {
   unlockTimeStamp: number | string;
@@ -26,8 +27,12 @@ export default function Renewal({
   const [countdown, { days, hours, minutes }] = useCountDown({
     targetDate: dayjs(unlockTimeStamp)
       .add(Number(unlockWindowDuration || 0), 'second')
-      .unix(),
+      .valueOf(),
   });
+
+  const minutesDisplay = useMemo(() => {
+    return minutes > 1 ? minutes : 1;
+  }, [minutes]);
 
   return (
     <div className="flex flex-col gap-2 text-neutralSecondary">
@@ -40,16 +45,28 @@ export default function Renewal({
             </ToolTip>
           </div>
           <Flex gap={4} align="center" justify="center">
-            <Flex className="w-[36px] h-[34px] border-solid border-neutralBorder rounded-md text-lg font-semibold text-neutralTitle">
+            <Flex
+              className="w-[36px] h-[34px] border-solid border-[1px] border-neutralBorder rounded-md text-lg font-semibold text-neutralTitle"
+              align="center"
+              justify="center"
+            >
               {days}
             </Flex>
             <span className="p-2 text-xs font-medium text-neutralSecondary">D</span>
-            <Flex className="w-[36px] h-[34px] border-solid border-neutralBorder rounded-md text-lg font-semibold text-neutralTitle">
+            <Flex
+              className="w-[36px] h-[34px] border-solid border-[1px] border-neutralBorder rounded-md text-lg font-semibold text-neutralTitle"
+              align="center"
+              justify="center"
+            >
               {hours}
             </Flex>
             <span className="p-2 text-xs font-medium text-neutralSecondary">H</span>
-            <Flex className="w-[36px] h-[34px] border-solid border-neutralBorder rounded-md text-lg font-semibold text-neutralTitle">
-              {minutes}
+            <Flex
+              className="w-[36px] h-[34px] border-solid border-neutralBorder border-[1px] rounded-md text-lg font-semibold text-neutralTitle"
+              align="center"
+              justify="center"
+            >
+              {minutesDisplay}
             </Flex>
             <span className="p-2 text-xs font-medium text-neutralSecondary">M</span>
           </Flex>

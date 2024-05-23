@@ -12,6 +12,7 @@ interface IUnlockModalProps {
   poolId: string;
   tokenSymbol: string;
   rewardsSymbol: string;
+  releasePeriod: string | number;
   onSuccess?: () => void;
 }
 
@@ -22,6 +23,7 @@ function UnlockModal({
   poolId,
   tokenSymbol,
   rewardsSymbol,
+  releasePeriod,
   onSuccess,
 }: IUnlockModalProps) {
   const modal = useModal();
@@ -63,7 +65,14 @@ function UnlockModal({
       visible={modal.visible}
       status={status}
       loading={loading}
-      content={{ amountFromStake, autoClaimAmount, amountFromWallet, tokenSymbol, rewardsSymbol }}
+      content={{
+        amountFromStake,
+        autoClaimAmount,
+        amountFromWallet,
+        tokenSymbol,
+        rewardsSymbol,
+        releasePeriod,
+      }}
       onClose={onClose}
       onConfirm={onConfirm}
       transactionId={TransactionId}

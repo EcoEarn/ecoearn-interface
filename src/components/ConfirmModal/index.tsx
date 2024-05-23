@@ -25,6 +25,7 @@ export type TConfirmModalStatus = 'normal' | 'success' | 'error';
 export interface IClaimContent {
   amount?: number | string;
   tokenSymbol?: string;
+  releasePeriod?: number | string;
 }
 
 export interface IWithDrawContent extends IClaimContent {
@@ -54,6 +55,7 @@ export interface IUnLockContent {
   autoClaimAmount?: string;
   tokenSymbol?: string;
   rewardsSymbol?: string;
+  releasePeriod?: number | string;
 }
 
 export type TConfirmModalContentType = IExtendedLockupContent &
@@ -78,6 +80,11 @@ function ConfirmModal(props: IConfirmModalProps) {
   const { content, onConfirm, loading, type, status, onClose, transactionId, visible } = props;
   const { isLG } = useResponsive();
   const { explorerUrl } = useGetCmsInfo() || {};
+
+  const withDrawPeriod = useMemo(() => {
+    const withDrawPeriodDays = dayjs.duration(Number(content?.releasePeriod || 0), 'second').days();
+    return `${withDrawPeriodDays} ${withDrawPeriodDays > 1 ? 'days' : 'day'}`;
+  }, [content?.releasePeriod]);
 
   const renderTitle = useMemo(() => {
     if (status !== 'normal') {
@@ -138,7 +145,7 @@ function ConfirmModal(props: IConfirmModalProps) {
           </div>
           <div className="text-sm font-normal text-neutralSecondary mt-4">
             <span>{`Your claimed rewards will be available for withdrawal after `}</span>
-            <span className="font-medium text-neutralTitle">24h</span>
+            <span className="font-medium text-neutralTitle">{withDrawPeriod}</span>
             <span> {` , appearing on the "Rewards" page.`}</span>
           </div>
         </Flex>
@@ -329,7 +336,7 @@ function ConfirmModal(props: IConfirmModalProps) {
               </span>
               <span>
                 <span>{`Your claimed rewards will be available for withdrawal after `}</span>
-                <span className="font-medium text-neutralTitle">24h</span>
+                <span className="font-medium text-neutralTitle">{withDrawPeriod}</span>
                 <span>{` , appearing on "Rewards" page.`}</span>
               </span>
             </Flex>

@@ -100,7 +100,7 @@ export function PointsStakeItem({
         </Flex>
         <Flex
           align="center"
-          className="mt-2 w-full md:w-fit"
+          className="md:mt-0 mt-2 w-full md:w-fit"
           gap={4}
           justify={isMD ? 'space-between' : 'start'}
         >
@@ -264,7 +264,11 @@ export default function PointsStakingList() {
     <>
       <ConfirmModal
         type={ConfirmModalTypeEnum.Claim}
-        content={{ amount: curItem?.realEarned || 0, tokenSymbol: curItem?.rewardsTokenName }}
+        content={{
+          amount: curItem?.realEarned || 0,
+          tokenSymbol: curItem?.rewardsTokenName,
+          releasePeriod: curItem?.releasePeriod,
+        }}
         status={status}
         loading={loading}
         visible={modalVisible}

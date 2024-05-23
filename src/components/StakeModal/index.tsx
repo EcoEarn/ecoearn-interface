@@ -78,6 +78,7 @@ function StackModal({
     rate,
     fixedBoostFactor = '',
     boostedAmount = 0,
+    stakingPeriod,
   } = stakeData;
   const [form] = Form.useForm();
   const [amount, setAmount] = useState<string>('');
@@ -93,7 +94,8 @@ function StackModal({
 
   const [isExtend, setIsExtend] = useState(typeIsExtend);
   const [amountValid, setAmountValid] = useState(typeIsExtend || isFreezeAmount);
-  const [periodValid, setPeriodValid] = useState(typeIsAdd);
+  const [periodValid, setPeriodValid] = useState(typeIsAdd || typeIsRenew);
+
   const {
     curChain,
     awakenSGRUrl,
@@ -253,7 +255,14 @@ function StackModal({
     [isExtend, remainingTimeFormatStr],
   );
 
+  const curStakingPeriod = useMemo(() => {
+    return dayjs.duration(Number(stakingPeriod || 0), 'second').days();
+  }, [stakingPeriod]);
+
   const periodStr = useMemo(() => {
+    if (typeIsRenew) {
+      return `${curStakingPeriod} Days`;
+    }
     if (!typeIsStake && !period) return remainingTimeFormatStr;
     if (!period) return '--';
     if (isExtend) {
@@ -262,14 +271,25 @@ function StackModal({
         : '--';
     }
     return `${period} Days`;
-  }, [isExtend, period, remainingTime, remainingTimeFormatStr, typeIsStake]);
+  }, [
+    curStakingPeriod,
+    isExtend,
+    period,
+    remainingTime,
+    remainingTimeFormatStr,
+    typeIsRenew,
+    typeIsStake,
+  ]);
 
   const targetPeriod = useMemo(() => {
     if (isExtend) {
       return formatNumberWithDecimalPlaces(ZERO.plus(remainingTime).plus(period), 1);
+    } else if (typeIsRenew) {
+      return curStakingPeriod;
+    } else {
+      return period;
     }
-    return period;
-  }, [isExtend, period, remainingTime]);
+  }, [curStakingPeriod, isExtend, period, remainingTime, typeIsRenew]);
 
   const originAPRStr = useMemo(() => {
     const originAprK = originPeriod ? getAprK(originPeriod, fixedBoostFactor) : '--';
@@ -298,6 +318,7 @@ function StackModal({
 
   const releaseDateStr = useMemo(() => {
     if (typeIsAdd && !isExtend) return originReleaseDateStr;
+    if (typeIsRenew) return dayjs().add(+curStakingPeriod, 'day').format(DEFAULT_DATE_FORMAT);
     if (!period) return '--';
     if (isExtend && unlockTime) {
       return dayjs(unlockTime).add(+period, 'day').format(DEFAULT_DATE_FORMAT);
@@ -307,7 +328,16 @@ function StackModal({
     }
 
     return '--';
-  }, [isExtend, originReleaseDateStr, period, typeIsAdd, typeIsStake, unlockTime]);
+  }, [
+    curStakingPeriod,
+    isExtend,
+    originReleaseDateStr,
+    period,
+    typeIsAdd,
+    typeIsRenew,
+    typeIsStake,
+    unlockTime,
+  ]);
 
   const notesList = useMemo(() => {
     if (typeIsStake) return stakeNotes;
@@ -356,13 +386,11 @@ function StackModal({
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Lock duration</span>
         <span className={clsx('font-normal text-neutralTitle mb-6')}>
-          <span className=" text-neutralPrimary font-semibold">
-            {dayjs.duration(Number(period), 'second').days()}
-          </span>
+          <span className=" text-neutralPrimary font-semibold">{curStakingPeriod}</span>
         </span>
       </div>
     );
-  }, [period]);
+  }, [curStakingPeriod]);
 
   const onExtendChange = useCallback(() => {
     setIsExtend(!isExtend);
@@ -482,7 +510,7 @@ function StackModal({
     (values: any) => {
       console.log('finish', values);
       const _amount = typeIsExtend || isFreezeAmount ? stakedAmount ?? '' : amount;
-      onConfirm?.(_amount.replaceAll(',', ''), targetPeriod);
+      onConfirm?.(_amount.replaceAll(',', ''), String(targetPeriod));
     },
     [amount, isFreezeAmount, onConfirm, stakedAmount, targetPeriod, typeIsExtend],
   );

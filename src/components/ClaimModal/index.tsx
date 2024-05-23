@@ -8,6 +8,7 @@ import { divDecimals } from 'utils/calculate';
 
 interface IClaimModalProps {
   amount: string | number;
+  releasePeriod: string | number;
   tokenSymbol: string;
   decimal: number;
   stakeId: string;
@@ -15,7 +16,14 @@ interface IClaimModalProps {
   onSuccess?: () => void;
 }
 
-function ClaimModal({ amount, tokenSymbol, decimal = 8, stakeId, onSuccess }: IClaimModalProps) {
+function ClaimModal({
+  amount,
+  tokenSymbol,
+  decimal = 8,
+  stakeId,
+  onSuccess,
+  releasePeriod,
+}: IClaimModalProps) {
   const modal = useModal();
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
   const [loading, setLoading] = useState(false);
@@ -47,7 +55,7 @@ function ClaimModal({ amount, tokenSymbol, decimal = 8, stakeId, onSuccess }: IC
       visible={modal.visible}
       status={status}
       loading={loading}
-      content={{ amount: divDecimals(amount, decimal).toFixed(2), tokenSymbol }}
+      content={{ amount: divDecimals(amount, decimal).toFixed(2), tokenSymbol, releasePeriod }}
       onClose={onClose}
       onConfirm={onConfirm}
       transactionId={transactionId}

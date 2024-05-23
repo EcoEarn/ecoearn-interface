@@ -17,6 +17,7 @@ import useCountDownLock from 'hooks/useCountDownLock';
 import { PoolType } from 'types/stack';
 import { MAX_STAKE_PERIOD } from 'constants/stake';
 import Renewal from 'components/Renewal';
+import useUnlockCount from './hooks/useUnlockCount';
 
 interface IStackCardProps {
   type: PoolType | string;
@@ -61,9 +62,15 @@ export default function StackCard({
     decimal = 8,
     rate,
     unlockWindowDuration,
+    stakingPeriod,
+    lastOperationTime,
   } = data;
 
-  const { isUnLocked, countDisplay } = useCountDownLock({ targetTimeStamp: unlockTime || '' });
+  const { countDisplay, isUnLocked, targetUnlockTimeStamp } = useUnlockCount({
+    unlockWindowDuration: unlockWindowDuration || 0,
+    stakingPeriod: stakingPeriod || 0,
+    lastOperationTime: lastOperationTime || 0,
+  });
 
   const showStackInfo = useMemo(
     () => !BigNumber(data?.staked || '').isZero() && isLogin,
@@ -96,10 +103,10 @@ export default function StackCard({
   }, [decimal, staked]);
 
   const disabledExtendBtn = useMemo(() => {
-    const remainingDays = durationFromNow(unlockTime || '', 'days', true);
-    const canNotExtends = ZERO.plus(remainingDays || 0).gt(MAX_STAKE_PERIOD - 1);
+    const days = dayjs.duration(Number(stakingPeriod || 0), 'second').days();
+    const canNotExtends = ZERO.plus(days || 0).gt(MAX_STAKE_PERIOD - 1);
     return isUnLocked || canNotExtends;
-  }, [isUnLocked, unlockTime]);
+  }, [isUnLocked, stakingPeriod]);
 
   return (
     <div className="stack-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
@@ -226,7 +233,7 @@ export default function StackCard({
           <div className="flex flex-1 flex-col gap-6 xl:flex-row md:gap-4 ">
             {isUnLocked ? (
               <Renewal
-                unlockTimeStamp={unlockTime || ''}
+                unlockTimeStamp={targetUnlockTimeStamp || ''}
                 unlockWindowDuration={unlockWindowDuration || ''}
                 renewText={renewText}
                 onRenewal={() => {
@@ -244,7 +251,7 @@ export default function StackCard({
                       {isUnLocked ? 'Unlockable' : countDisplay}
                     </div>
                     <div className="text-sm font-medium text-neutralDisable">
-                      Unlock on {dayjs(unlockTime).format('YYYY-MM-DD HH:mm')}
+                      Unlock on {dayjs(targetUnlockTimeStamp).format('YYYY-MM-DD HH:mm')}
                     </div>
                   </div>
                 </div>

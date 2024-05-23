@@ -103,6 +103,7 @@ function StackModalWithConfirm({
         oldDateTimeStamp: unlockTime,
         newDateTimeStamp: getNewUnlockTimeStamp(period),
         tokenSymbol: stakeSymbol,
+        days: type === StakeType.RENEW ? period : undefined,
       });
       return;
     },
@@ -113,7 +114,7 @@ function StackModalWithConfirm({
     (amount: string, period: string) => {
       console.log('onStakeModalConfirm', amount, period);
       setConfirmType(
-        type === StakeType.EXTEND
+        type === StakeType.EXTEND || type === StakeType.RENEW
           ? ConfirmModalTypeEnum.ExtendedLockup
           : ConfirmModalTypeEnum.Stake,
       );

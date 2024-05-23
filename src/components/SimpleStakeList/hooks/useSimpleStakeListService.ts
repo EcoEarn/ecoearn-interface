@@ -82,12 +82,13 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
 
   const onClaim = useCallback(
     (stakeData: IStakePoolData) => {
-      const { earnedSymbol = '--', stakeId, earned, decimal } = stakeData;
+      const { earnedSymbol = '--', stakeId, earned, decimal, releasePeriod } = stakeData;
       claimModal.show({
         amount: earned,
         tokenSymbol: earnedSymbol,
         decimal,
         stakeId: String(stakeId) || '',
+        releasePeriod,
         onSuccess: () => getStakeData(),
       });
     },
@@ -104,6 +105,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         earnedSymbol,
         poolId = '',
         decimal,
+        releasePeriod,
       } = stakeData;
       if (!stakeId || !poolId) {
         singleMessage.error('missing params');
@@ -120,6 +122,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           tokenSymbol: stakeSymbol,
           rewardsSymbol: earnedSymbol,
           poolId,
+          releasePeriod,
           onSuccess: () => getStakeData(),
         });
       } catch (error) {
@@ -206,10 +209,9 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         balance: symbolBalance,
         onStake: async (amount, period) => {
           if (type === StakeType.RENEW) {
-            const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
             return await Renew({
               poolId: stakeData?.poolId || '',
-              period: periodInSeconds || 0,
+              period: stakeData?.stakingPeriod || 0,
             });
           } else {
             await checkApproveParams(rate as TFeeType);

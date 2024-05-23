@@ -40,6 +40,9 @@ interface IStakePoolData {
   fixedBoostFactor?: number | string;
   unlockWindowDuration?: number | string;
   boostedAmount?: number | string;
+  stakingPeriod?: number | string;
+  releasePeriod?: number | string;
+  lastOperationTime?: number | string;
 }
 
 type TStackPoolDataKey = keyof IStakePoolData;
@@ -89,6 +92,7 @@ interface IPointsPoolItem {
   decimal: number;
   rewardsTokenName: string;
   stakeTokenName: string;
+  releasePeriod: number;
 }
 
 interface IStakingClaimParams {
