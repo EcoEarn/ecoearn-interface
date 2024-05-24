@@ -207,11 +207,11 @@ function ConfirmModal(props: IConfirmModalProps) {
             ) : (
               <Flex vertical className="w-full gap-4">
                 <Flex justify="space-between">
-                  <span>{`Unlock on (current)`}</span>
+                  <span className="text-neutralSecondary">{`Unlock on (current)`}</span>
                   <span>{dayjs(Number(content?.oldDateTimeStamp)).format('YYYY.MM.DD HH:mm')}</span>
                 </Flex>
                 <Flex justify="space-between">
-                  <span>{`Unlock on (new)`}</span>
+                  <span className="text-neutralSecondary">{`Unlock on (new)`}</span>
                   <span>{dayjs(Number(content?.newDateTimeStamp)).format('YYYY.MM.DD HH:mm')}</span>
                 </Flex>
               </Flex>
@@ -357,7 +357,8 @@ function ConfirmModal(props: IConfirmModalProps) {
       </div>
     );
   }, [
-    content,
+    content?.autoClaimAmount,
+    content?.rewardsSymbol,
     explorerUrl,
     handleConfirm,
     isLG,
@@ -366,6 +367,7 @@ function ConfirmModal(props: IConfirmModalProps) {
     status,
     transactionId,
     type,
+    withDrawPeriod,
   ]);
 
   return (

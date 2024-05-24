@@ -12,7 +12,7 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useWalletService } from 'hooks/useWallet';
 import useLoading from 'hooks/useLoading';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import { divDecimals } from 'utils/calculate';
+import { divDecimals, getTargetUnlockTimeStamp } from 'utils/calculate';
 import dayjs from 'dayjs';
 
 export default function useRewardsAggregation() {
@@ -115,7 +115,17 @@ export default function useRewardsAggregation() {
               address: wallet.address || '',
               chainId: curChain!,
             });
-            setEarlyStakeData(earlyStakeData || {});
+            if (earlyStakeData) {
+              const fixedEarlyStakeData = {
+                ...earlyStakeData,
+                unlockTime: getTargetUnlockTimeStamp(
+                  earlyStakeData?.stakingPeriod || 0,
+                  earlyStakeData?.lastOperationTime || 0,
+                  earlyStakeData?.unlockWindowDuration || 0,
+                ).unlockTime,
+              };
+              setEarlyStakeData(fixedEarlyStakeData);
+            }
           }
         }
       } catch (error) {

@@ -111,11 +111,22 @@ function StackModal({
       return setAprK(getAprK(originPeriod, fixedBoostFactor));
     }
     if (!period) return setAprK('');
-    console.log('period', period, ONE_DAY_IN_SECONDS, originPeriod);
-    const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + originPeriod, fixedBoostFactor);
+    const remaining = dayjs.duration(dayjs(unlockTime).diff(dayjs())).asSeconds();
+    console.log('period', period, remaining, originPeriod);
+    const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + remaining, fixedBoostFactor);
     setAprK(aprK);
     console.log('APRK--', aprK);
-  }, [fixedBoostFactor, getAprK, isExtend, originPeriod, period, typeIsAdd, typeIsRenew]);
+  }, [
+    fixedBoostFactor,
+    getAprK,
+    isExtend,
+    originPeriod,
+    period,
+    stakingPeriod,
+    typeIsAdd,
+    typeIsRenew,
+    unlockTime,
+  ]);
 
   const stakedAmount = useMemo(() => divDecimals(staked, decimal).toFixed(), [decimal, staked]);
 
@@ -245,24 +256,32 @@ function StackModal({
   );
 
   const curStakingPeriod = useMemo(() => {
-    return dayjs.duration(Number(stakingPeriod || 0), 'second').days();
+    return dayjs.duration(Number(stakingPeriod || 0), 'second').asDays();
   }, [stakingPeriod]);
+
+  const maxDuration = useMemo(() => {
+    if (typeIsStake) return MAX_STAKE_PERIOD;
+    return ZERO.plus(MAX_STAKE_PERIOD).minus(remainingTime).toFixed(0);
+  }, [remainingTime, typeIsStake]);
 
   const periodStr = useMemo(() => {
     if (typeIsRenew) {
-      return `${curStakingPeriod} Days`;
+      return `${curStakingPeriod.toFixed(1)} Days`;
     }
     if (!typeIsStake && !period) return remainingTimeFormatStr;
     if (!period) return '--';
     if (isExtend) {
+      const inputValue = period.replaceAll(',', '');
+      const value = ZERO.plus(inputValue).gt(maxDuration) ? maxDuration : inputValue;
       return remainingTime
-        ? `${formatNumberWithDecimalPlaces(ZERO.plus(remainingTime).plus(period), 1)} Days`
+        ? `${formatNumberWithDecimalPlaces(ZERO.plus(remainingTime).plus(value), 1)} Days`
         : '--';
     }
     return `${period} Days`;
   }, [
     curStakingPeriod,
     isExtend,
+    maxDuration,
     period,
     remainingTime,
     remainingTimeFormatStr,
@@ -282,7 +301,9 @@ function StackModal({
     const originAprK = originPeriod ? getAprK(originPeriod, fixedBoostFactor) : '--';
     const originAprKDisplay = BigNumber(originAprK).toFixed(2, BigNumber.ROUND_DOWN);
     return !typeIsStake
-      ? `${formatNumberWithDecimalPlaces(stakeApr ?? '')}%(${originAprKDisplay}x)`
+      ? `${formatNumberWithDecimalPlaces(
+          stakeApr ? BigNumber(stakeApr).times(100) : '',
+        )}%(${originAprKDisplay}x)`
       : '';
   }, [fixedBoostFactor, getAprK, originPeriod, stakeApr, typeIsStake]);
 
@@ -341,11 +362,6 @@ function StackModal({
     typeIsStake,
   ]);
 
-  const maxDuration = useMemo(() => {
-    if (typeIsStake) return MAX_STAKE_PERIOD;
-    return ZERO.plus(MAX_STAKE_PERIOD).minus(remainingTime).toFixed(0);
-  }, [remainingTime, typeIsStake]);
-
   const minDuration = useMemo(() => (typeIsStake ? MIN_STAKE_PERIOD : 0), [typeIsStake]);
 
   const stakeLabel = useMemo(() => {
@@ -373,7 +389,7 @@ function StackModal({
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Lock duration</span>
         <span className={clsx('font-normal text-neutralTitle mb-6')}>
-          <span className=" text-neutralPrimary font-semibold">{curStakingPeriod}</span>
+          <span className=" text-neutralPrimary font-semibold">{curStakingPeriod.toFixed(1)}</span>
         </span>
       </div>
     );
@@ -467,8 +483,7 @@ function StackModal({
   const onSelectDays = useCallback(
     (val: string) => {
       if (disabledDurationInput) return;
-      if (ZERO.plus(val).gt(maxDuration)) return;
-      form.setFieldValue('period', val);
+      form.setFieldValue('period', ZERO.plus(val).gt(maxDuration) ? maxDuration : val);
       form.validateFields(['period']);
       setPeriod(val);
     },

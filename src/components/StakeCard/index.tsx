@@ -56,7 +56,6 @@ export default function StackCard({
     earnedInUsd,
     staked,
     stakedInUsD,
-    unlockTime,
     stakeApr,
     icons,
     decimal = 8,

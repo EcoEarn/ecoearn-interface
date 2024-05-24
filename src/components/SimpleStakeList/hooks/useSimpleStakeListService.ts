@@ -14,7 +14,7 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import dayjs from 'dayjs';
 import { GetBalance } from 'contract/multiToken';
 import { GetBalance as GetLpBalance } from 'contract/lpToken';
-import { divDecimals, timesDecimals } from 'utils/calculate';
+import { divDecimals, getTargetUnlockTimeStamp, timesDecimals } from 'utils/calculate';
 import { checkAllowanceAndApprove } from 'utils/aelfUtils';
 import useLoading from 'hooks/useLoading';
 import { useInterval } from 'ahooks';
@@ -57,7 +57,17 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           address: wallet.address || '',
           chainId: curChain!,
         });
-        setStakeData(pools || []);
+        const stakeData = (pools || []).map((item, index) => {
+          return {
+            ...item,
+            unlockTime: getTargetUnlockTimeStamp(
+              item?.stakingPeriod || 0,
+              item?.lastOperationTime || 0,
+              item?.unlockWindowDuration || 0,
+            ).unlockTime,
+          };
+        });
+        setStakeData(stakeData);
         setRenewText(textNodes || []);
       } catch (error) {
         console.error('getStakeData error', error);

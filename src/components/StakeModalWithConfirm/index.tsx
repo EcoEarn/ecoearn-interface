@@ -84,7 +84,7 @@ function StackModalWithConfirm({
         return;
       }
 
-      if (type === StakeType.STAKE) {
+      if (type === StakeType.STAKE || type === StakeType.RENEW) {
         console.log('unlockDateTimeStamp', getNewUnlockTimeStamp(period));
         setContent({
           amount,
@@ -103,7 +103,6 @@ function StackModalWithConfirm({
         oldDateTimeStamp: unlockTime,
         newDateTimeStamp: getNewUnlockTimeStamp(period),
         tokenSymbol: stakeSymbol,
-        days: type === StakeType.RENEW ? period : undefined,
       });
       return;
     },
@@ -114,7 +113,7 @@ function StackModalWithConfirm({
     (amount: string, period: string) => {
       console.log('onStakeModalConfirm', amount, period);
       setConfirmType(
-        type === StakeType.EXTEND || type === StakeType.RENEW
+        type === StakeType.EXTEND
           ? ConfirmModalTypeEnum.ExtendedLockup
           : ConfirmModalTypeEnum.Stake,
       );

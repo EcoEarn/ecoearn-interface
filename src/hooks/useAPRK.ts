@@ -7,7 +7,7 @@ export default function useAPRK() {
   const getAprK = useCallback((period: number | string, fixedBoostFactor: number | string) => {
     if (fixedBoostFactor && period) {
       const aprX = fixedBoostFactor;
-      const period2Days = dayjs.duration(+period, 'seconds').asDays();
+      const period2Days = dayjs.duration(+period, 'second').asDays();
       const realPeriod = ZERO.plus(period2Days).gt(MAX_STAKE_PERIOD)
         ? MAX_STAKE_PERIOD
         : period2Days;

@@ -172,6 +172,9 @@ interface IEarlyStakeInfo {
   chainId: ChainId;
   poolId: string;
   fixedBoostFactor?: number | string;
+  unlockWindowDuration?: number | string;
+  stakingPeriod?: number | string;
+  lastOperationTime?: number | string;
 }
 
 interface IFetchStakeParams {
