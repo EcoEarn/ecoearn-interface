@@ -387,7 +387,11 @@ function StackModal({
   const minDuration = useMemo(() => (typeIsStake ? MIN_STAKE_PERIOD : 0), [typeIsStake]);
 
   const stakeLabel = useMemo(() => {
-    const _balance = typeIsExtend || isFreezeAmount ? stakedAmount : balance;
+    const _balance = typeIsExtend
+      ? stakedAmount
+      : isFreezeAmount
+      ? divDecimals(freezeAmount, decimal).toFixed(2)
+      : balance;
     return (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
@@ -404,7 +408,7 @@ function StackModal({
         </span>
       </div>
     );
-  }, [balance, isFreezeAmount, stakedAmount, typeIsExtend]);
+  }, [balance, decimal, freezeAmount, isFreezeAmount, stakedAmount, typeIsExtend]);
 
   const periodLabel = useMemo(() => {
     return (
