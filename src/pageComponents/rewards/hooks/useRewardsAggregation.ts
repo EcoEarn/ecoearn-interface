@@ -161,16 +161,7 @@ export default function useRewardsAggregation() {
         earlyAmount: hasHistoryStake
           ? BigNumber(earlyStakeData?.staked || 0).toNumber()
           : undefined,
-        stakeData: {
-          period: hasHistoryStake ? earlyStakeData?.period : undefined,
-          poolId: earlyStakeData?.poolId,
-          staked: String(data?.pointsPoolAgg?.total),
-          unlockTime: hasHistoryStake ? earlyStakeData?.unlockTime : undefined,
-          stakeApr: hasHistoryStake ? earlyStakeData?.stakeApr : undefined,
-          stakeSymbol: data?.pointsPoolAgg?.rewardsTokenName,
-          yearlyRewards: earlyStakeData?.yearlyRewards,
-          fixedBoostFactor: earlyStakeData?.fixedBoostFactor,
-        },
+        stakeData: earlyStakeData,
         onStake: async (amount, period = 0) => {
           const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
           const result = await EarlyStake({
@@ -191,7 +182,6 @@ export default function useRewardsAggregation() {
     }
   }, [
     closeLoading,
-    data?.pointsPoolAgg?.rewardsTokenName,
     data?.pointsPoolAgg?.stakeClaimIds,
     data?.pointsPoolAgg?.total,
     earlyStakeData,

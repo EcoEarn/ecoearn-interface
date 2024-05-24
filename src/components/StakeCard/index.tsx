@@ -109,7 +109,7 @@ export default function StackCard({
 
   return (
     <div className="stack-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
-      <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
+      <div className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-start">
         <StackToken
           className="lg:min-w-[280px]"
           type={type as PoolType}

@@ -33,7 +33,7 @@ function SkeletonImage(props: ISkeletonImage) {
   return (
     <div
       className={clsx(
-        'flex justify-center items-center relative overflow-hidden',
+        'flex justify-center items-center relative',
         `w-[${fallback ? width : 0}px] h-[${fallback ? height : 0}px]`,
         className,
       )}

@@ -29,7 +29,7 @@ export default function DappListMobile({
   }, [closeLoading, loading, showLoading]);
 
   return (
-    <>
+    <Flex vertical gap={16}>
       {items?.map((item, index) => {
         return (
           <Flex
@@ -55,7 +55,7 @@ export default function DappListMobile({
                 <CommonTooltip title="Total number of points Staked by all users" />
               </Flex>
               <span className="text-neutralPrimary font-semibold text-base">
-                {formatNumber(item.tvl)}
+                {item.tvl ? formatNumber(item.tvl) : '--'}
               </span>
             </Flex>
             <Flex className="mt-6" justify="space-between">
@@ -63,7 +63,7 @@ export default function DappListMobile({
                 <span className="text-neutralDisable">Staking Address</span>
               </Flex>
               <span className="text-neutralPrimary font-semibold text-base">
-                {formatNumber(item.stakingAddress)}
+                {item.stakingAddress ? formatNumber(item.stakingAddress) : '--'}
               </span>
             </Flex>
             <Flex gap={8} vertical>
@@ -109,6 +109,6 @@ export default function DappListMobile({
           </Flex>
         );
       })}
-    </>
+    </Flex>
   );
 }

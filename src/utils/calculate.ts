@@ -42,11 +42,12 @@ export function getTotalStakedWithAdd(
   boostedAmount: string | number,
   addAmount: number | string,
   aprK: string | number,
-  tokenDecimal: string | number,
 ) {
+  console.log('getTotalStakedWithAdd', total, boostedAmount, addAmount, aprK);
+
   if (!total || !addAmount || !aprK) return '';
   const amount = typeof addAmount === 'string' ? addAmount.replaceAll(',', '') : addAmount;
-  const virtualAmount = timesDecimals(amount, tokenDecimal).times(aprK);
+  const virtualAmount = ZERO.plus(amount).times(aprK);
   return ZERO.plus(total).minus(boostedAmount).plus(virtualAmount);
 }
 

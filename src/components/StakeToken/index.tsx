@@ -37,7 +37,7 @@ const StackToken = memo(
 
     return (
       <div
-        className={clsx('flex items-center lg:self-center', tokenName && 'gap-4', `${className}`)}
+        className={clsx('flex items-center lg:items-start', tokenName && 'gap-4', `${className}`)}
       >
         {tokenIconList && (
           <Flex className="max-w-[84px]">
@@ -47,8 +47,8 @@ const StackToken = memo(
                 <SkeletonImage
                   key={index}
                   img={item}
-                  width={40}
-                  height={40}
+                  width={48}
+                  height={48}
                   className={clsx('!rounded-[50%]  flex-shrink-0', index !== 0 && 'ml-[-12px]')}
                   fallback={tokenName ? <TokenTextIcon tokenName={tokenName} /> : undefined}
                 />

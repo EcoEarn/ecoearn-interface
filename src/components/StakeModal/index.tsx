@@ -22,7 +22,7 @@ import { singleMessage } from '@portkey/did-ui-react';
 import { getPoolTotalStaked } from 'api/request';
 import useAPRK from 'hooks/useAPRK';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import { getTotalStakedWithAdd, getOwnerAprK, divDecimals } from 'utils/calculate';
+import { getTotalStakedWithAdd, getOwnerAprK, divDecimals, timesDecimals } from 'utils/calculate';
 import RateTag from 'components/RateTag';
 import BigNumber from 'bignumber.js';
 
@@ -141,13 +141,34 @@ function StackModal({
       return '';
     }
     if (isFreezeAmount) {
-      const addAmount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : 0;
-      currentTotal = getTotalStakedWithAdd(totalStaked, boostedAmount, addAmount, aprK, decimal);
+      const addAmount = freezeAmount || 0;
+      currentTotal = getTotalStakedWithAdd(totalStaked, boostedAmount, addAmount, aprK);
     } else if (typeIsExtend) {
-      currentTotal = ZERO.plus(totalStaked);
-    } else if (typeIsAdd || typeIsStake) {
+      currentTotal = getTotalStakedWithAdd(
+        totalStaked,
+        boostedAmount,
+        timesDecimals(stakedAmount, decimal).toFixed(),
+        aprK,
+      );
+    } else if (typeIsAdd) {
       currentTotal = amount
-        ? getTotalStakedWithAdd(totalStaked, boostedAmount, amount, aprK, decimal)
+        ? getTotalStakedWithAdd(
+            totalStaked,
+            boostedAmount,
+            ZERO.plus(timesDecimals(amount, decimal))
+              .plus(timesDecimals(stakedAmount, decimal))
+              .toFixed(),
+            aprK,
+          )
+        : '';
+    } else if (typeIsStake) {
+      currentTotal = amount
+        ? getTotalStakedWithAdd(
+            totalStaked,
+            boostedAmount,
+            timesDecimals(amount, decimal).toFixed(),
+            aprK,
+          )
         : '';
     }
 
@@ -163,6 +184,7 @@ function StackModal({
     decimal,
     freezeAmount,
     isFreezeAmount,
+    stakedAmount,
     totalStaked,
     typeIsAdd,
     typeIsExtend,
@@ -404,6 +426,15 @@ function StackModal({
 
   const disabledDurationInput = useMemo(() => typeIsAdd && !isExtend, [isExtend, typeIsAdd]);
 
+  const stakeSymbolFix = useMemo(() => {
+    if (!stakeSymbol) return;
+    const splitSymbol = stakeSymbol.split(' ');
+    if (splitSymbol.length > 1 && splitSymbol[0] === 'ALP') {
+      return `${splitSymbol[1]} LP`;
+    }
+    return stakeSymbol;
+  }, [stakeSymbol]);
+
   const durationLabel = useMemo(() => {
     return (
       <>
@@ -462,11 +493,11 @@ function StackModal({
       }
       if (typeIsAdd && ZERO.plus(_val).lte(0)) return Promise.reject(`amount must greater than 0`);
       if (typeIsStake && ZERO.plus(_val).lt(min))
-        return Promise.reject(`Minimum staking ${min} ${stakeSymbol}`);
+        return Promise.reject(`Min staking ${min} ${stakeSymbolFix}`);
       setAmountValid(true);
       return Promise.resolve();
     },
-    [balance, min, stakeSymbol, typeIsAdd, typeIsStake],
+    [balance, min, stakeSymbol, stakeSymbolFix, typeIsAdd, typeIsStake],
   );
 
   const onValueChange = useCallback(
@@ -608,6 +639,11 @@ function StackModal({
                 suffixText="Days"
                 decimal={0}
                 allowClear
+                onKeyDown={(e) => {
+                  if (BigNumber(e.key).isZero()) {
+                    e.preventDefault();
+                  }
+                }}
                 disabled={disabledDurationInput}
               />
             </FormItem>

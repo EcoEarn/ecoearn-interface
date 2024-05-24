@@ -55,7 +55,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
   const stakeDisabledTip = useMemo(() => {
     return pointsStakeDisabled
       ? BigNumber(pointsPoolsAmount.stakeTotal || 0).gt(ZERO)
-        ? `Minimum staking 10 ${pointsPoolsAmount.rewardsTokenName}`
+        ? `Min staking 10 ${pointsPoolsAmount.rewardsTokenName}`
         : undefined
       : pointsEarlyStakeDisabled
       ? 'Stake has expired, cannot be added stake. Please renew the staking first.'

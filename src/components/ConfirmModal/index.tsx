@@ -144,9 +144,9 @@ function ConfirmModal(props: IConfirmModalProps) {
             }`}
           </div>
           <div className="text-sm font-normal text-neutralSecondary mt-4">
-            <span>{`Your claimed rewards will be available for withdrawal after `}</span>
+            <span>{`Your claimed rewards can be withdrawn after `}</span>
             <span className="font-medium text-neutralTitle">{withDrawPeriod}</span>
-            <span> {` , appearing on the "Rewards" page.`}</span>
+            <span> {`. To withdraw rewards, head over to "Rewards".`}</span>
           </div>
         </Flex>
       );
@@ -335,9 +335,9 @@ function ConfirmModal(props: IConfirmModalProps) {
                 will be automatically claimed.
               </span>
               <span>
-                <span>{`Your claimed rewards will be available for withdrawal after `}</span>
+                <span>{`Your claimed rewards can be withdrawn after `}</span>
                 <span className="font-medium text-neutralTitle">{withDrawPeriod}</span>
-                <span>{` , appearing on "Rewards" page.`}</span>
+                <span>{`. To withdraw rewards, head over to "Rewards".`}</span>
               </span>
             </Flex>
           )}

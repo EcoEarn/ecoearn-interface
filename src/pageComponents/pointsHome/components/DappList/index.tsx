@@ -138,7 +138,7 @@ export default function DappList({
                 <Button
                   type="primary"
                   disabled={!item.isOpenStake}
-                  className="!min-w-[120px] !rounded-md"
+                  className="!min-w-[132px] !rounded-md"
                   size={isMD ? 'small' : 'medium'}
                 >
                   {item.isOpenStake ? 'Stake' : 'Coming Soon'}
