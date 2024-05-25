@@ -162,7 +162,7 @@ export const isPotentialNumber = (str: string) => {
 export function formatNumberWithDecimalPlaces(val: number | string | BigNumber, decimal = 2) {
   const _val = ZERO.plus(val);
   if (_val.isNaN()) return '';
-  return ZERO.plus(_val.toFixed(decimal)).toFormat();
+  return ZERO.plus(_val.toFixed(decimal, BigNumber.ROUND_DOWN)).toFormat();
 }
 
 export function formatTokenAmount(val: string | number, min = DEFAULT_MIN_AMOUNT) {

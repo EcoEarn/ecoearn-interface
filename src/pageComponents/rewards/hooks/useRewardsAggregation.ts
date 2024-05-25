@@ -111,21 +111,29 @@ export default function useRewardsAggregation() {
           const rewardsTokenName = data?.pointsPoolAgg?.rewardsTokenName || '';
           const stakeTotal = data?.pointsPoolAgg?.total || 0;
           if (rewardsTokenName && !BigNumber(stakeTotal).isZero()) {
-            const earlyStakeData = await getEarlyStakeInfo({
-              tokenName: rewardsTokenName,
-              address: wallet.address || '',
-              chainId: curChain!,
-            });
-            if (earlyStakeData) {
-              const fixedEarlyStakeData = {
-                ...earlyStakeData,
-                unlockTime: getTargetUnlockTimeStamp(
-                  earlyStakeData?.stakingPeriod || 0,
-                  earlyStakeData?.lastOperationTime || 0,
-                  earlyStakeData?.unlockWindowDuration || 0,
-                ).unlockTime,
-              };
-              setEarlyStakeData(fixedEarlyStakeData);
+            try {
+              showLoading();
+              const earlyStakeData = await getEarlyStakeInfo({
+                tokenName: rewardsTokenName,
+                address: wallet.address || '',
+                chainId: curChain!,
+              });
+              closeLoading();
+              if (earlyStakeData) {
+                const fixedEarlyStakeData = {
+                  ...earlyStakeData,
+                  unlockTime: getTargetUnlockTimeStamp(
+                    earlyStakeData?.stakingPeriod || 0,
+                    earlyStakeData?.lastOperationTime || 0,
+                    earlyStakeData?.unlockWindowDuration || 0,
+                  ).unlockTime,
+                };
+                setEarlyStakeData(fixedEarlyStakeData);
+              }
+            } catch (error) {
+              console.error('getEarlyStakeInfo error', error);
+            } finally {
+              closeLoading();
             }
           }
         }

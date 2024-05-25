@@ -68,6 +68,7 @@ export default function PoolsTable({
       {
         key: 'Rewards',
         dataIndex: 'rewards',
+        width: 280,
         title: (
           <div className="flex items-center">
             <span>Rewards</span>

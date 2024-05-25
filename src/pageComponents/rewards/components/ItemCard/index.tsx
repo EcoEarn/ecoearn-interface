@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 import StakeToken from 'components/StakeToken';
 import { PoolType } from 'types/stack';
 import clsx from 'clsx';
-import { CommonTooltip } from '@portkey/did-ui-react';
+import CommonTooltip from 'components/CommonTooltip';
 
 export default function ItemCard({
   item,

@@ -79,7 +79,7 @@ function StackModal({
     fixedBoostFactor = '',
     boostedAmount = 0,
     stakingPeriod,
-  } = stakeData;
+  } = stakeData || {};
   const [form] = Form.useForm();
   const [amount, setAmount] = useState<string>('');
   const [period, setPeriod] = useState('');
@@ -223,8 +223,8 @@ function StackModal({
       if (earlyAmount) {
         _amount = divDecimals(BigNumber(freezeAmount || 0), decimal)
           .plus(divDecimals(BigNumber(earlyAmount || 0), decimal))
-          .toNumber()
-          .toFixed(2);
+          .toFixed(2, BigNumber.ROUND_DOWN)
+          .toString();
       } else {
         _amount = freezeAmount ? divDecimals(freezeAmount, decimal).toFixed() : stakedAmount;
       }
@@ -256,7 +256,9 @@ function StackModal({
       return formatNumberWithDecimalPlaces(stakedAmount);
     }
     if (earlyAmount) {
-      return formatNumberWithDecimalPlaces(divDecimals(earlyAmount, decimal).toFixed(2));
+      return formatNumberWithDecimalPlaces(
+        divDecimals(earlyAmount, decimal).toFixed(2, BigNumber.ROUND_DOWN),
+      );
     }
     return '';
   }, [amount, decimal, earlyAmount, freezeAmount, isFreezeAmount, stakedAmount, typeIsAdd]);
@@ -400,7 +402,7 @@ function StackModal({
     const _balance = typeIsExtend
       ? stakedAmount
       : isFreezeAmount
-      ? divDecimals(freezeAmount, decimal).toFixed(2)
+      ? divDecimals(freezeAmount, decimal).toFixed(2, BigNumber.ROUND_DOWN)
       : balance;
     return (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
@@ -559,7 +561,7 @@ function StackModal({
       const _amount =
         typeIsExtend || isFreezeAmount
           ? earlyAmount
-            ? divDecimals(freezeAmount || '', decimal).toFixed()
+            ? divDecimals(freezeAmount || '', decimal).toFixed(2, BigNumber.ROUND_DOWN)
             : stakedAmount ?? ''
           : amount;
 

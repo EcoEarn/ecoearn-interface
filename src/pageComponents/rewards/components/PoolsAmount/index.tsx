@@ -75,13 +75,12 @@ export default forwardRef(function PoolsAmount(props, ref) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           <div className="p-4 bg-brandBg rounded-xl">
             <div className="flex gap-1 items-center">
-              <span className="text-base font-medium text-neutralTertiary">
-                Stakeable {pointsPoolsAmount.rewardsTokenName} Rewards
-              </span>
+              <span className="text-base font-medium text-neutralTertiary">Stakeable Rewards</span>
               <CommonTooltip title="Stake XPSGR pool to earn more with all claimed SGR rewards (including those in the lock-up period)." />
             </div>
-            <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
-              {pointsPoolsAmount.stakeTotal}
+            <div className="mt-2 break-all text-neutralTitle flex gap-2 items-end">
+              <span className="text-lg font-semibold">{pointsPoolsAmount.stakeTotal}</span>
+              <span className="text-base font-normal">{pointsPoolsAmount.rewardsTokenName}</span>
             </div>
             <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
               {pointsPoolsAmount.stakeTotalUSD}
@@ -104,12 +103,13 @@ export default forwardRef(function PoolsAmount(props, ref) {
           <div className="p-4 bg-brandBg rounded-xl">
             <div className="flex gap-1 items-center">
               <span className="text-base font-medium text-neutralTertiary">
-                Withdrawable {pointsPoolsAmount.rewardsTokenName} Rewards
+                Withdrawable Rewards
               </span>
               <CommonTooltip title="After staking in the XPSGR pool, claimed SGR rewards can be withdrawn to the wallet after the lock-up period, while staking rewards cannot be withdrawn." />
             </div>
-            <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
-              {pointsPoolsAmount.rewardsTotal}
+            <div className="text-neutralTitle mt-2 break-all flex gap-2 items-end">
+              <span className="text-lg font-semibold">{pointsPoolsAmount.rewardsTotal}</span>
+              <span className="text-base font-normal">{pointsPoolsAmount.rewardsTokenName}</span>
             </div>
             <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
               {pointsPoolsAmount.rewardsTotalUSD}
@@ -134,15 +134,14 @@ export default forwardRef(function PoolsAmount(props, ref) {
         <div className="text-xl text-neutralTitle font-semibold">SGR Pool</div>
         <div className="p-4 bg-brandBg rounded-xl mt-4 flex-1 flex flex-col">
           <div className="flex items-center gap-1">
-            <span className="text-base font-medium text-neutralTertiary">
-              Withdrawable {tokenPoolsAmount.rewardsTokenName} Rewards
-            </span>
+            <span className="text-base font-medium text-neutralTertiary">Withdrawable Rewards</span>
             <CommonTooltip
               title={`After staking in the ${tokenPoolsAmount.rewardsTokenName} pool, rewards can be withdrawn to the wallet after the lock-up period.`}
             />
           </div>
-          <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
-            {tokenPoolsAmount.rewardsTotal}
+          <div className="flex gap-2 text-neutralTitle items-end mt-2 break-all">
+            <span className="text-lg font-semibold">{tokenPoolsAmount.rewardsTotal}</span>
+            <span className="text-base font-normal">{tokenPoolsAmount.rewardsTokenName}</span>
           </div>
           <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
             {tokenPoolsAmount.rewardsTotalUSD}
@@ -166,17 +165,16 @@ export default forwardRef(function PoolsAmount(props, ref) {
         <div className="text-xl text-neutralTitle font-semibold">LP Pool</div>
         <div className="p-4 bg-brandBg rounded-xl mt-4 flex-1 flex flex-col">
           <div className="flex items-center gap-1">
-            <span className="text-base font-medium text-neutralTertiary">
-              Withdrawable {LpPoolsAmount.rewardsTokenName} Rewards
-            </span>
+            <span className="text-base font-medium text-neutralTertiary">Withdrawable Rewards</span>
             <CommonTooltip
               title={`After staking in the ${
                 LpPoolsAmount?.rewardsTokenName || ''
               } pool, rewards can be withdrawn to the wallet after the lock-up period.`}
             />
           </div>
-          <div className="text-lg text-neutralPrimary font-semibold mt-2 break-all">
-            {LpPoolsAmount.rewardsTotal}
+          <div className="flex gap-2 items-end text-neutralTitle mt-2 break-all">
+            <span className="text-lg font-semibold">{LpPoolsAmount.rewardsTotal}</span>
+            <span className="text-base font-normal">{LpPoolsAmount.rewardsTokenName}</span>
           </div>
           <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
             {LpPoolsAmount.rewardsTotalUSD}

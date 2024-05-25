@@ -55,7 +55,7 @@ function StackModalWithConfirm({
     tokenSymbol: '',
   });
   const [transactionId, setTransactionId] = useState('');
-  const { stakeSymbol = '--', staked, unlockTime = '', decimal = 8 } = stakeData;
+  const { stakeSymbol = '--', staked, unlockTime = '', decimal = 8 } = stakeData || {};
 
   const getNewUnlockTimeStamp = useCallback(
     (period: string) =>
