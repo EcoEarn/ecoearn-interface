@@ -63,6 +63,7 @@ export default function StackCard({
     unlockWindowDuration,
     stakingPeriod,
     lastOperationTime,
+    minimumClaimAmount,
   } = data;
 
   const { countDisplay, isUnLocked, targetUnlockTimeStamp } = useUnlockCount({
@@ -83,7 +84,16 @@ export default function StackCard({
     )}% ~ ${formatNumberWithDecimalPlaces(ZERO.plus(aprMax).times(100))}%`;
   }, [aprMax, aprMin]);
 
-  const canClaim = useMemo(() => ZERO.plus(earned).gt(0), [earned]);
+  const canClaim = useMemo(
+    () => ZERO.plus(divDecimals(earned, decimal)).gt(minimumClaimAmount || 0),
+    [decimal, earned, minimumClaimAmount],
+  );
+
+  const claimBtnTip = useMemo(() => {
+    return canClaim
+      ? undefined
+      : `The rewards amount is less than ${minimumClaimAmount} ${earnedSymbol} and cannot be claimed.`;
+  }, [canClaim, earnedSymbol, minimumClaimAmount]);
 
   const unStackTip = useMemo(
     () => (!isUnLocked ? 'You cannot unlock during the lock-up period for staking.' : ''),
@@ -171,18 +181,20 @@ export default function StackCard({
                 </div>
               </div>
             </div>
-            <Button
-              className="lg:w-[100px] !rounded-md"
-              type="primary"
-              ghost
-              size="medium"
-              disabled={!canClaim}
-              onClick={() => {
-                onClaim?.(data);
-              }}
-            >
-              Claim
-            </Button>
+            <ToolTip title={claimBtnTip}>
+              <Button
+                className="lg:w-[100px] !rounded-md"
+                type="primary"
+                ghost
+                size="medium"
+                disabled={!canClaim}
+                onClick={() => {
+                  onClaim?.(data);
+                }}
+              >
+                Claim
+              </Button>
+            </ToolTip>
           </div>
           <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] bg-neutralDivider"></div>
           <div className="flex flex-1 flex-col xl:flex-row justify-between md:max-w-[336px] gap-6 md:gap-4">

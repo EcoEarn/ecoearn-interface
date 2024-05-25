@@ -43,6 +43,7 @@ interface IStakePoolData {
   stakingPeriod?: number | string;
   releasePeriod?: number | string;
   lastOperationTime?: number | string;
+  minimumClaimAmount?: number | string;
 }
 
 type TStackPoolDataKey = keyof IStakePoolData;
