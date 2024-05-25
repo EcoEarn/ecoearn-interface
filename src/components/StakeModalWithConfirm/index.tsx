@@ -22,6 +22,7 @@ interface IStackModalProps {
   isFreezePeriod?: boolean;
   freezePeriod?: number | string;
   earlyAmount?: number | string;
+  isEarlyStake?: boolean;
   balance?: string;
   stakeData: IStakePoolData;
   onStake: (amount: number | string, period: number | string) => Promise<ISendResult | void>;
@@ -38,6 +39,7 @@ function StackModalWithConfirm({
   isFreezePeriod,
   freezePeriod,
   earlyAmount,
+  isEarlyStake,
   onStake,
   onSuccess,
   balance,
@@ -169,6 +171,7 @@ function StackModalWithConfirm({
         freezePeriod={freezePeriod}
         freezeAmount={freezeAmount}
         earlyAmount={earlyAmount}
+        isEarlyStake={isEarlyStake}
         type={type}
         balance={balance}
         onClose={onClose}

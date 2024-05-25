@@ -45,6 +45,7 @@ interface IStackModalProps {
   freezePeriod?: number | string;
   freezeAmount?: number | string;
   earlyAmount?: number | string;
+  isEarlyStake?: boolean;
   visible: boolean;
   balance?: string;
   min?: number; // min balance
@@ -60,6 +61,7 @@ function StackModal({
   isFreezePeriod = false,
   freezeAmount,
   earlyAmount,
+  isEarlyStake,
   balance,
   min = MIN_STAKE_AMOUNT,
   stakeData,
@@ -559,7 +561,7 @@ function StackModal({
       console.log('finish', values);
       const _amount =
         typeIsExtend || isFreezeAmount
-          ? earlyAmount
+          ? isEarlyStake
             ? divDecimals(freezeAmount || '', decimal).toFixed(2, BigNumber.ROUND_DOWN)
             : stakedAmount ?? ''
           : amount;
@@ -569,8 +571,8 @@ function StackModal({
     [
       amount,
       decimal,
-      earlyAmount,
       freezeAmount,
+      isEarlyStake,
       isFreezeAmount,
       onConfirm,
       stakedAmount,

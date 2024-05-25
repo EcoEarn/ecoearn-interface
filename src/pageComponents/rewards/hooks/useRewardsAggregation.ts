@@ -174,6 +174,7 @@ export default function useRewardsAggregation() {
       console.log('earlyStakeData', earlyStakeData);
       stakeModal.show({
         isFreezeAmount: true,
+        isEarlyStake: true,
         type: hasHistoryStake ? StakeType.ADD : StakeType.STAKE,
         freezeAmount: String(data?.pointsPoolAgg?.total),
         earlyAmount: hasHistoryStake
