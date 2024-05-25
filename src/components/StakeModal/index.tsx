@@ -556,10 +556,26 @@ function StackModal({
   const onFinish = useCallback(
     (values: any) => {
       console.log('finish', values);
-      const _amount = typeIsExtend || isFreezeAmount ? stakedAmount ?? '' : amount;
+      const _amount =
+        typeIsExtend || isFreezeAmount
+          ? earlyAmount
+            ? divDecimals(freezeAmount || '', decimal).toFixed()
+            : stakedAmount ?? ''
+          : amount;
+
       onConfirm?.(_amount.replaceAll(',', ''), String(targetPeriod));
     },
-    [amount, isFreezeAmount, onConfirm, stakedAmount, targetPeriod, typeIsExtend],
+    [
+      amount,
+      decimal,
+      earlyAmount,
+      freezeAmount,
+      isFreezeAmount,
+      onConfirm,
+      stakedAmount,
+      targetPeriod,
+      typeIsExtend,
+    ],
   );
 
   const displayGainToken = useMemo(() => {
