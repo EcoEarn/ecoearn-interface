@@ -89,7 +89,7 @@ function StackModalWithConfirm({
         setContent({
           amount,
           period,
-          unlockDateTimeStamp: getNewUnlockTimeStamp(period),
+          unlockDateTimeStamp: dayjs().add(+period, 'days').valueOf(),
           tokenSymbol: stakeSymbol,
         });
         return;

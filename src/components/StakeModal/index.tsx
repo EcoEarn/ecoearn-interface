@@ -111,9 +111,8 @@ function StackModal({
       return setAprK(getAprK(originPeriod, fixedBoostFactor));
     }
     if (!period) return setAprK('');
-    const remaining = dayjs.duration(dayjs(unlockTime).diff(dayjs())).asSeconds();
-    console.log('period', period, remaining, originPeriod);
-    const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + remaining, fixedBoostFactor);
+    console.log('period', period, originPeriod);
+    const aprK = getAprK(+period * ONE_DAY_IN_SECONDS + originPeriod, fixedBoostFactor);
     setAprK(aprK);
     console.log('APRK--', aprK);
   }, [
@@ -335,7 +334,9 @@ function StackModal({
       return `${formatNumberWithDecimalPlaces(apr)}%(${aprK ? aprKDisplay : '--'}x)`;
     }
     if (typeIsRenew) {
-      return `${formatNumberWithDecimalPlaces(stakeApr ?? '')}%(${aprKDisplay}x)`;
+      return `${formatNumberWithDecimalPlaces(
+        stakeApr ? ZERO.plus(stakeApr).times(100) : '',
+      )}%(${aprKDisplay}x)`;
     }
     if (typeIsAdd || typeIsExtend) return originAPRStr;
     return '--';
@@ -348,7 +349,10 @@ function StackModal({
 
   const releaseDateStr = useMemo(() => {
     if (typeIsAdd && !isExtend) return originReleaseDateStr;
-    if (typeIsRenew) return dayjs().add(+curStakingPeriod, 'day').format(DEFAULT_DATE_FORMAT);
+    if (typeIsRenew)
+      return dayjs()
+        .add(Number(stakingPeriod || 0), 'second')
+        .format(DEFAULT_DATE_FORMAT);
     if (!period) return '--';
     if (isExtend && unlockTime) {
       return dayjs(unlockTime).add(+period, 'day').format(DEFAULT_DATE_FORMAT);
@@ -359,10 +363,10 @@ function StackModal({
 
     return '--';
   }, [
-    curStakingPeriod,
     isExtend,
     originReleaseDateStr,
     period,
+    stakingPeriod,
     typeIsAdd,
     typeIsRenew,
     typeIsStake,
