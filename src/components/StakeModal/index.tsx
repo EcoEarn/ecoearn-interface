@@ -530,9 +530,10 @@ function StackModal({
   const onSelectDays = useCallback(
     (val: string) => {
       if (disabledDurationInput) return;
-      form.setFieldValue('period', ZERO.plus(val).gt(maxDuration) ? maxDuration : val);
+      const period = ZERO.plus(val).gt(maxDuration) ? maxDuration : val;
+      form.setFieldValue('period', period);
       form.validateFields(['period']);
-      setPeriod(val);
+      setPeriod(String(period));
     },
     [disabledDurationInput, form, maxDuration],
   );

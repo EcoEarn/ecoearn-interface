@@ -14,6 +14,7 @@ import GetPointsModal, { IPointsModalProps } from '../GetPointsModal';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import DappListMobile from './DappListMobile';
 import CommonTooltip from 'components/CommonTooltip';
+import styles from './style.module.css';
 
 export default function DappList({
   items,
@@ -153,19 +154,9 @@ export default function DappList({
                   handleGainPoints(item);
                 }}
               >
-                <span
-                  className={clsx(
-                    'text-brandDefault hover:text-brandHover text-base font-medium',
-                    !item.isOpenStake && 'text-brandDisable',
-                  )}
-                >
-                  Gain points
-                </span>
+                <span className={clsx(item.isOpenStake && 'text-brandDefault')}>Gain points</span>
                 <RightOutlined
-                  className={clsx(
-                    'text-brandDefault lg:ml-4',
-                    !item.isOpenStake && 'text-brandDisable',
-                  )}
+                  className={clsx('lg:ml-4', item.isOpenStake && 'text-brandDefault')}
                   width={20}
                   height={20}
                 />
@@ -191,7 +182,7 @@ export default function DappList({
       dataSource={items}
       loading={loading}
       scroll={{ x: 'max-content' }}
-      className="mt-[80px]"
+      className={clsx('mt-[80px]', styles.table)}
     />
   );
 }

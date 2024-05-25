@@ -1,0 +1,7 @@
+.table{
+  :global{
+    .earn-table-tbody  .earn-table-cell {
+      @apply !border-none;
+    }
+  }
+}

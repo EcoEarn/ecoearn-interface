@@ -89,18 +89,12 @@ export default function DappListMobile({
                 }}
               >
                 <span
-                  className={clsx(
-                    'text-brandDefault hover:text-brandHover text-base font-medium',
-                    !item.isOpenStake && 'text-brandDisable',
-                  )}
+                  className={clsx('text-base font-medium', item.isOpenStake && 'text-brandDefault')}
                 >
                   Gain points
                 </span>
                 <RightOutlined
-                  className={clsx(
-                    'w-5 h-5 text-brandDefault ml-2',
-                    !item.isOpenStake && 'text-brandDisable',
-                  )}
+                  className={clsx('w-5 h-5ml-2', item.isOpenStake && 'text-brandDefault')}
                   width={20}
                   height={20}
                 />

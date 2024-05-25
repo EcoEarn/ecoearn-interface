@@ -61,7 +61,7 @@ const StackToken = memo(
             <span>{tokenName || '--'}</span>
             {!!rate && <RateTag value={Number(rate) * 100} />}
           </div>
-          <div className="text-lg font-medium text-neutralSecondary">{projectName}</div>
+          <div className="text-base font-medium text-neutralTertiary">{projectName}</div>
         </div>
       </div>
     );

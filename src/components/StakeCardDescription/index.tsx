@@ -3,6 +3,7 @@ import { ToolTip } from 'aelf-design';
 import { ReactComponent as QuestionSVG } from 'assets/img/questionCircleOutlined.svg';
 import clsx from 'clsx';
 import useResponsive from 'hooks/useResponsive';
+import CommonTooltip from 'components/CommonTooltip';
 
 interface ITextProps {
   className?: string;
@@ -28,29 +29,25 @@ const Description = memo(
     return (
       <div
         className={clsx(
-          'flex justify-between text-neutralTitle text-lg font-medium lg:gap-4 lg:flex-col lg:justify-start',
+          'flex justify-between text-neutralTitle text-lg font-medium lg:flex-col lg:justify-start',
           className,
         )}
       >
-        <div className={clsx('flex gap-2 items-center text-neutralDisable')}>
+        <div className={clsx('flex gap-2 text-lg items-center font-medium text-neutralTertiary')}>
           <span>{label}</span>
-          {tip && (
-            <ToolTip title={tip}>
-              <QuestionSVG className="w-5 h-5" />
-            </ToolTip>
-          )}
+          {tip && <CommonTooltip title={tip} />}
         </div>
         <div>
           <div
             className={clsx(
-              'flex font-semibold text-xl',
+              'flex font-semibold text-neutralTitle',
               flexType === 'end' ? 'justify-end' : 'justify-start',
             )}
           >
             <span className={clsx(icon && 'mr-2', isLG && 'text-right')}>{value}</span>
             {icon}
           </div>
-          <div className="text-base font-medium text-right text-neutralSecondary">{extra}</div>
+          <div className="text-sm font-medium text-right text-neutralSecondary">{extra}</div>
         </div>
       </div>
     );
