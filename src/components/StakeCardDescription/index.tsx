@@ -33,11 +33,15 @@ const Description = memo(
           className,
         )}
       >
-        <div className={clsx('flex gap-2 text-lg items-center font-medium text-neutralTertiary')}>
+        <div
+          className={clsx(
+            'flex gap-2 text-base  md:text-lg items-center font-medium text-neutralTertiary',
+          )}
+        >
           <span>{label}</span>
           {tip && <CommonTooltip title={tip} />}
         </div>
-        <div>
+        <div className="text-base md:text-lg">
           <div
             className={clsx(
               'flex font-semibold text-neutralTitle',

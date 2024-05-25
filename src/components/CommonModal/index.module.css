@@ -53,7 +53,7 @@
       }
 
       :global(.earn-modal-body) {
-        @apply px-4 box-border border-0 flex-1 overflow-y-auto pt-[16px];
+        @apply !px-5 box-border border-0 flex-1 overflow-y-auto !pt-5;
       }
 
       :global(.earn-modal-footer) {
@@ -87,6 +87,9 @@
   :global{
     .earn-modal-title{
       @apply hidden;
+    }
+    .earn-modal-header{
+      @apply !h-0;
     }
   }
 }

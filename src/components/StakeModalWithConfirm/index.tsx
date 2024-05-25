@@ -118,7 +118,6 @@ function StackModalWithConfirm({
   const onStakeModalConfirm = useCallback(
     (amount: string, period: string) => {
       console.log('onStakeModalConfirm', amount, period);
-      return;
       setConfirmType(
         type === StakeType.EXTEND
           ? ConfirmModalTypeEnum.ExtendedLockup

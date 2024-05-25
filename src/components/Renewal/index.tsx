@@ -72,7 +72,7 @@ export default function Renewal({
           </Flex>
         </div>
         <Button
-          className="!rounded-md xl:w-[100px]"
+          className="!rounded-md xl:w-[100px] xl:!mt-2"
           type="primary"
           size="medium"
           ghost

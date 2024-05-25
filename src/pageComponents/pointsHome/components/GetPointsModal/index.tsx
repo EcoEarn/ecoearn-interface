@@ -25,6 +25,7 @@ function GetPointsModal({
   const { isLG } = useResponsive();
   return (
     <CommonModal
+      disableMobileLayout
       className={styles.pointsModal}
       open={modal.visible}
       onCancel={modal.hide}

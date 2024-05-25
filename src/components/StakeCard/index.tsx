@@ -183,7 +183,7 @@ export default function StackCard({
             </div>
             <ToolTip title={claimBtnTip}>
               <Button
-                className="lg:w-[100px] !rounded-md"
+                className="lg:w-[100px] !rounded-md xl:!mt-2"
                 type="primary"
                 ghost
                 size="medium"
@@ -212,7 +212,7 @@ export default function StackCard({
                 </div>
               </div>
             </div>
-            <div className="flex gap-4 md:gap-3 xl:flex-col">
+            <div className="flex gap-4 md:gap-3 xl:flex-col xl:mt-2">
               <ToolTip title={stakingExpiredTip}>
                 <Button
                   className="flex-1 lg:flex-initial lg:w-[100px] !rounded-md"
@@ -268,7 +268,7 @@ export default function StackCard({
                 </div>
                 <ToolTip title={stakingExpiredTip}>
                   <Button
-                    className="!rounded-md xl:w-[100px]"
+                    className="!rounded-md xl:w-[100px] xl:!mt-2"
                     type="primary"
                     size="medium"
                     ghost
