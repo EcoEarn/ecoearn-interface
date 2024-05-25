@@ -14,6 +14,7 @@ import useLoading from 'hooks/useLoading';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { divDecimals, getTargetUnlockTimeStamp } from 'utils/calculate';
 import dayjs from 'dayjs';
+import { useInterval } from 'ahooks';
 
 export default function useRewardsAggregation() {
   const [data, setData] = useState<IPoolRewardsData>();
@@ -141,6 +142,14 @@ export default function useRewardsAggregation() {
     fetchData();
   }, [fetchData]);
 
+  useInterval(
+    () => {
+      fetchData();
+    },
+    30000,
+    { immediate: false },
+  );
+
   const confirmModalOnClose = useCallback(() => {
     setConfirmModalVisible(false);
     setConfirmModalContent(undefined);
@@ -148,7 +157,8 @@ export default function useRewardsAggregation() {
     setConfirmModalStatus('normal');
     setConfirmModalTransactionId('');
     setConfirmModalType(undefined);
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   const pointsState = useCallback(async () => {
     try {
@@ -260,14 +270,13 @@ export default function useRewardsAggregation() {
       if (TransactionId) {
         setConfirmModalTransactionId(TransactionId);
         setConfirmModalStatus('success');
-        fetchData();
       }
     } catch (error) {
       console.error('pointsWithdraw error', error);
       setConfirmModalTransactionId('');
       setConfirmModalStatus('error');
     }
-  }, [data?.pointsPoolAgg?.withDrawClaimIds, fetchData]);
+  }, [data?.pointsPoolAgg?.withDrawClaimIds]);
 
   const tokenWithdrawConfirm = useCallback(async () => {
     try {
@@ -277,14 +286,13 @@ export default function useRewardsAggregation() {
       if (TransactionId) {
         setConfirmModalTransactionId(TransactionId);
         setConfirmModalStatus('success');
-        fetchData();
       }
     } catch (error) {
       console.error('pointsWithdraw error', error);
       setConfirmModalTransactionId('');
       setConfirmModalStatus('error');
     }
-  }, [data?.tokenPoolAgg?.withDrawClaimIds, fetchData]);
+  }, [data?.tokenPoolAgg?.withDrawClaimIds]);
 
   const LPWithdrawConfirm = useCallback(async () => {
     try {
@@ -294,14 +302,13 @@ export default function useRewardsAggregation() {
       if (TransactionId) {
         setConfirmModalTransactionId(TransactionId);
         setConfirmModalStatus('success');
-        fetchData();
       }
     } catch (error) {
       console.error('pointsWithdraw error', error);
       setConfirmModalTransactionId('');
       setConfirmModalStatus('error');
     }
-  }, [data?.lpPoolAgg?.withDrawClaimIds, fetchData]);
+  }, [data?.lpPoolAgg?.withDrawClaimIds]);
 
   const confirmModalOnConfirm = useCallback(async () => {
     setConfirmModalLoading(true);

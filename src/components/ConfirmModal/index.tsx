@@ -283,7 +283,7 @@ function ConfirmModal(props: IConfirmModalProps) {
         </Flex>
       );
     }
-  }, [content, renderResult, status, type]);
+  }, [content, renderResult, status, type, withDrawPeriod]);
 
   const handleClose = useCallback(() => {
     onClose();

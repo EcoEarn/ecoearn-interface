@@ -314,7 +314,7 @@ function StackModal({
     if (typeIsRenew) {
       return curStakingPeriod;
     } else {
-      return period;
+      return period ?? '';
     }
   }, [curStakingPeriod, period, typeIsRenew]);
 

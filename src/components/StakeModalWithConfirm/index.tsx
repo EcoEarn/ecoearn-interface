@@ -99,9 +99,9 @@ function StackModalWithConfirm({
         amount,
         period,
         oldAmount: earlyAmount ? divDecimals(earlyAmount, decimal || 8).toNumber() : _staked,
-        unlockDateTimeStamp: period ? '' : unlockTime,
-        oldDateTimeStamp: unlockTime,
-        newDateTimeStamp: getNewUnlockTimeStamp(period),
+        unlockDateTimeStamp: period ? undefined : unlockTime,
+        oldDateTimeStamp: period ? unlockTime : undefined,
+        newDateTimeStamp: period ? getNewUnlockTimeStamp(period) : undefined,
         tokenSymbol: stakeSymbol,
       });
       return;
