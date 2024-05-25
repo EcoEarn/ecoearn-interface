@@ -172,7 +172,7 @@ export default function StackCard({
                 <span>Earned</span>
                 <span className="ml-2 text-sm">{earnedSymbol}</span>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 items-end md:items-start">
                 <div className="text-base font-semibold text-neutralTitle">
                   {formatTokenAmount(divDecimals(earned, decimal).toFixed())}
                 </div>
@@ -200,7 +200,7 @@ export default function StackCard({
           <div className="flex flex-1 flex-col xl:flex-row justify-between md:max-w-[336px] gap-6 md:gap-4">
             <div className="flex justify-between md:flex-col md:justify-start md:gap-2">
               <div className="text-base text-neutralSecondary font-medium">Staked</div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 items-end md:items-start">
                 <div className="flex gap-1 text-base font-semibold text-neutralTitle flex-grow-0">
                   <ToolTip title="The number of rewards included">
                     <span>{stakedStr}</span>
