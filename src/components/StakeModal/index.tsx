@@ -16,7 +16,7 @@ import { RightOutlined } from '@ant-design/icons';
 import style from './style.module.css';
 import dayjs from 'dayjs';
 import { StakeType } from 'types/stack';
-import { formatNumberWithDecimalPlaces } from 'utils/format';
+import { formatNumberWithDecimalPlaces, formatTokenSymbol } from 'utils/format';
 import clsx from 'clsx';
 import { singleMessage } from '@portkey/did-ui-react';
 import { getPoolTotalStaked } from 'api/request';
@@ -203,9 +203,11 @@ function StackModal({
   const title = useMemo(() => {
     switch (type) {
       case StakeType.STAKE:
-        return <StakeTitle text={`Stake ${stakeSymbol}`} rate={rate} />;
+        return <StakeTitle text={`Stake ${formatTokenSymbol(stakeSymbol || '')}`} rate={rate} />;
       case StakeType.ADD:
-        return <StakeTitle text={`Add Staking ${stakeSymbol}`} rate={rate} />;
+        return (
+          <StakeTitle text={`Add Staking ${formatTokenSymbol(stakeSymbol || '')}`} rate={rate} />
+        );
       case StakeType.EXTEND:
         return <StakeTitle text="Extend Lock-up Period" rate={rate} />;
       case StakeType.RENEW:
@@ -356,6 +358,7 @@ function StackModal({
   }, [unlockTime]);
 
   const releaseDateStr = useMemo(() => {
+    const periodNumber = period?.replaceAll(',', '');
     if (typeIsAdd && !isExtend) return originReleaseDateStr;
     if (typeIsRenew)
       return dayjs()
@@ -363,15 +366,19 @@ function StackModal({
         .format(DEFAULT_DATE_FORMAT);
     if (!period) return '--';
     if (isExtend && unlockTime) {
-      return dayjs(unlockTime).add(+period, 'day').format(DEFAULT_DATE_FORMAT);
+      if (ZERO.plus(periodNumber).gt(maxDuration)) {
+        return '--';
+      }
+      return dayjs(unlockTime).add(+periodNumber, 'day').format(DEFAULT_DATE_FORMAT);
     }
     if (typeIsStake) {
-      return dayjs().add(+period, 'day').format(DEFAULT_DATE_FORMAT);
+      return dayjs().add(+periodNumber, 'day').format(DEFAULT_DATE_FORMAT);
     }
 
     return '--';
   }, [
     isExtend,
+    maxDuration,
     originReleaseDateStr,
     period,
     stakingPeriod,
@@ -442,15 +449,6 @@ function StackModal({
 
   const disabledDurationInput = useMemo(() => typeIsAdd && !isExtend, [isExtend, typeIsAdd]);
 
-  const stakeSymbolFix = useMemo(() => {
-    if (!stakeSymbol) return;
-    const splitSymbol = stakeSymbol.split(' ');
-    if (splitSymbol.length > 1 && splitSymbol[0] === 'ALP') {
-      return `${splitSymbol[1]} LP`;
-    }
-    return stakeSymbol;
-  }, [stakeSymbol]);
-
   const durationLabel = useMemo(() => {
     return (
       <>
@@ -505,15 +503,15 @@ function StackModal({
       if (!val) return Promise.reject();
       const _val = val.replaceAll(',', '');
       if (ZERO.plus(balance || 0).lt(_val)) {
-        return Promise.reject(`insufficient ${stakeSymbol} balance`);
+        return Promise.reject(`Insufficient ${formatTokenSymbol(stakeSymbol || '')} balance`);
       }
       if (typeIsAdd && ZERO.plus(_val).lte(0)) return Promise.reject(`amount must greater than 0`);
       if (typeIsStake && ZERO.plus(_val).lt(min))
-        return Promise.reject(`Min staking ${min} ${stakeSymbolFix}`);
+        return Promise.reject(`Min staking ${min} ${formatTokenSymbol(stakeSymbol || '')}`);
       setAmountValid(true);
       return Promise.resolve();
     },
-    [balance, min, stakeSymbol, stakeSymbolFix, typeIsAdd, typeIsStake],
+    [balance, min, stakeSymbol, typeIsAdd, typeIsStake],
   );
 
   const onValueChange = useCallback(
@@ -645,7 +643,7 @@ function StackModal({
           >
             <InputNumberBase
               decimal={2}
-              placeholder={`Please enter ${stakeSymbol} amount`}
+              placeholder={`Please enter ${formatTokenSymbol(stakeSymbol || '')} amount`}
               suffixText="Max"
               suffixClick={getMaxAmount}
               allowClear
@@ -656,7 +654,7 @@ function StackModal({
           <div className="flex justify-end items-center cursor-pointer mb-6">
             <div onClick={jumpUrl}>
               <span className="text-brandDefault hover:text-brandHover text-xs">
-                Gain {stakeSymbol}
+                Gain {formatTokenSymbol(stakeSymbol || '')}
               </span>
               <RightOutlined className={'w-4 h-4 text-brandDefault ml-1'} width={20} height={20} />
             </div>

@@ -112,7 +112,7 @@ export default function StackCard({
   }, [decimal, staked]);
 
   const disabledExtendBtn = useMemo(() => {
-    const days = dayjs.duration(Number(stakingPeriod || 0), 'second').days();
+    const days = dayjs.duration(Number(stakingPeriod || 0), 'seconds').asDays();
     const canNotExtends = ZERO.plus(days || 0).gt(MAX_STAKE_PERIOD - 1);
     return isUnLocked || canNotExtends;
   }, [isUnLocked, stakingPeriod]);

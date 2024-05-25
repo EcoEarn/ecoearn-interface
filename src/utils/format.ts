@@ -206,3 +206,12 @@ export function durationFromNow(
   const targetDate = dayjs(date);
   return targetDate.diff(now, unit, float);
 }
+
+export function formatTokenSymbol(symbol: string) {
+  if (!symbol) return;
+  const splitSymbol = symbol.split(' ');
+  if (splitSymbol.length > 1 && splitSymbol[0] === 'ALP') {
+    return `${splitSymbol[1]} LP`;
+  }
+  return symbol;
+}

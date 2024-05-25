@@ -9,7 +9,7 @@ interface IViewItemProps {
 
 function ViewItem({ label, text, originText }: IViewItemProps) {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between flex-col md:flex-row gap-2">
       <div className="text-base text-neutralTertiary">{label}</div>
       <div className="flex gap-3 items-center text-base text-neutralPrimary font-medium">
         {originText ? (

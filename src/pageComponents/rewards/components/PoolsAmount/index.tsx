@@ -136,7 +136,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
           <div className="flex items-center gap-1">
             <span className="text-base font-medium text-neutralTertiary">Withdrawable Rewards</span>
             <CommonTooltip
-              title={`After staking in the ${tokenPoolsAmount.rewardsTokenName} pool, rewards can be withdrawn to the wallet after the lock-up period.`}
+              title={`After staking in the SGR pool, rewards can be withdrawn to the wallet after the lock-up period.`}
             />
           </div>
           <div className="flex gap-2 text-neutralTitle items-end mt-2 break-all">
@@ -167,9 +167,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
           <div className="flex items-center gap-1">
             <span className="text-base font-medium text-neutralTertiary">Withdrawable Rewards</span>
             <CommonTooltip
-              title={`After staking in the ${
-                LpPoolsAmount?.rewardsTokenName || ''
-              } pool, rewards can be withdrawn to the wallet after the lock-up period.`}
+              title={`After staking in the ELF-USDT LP pool, rewards can be withdrawn to the wallet after the lock-up period.`}
             />
           </div>
           <div className="flex gap-2 items-end text-neutralTitle mt-2 break-all">

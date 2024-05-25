@@ -110,7 +110,7 @@ export function PointsStakeItem({
           <span className="flex items-center text-sm font-medium text-brandDefault">
             {dailyRewards} {item.rewardsTokenName}
             <CommonTooltip
-              title="It indicates daily rewards obtained by staking 10,000 points."
+              title="It indicates monthly rewards obtained by staking 10,000 points."
               className="ml-1 fill-brandDefault"
             />
           </span>
