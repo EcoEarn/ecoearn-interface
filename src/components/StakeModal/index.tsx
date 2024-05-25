@@ -231,7 +231,7 @@ function StackModal({
       _amount = stakedAmount;
     }
 
-    return formatNumberWithDecimalPlaces(_amount) || '--';
+    return ZERO.plus(_amount).gt(ZERO) ? formatNumberWithDecimalPlaces(_amount) : '--';
   }, [
     amount,
     decimal,
@@ -244,7 +244,7 @@ function StackModal({
   ]);
 
   const originAmountStr = useMemo(() => {
-    if (typeIsAdd && amount) {
+    if (typeIsAdd && ZERO.plus(amount).gt(ZERO)) {
       if (isFreezeAmount)
         return formatNumberWithDecimalPlaces(divDecimals(freezeAmount, decimal).toFixed());
       return formatNumberWithDecimalPlaces(stakedAmount);
@@ -648,7 +648,7 @@ function StackModal({
                 decimal={0}
                 allowClear
                 onKeyDown={(e) => {
-                  if (BigNumber(e.key).isZero()) {
+                  if (BigNumber(e.key).isZero() && BigNumber(period || 0).isZero()) {
                     e.preventDefault();
                   }
                 }}

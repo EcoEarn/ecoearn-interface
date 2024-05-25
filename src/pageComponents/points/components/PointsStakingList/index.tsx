@@ -105,7 +105,7 @@ export function PointsStakeItem({
           justify={isMD ? 'space-between' : 'start'}
         >
           <span className="text-sm font-medium text-brandDefault">
-            Rewards for 1w Points / Day:{' '}
+            Rewards for 1w Points / Month:{' '}
           </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
             {dailyRewards} {item.rewardsTokenName}

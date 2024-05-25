@@ -32,11 +32,11 @@ function SkeletonImage(props: ISkeletonImage) {
 
   return (
     <div
-      className={clsx(
-        'flex justify-center items-center relative',
-        `w-[${fallback ? width : 0}px] h-[${fallback ? height : 0}px]`,
-        className,
-      )}
+      style={{
+        width: fallback ? width : 0,
+        height: fallback ? height : 0,
+      }}
+      className={clsx('flex justify-center items-center relative', className)}
     >
       {(!imageUrl || error) && fallback}
 
