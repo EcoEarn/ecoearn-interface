@@ -85,11 +85,17 @@ function StackModalWithConfirm({
       }
 
       if (type === StakeType.STAKE || type === StakeType.RENEW) {
-        console.log('unlockDateTimeStamp', getNewUnlockTimeStamp(period));
+        const seconds = dayjs.duration(Number(period), 'day').asSeconds();
+        console.log(
+          'unlockDateTimeStamp',
+          dayjs().add(seconds, 'second').valueOf(),
+          +period,
+          seconds,
+        );
         setContent({
           amount,
           period,
-          unlockDateTimeStamp: dayjs().add(+period, 'days').valueOf(),
+          unlockDateTimeStamp: dayjs().add(seconds, 'second').valueOf(),
           tokenSymbol: stakeSymbol,
         });
         return;

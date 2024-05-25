@@ -141,7 +141,12 @@ function StackModal({
     }
     if (isFreezeAmount) {
       const addAmount = freezeAmount || 0;
-      currentTotal = getTotalStakedWithAdd(totalStaked, boostedAmount, addAmount, aprK);
+      currentTotal = getTotalStakedWithAdd(
+        totalStaked,
+        boostedAmount,
+        earlyAmount ? ZERO.plus(earlyAmount).plus(addAmount).toFixed() : addAmount,
+        aprK,
+      );
     } else if (typeIsExtend) {
       currentTotal = getTotalStakedWithAdd(
         totalStaked,
@@ -181,6 +186,7 @@ function StackModal({
     aprK,
     boostedAmount,
     decimal,
+    earlyAmount,
     freezeAmount,
     isFreezeAmount,
     stakedAmount,
@@ -494,7 +500,7 @@ function StackModal({
     (rule: any, val: string) => {
       console.log('validateAmount', val);
       setAmountValid(false);
-      if (!val) return Promise.reject('please enter number');
+      if (!val) return Promise.reject();
       const _val = val.replaceAll(',', '');
       if (ZERO.plus(balance || 0).lt(_val)) {
         return Promise.reject(`insufficient ${stakeSymbol} balance`);
@@ -537,7 +543,7 @@ function StackModal({
         setPeriodValid(true);
         return Promise.resolve();
       }
-      if (!val) return Promise.reject(`please enter duration`);
+      if (!val) return Promise.reject();
       const _val = val.replaceAll(',', '');
       if (ZERO.plus(_val).gt(maxDuration)) return Promise.reject(`max ${maxDuration} Days`);
       if (ZERO.plus(_val).lt(minDuration)) return Promise.reject(`min ${minDuration} days`);
