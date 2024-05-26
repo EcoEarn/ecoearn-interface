@@ -1,0 +1,17 @@
+.loading {
+  @apply !m-0;
+
+  :global {
+    .earn-modal-content {
+      @apply !w-[240px] !h-[106px] mx-auto !p-[16px];
+    }
+  }
+}
+
+.loadingWithClose {
+  :global {
+    .earn-modal-content {
+      @apply !w-[295px];
+    }
+  }
+}

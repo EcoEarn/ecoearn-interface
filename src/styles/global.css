@@ -1,0 +1,59 @@
+@tailwind components;
+@tailwind utilities;
+html,
+body {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+body {
+	margin: 0;
+	font-size: 16px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	appearance: none;
+	margin: 0;
+}
+input[type='number'] {
+	appearance: textfield;
+}
+
+* {
+	font-family: Poppins, sans-serif;
+	transition: background 0.3s, fill 0.3s, stork 0.3s, color 0.3s,
+		box-shadow 0.3s;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
+}
+
+@layer components {
+	/* 
+        demo for antd
+        .{app-prefix}-wrapper {
+            .ant-layout {
+                background: #fff;
+            }
+        }
+    */
+}
+
+.portkey-ui-wrapper{
+	height: 100% !important;
+}
+
+.earn-notification-notice-wrapper{
+	overflow: hidden !important;
+}
+
+.earn-notification-notice{
+	margin-bottom: 0 !important;
+}
+
+
+

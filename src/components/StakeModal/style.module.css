@@ -1,0 +1,10 @@
+.stack-modal { 
+  :global(.earn-form-vertical .earn-form-item-label) {
+    label[for="stack_amount"] {
+      @apply w-full;
+    }
+  }
+  :global(.earn-modal-footer) {
+    @apply !border-solid !border-[1px] !border-b-0 !border-x-0 !border-neutralBorder md:!py-8 !py-5;
+  }
+}

@@ -1,0 +1,64 @@
+:root {
+    --brand-default: #7D48E8;
+    --brand-hover: #915BFF;
+    --brand-pressed: #6434C6;
+    --brand-disable: #D8C8F8;
+    --brand-bg: #F9FCFF;
+    --brand-footer-bg: #F4F9FE;
+    --neutral-title: #1a1a1a;
+    --neutral-primary: #434343;
+    --neutral-secondary: #919191;
+    --neutral-tertiary: #9f9f9f;
+    --neutral-disable: #b8b8b8;
+    --neutral-border: #e1e1e1;
+    --neutral-divider: #ededed;
+    --neutral-default-bg: #f6f6f6;
+    --neutral-hover-bg: #fafafa;
+    --neutral-white-bg: #fff;
+    --functional-warning: #f90;
+    --functional-warning-bg: #fff3e0;
+    --functional-error: #f53f3f;
+    --functional-error-bg: #fee8e8;
+    --functional-error-hover: #fc7373;
+    --functional-error-pressed: #cf3737;
+    --functional-success: #00b73e;
+    --functional-success-bg: #e0f6e8;
+    --fill-mask-1: rgb(0 0 0 / 60%);
+    --fill-mask-2: rgb(0 0 0 / 80%);
+    --fill-mask-3: rgb(67 67 67 / 30%);
+    --fill-mask-4: rgb(0 0 0 / 50%);
+    --fill-mask-5: rgb(0 0 0 / 85%);
+  }
+  
+  .dark-theme {
+    --brand-default: #7D48E8;
+    --brand-hover: #915BFF;
+    --brand-pressed: #6434C6;
+    --brand-disable: #D8C8F8;
+    --brand-bg: #F9FCFF;
+    --brand-footer-bg: #F4F9FE;
+    --neutral-title: #1a1a1a;
+    --neutral-primary: #434343;
+    --neutral-secondary: #919191;
+    --neutral-tertiary: #9f9f9f;
+    --neutral-disable: #b8b8b8;
+    --neutral-border: #e1e1e1;
+    --neutral-divider: #ededed;
+    --neutral-default-bg: #f6f6f6;
+    --neutral-hover-bg: #fafafa;
+    --neutral-white-bg: #fff;
+    --functional-warning: #f90;
+    --functional-warning-bg: #fff3e0;
+    --functional-error: #f53f3f;
+    --functional-error-bg: #fee8e8;
+    --functional-error-hover: #fc7373;
+    --functional-error-pressed: #cf3737;
+    --functional-success: #00b73e;
+    --functional-success-bg: #e0f6e8;
+    --fill-mask-1: rgb(0 0 0 / 60%);
+    --fill-mask-2: rgb(0 0 0 / 80%);
+    --fill-mask-3: rgb(67 67 67 / 30%);
+    --fill-mask-4: rgb(0 0 0 / 50%);
+    --fill-mask-5: rgb(0 0 0 / 85%);
+  }
+  
