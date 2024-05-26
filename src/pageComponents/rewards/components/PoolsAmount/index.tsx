@@ -1,0 +1,206 @@
+import { Button, ToolTip } from 'aelf-design';
+import BigNumber from 'bignumber.js';
+import CommonTooltip from 'components/CommonTooltip';
+import ConfirmModal from 'components/ConfirmModal';
+import { ZERO } from 'constants/index';
+import useRewardsAggregation from 'pageComponents/rewards/hooks/useRewardsAggregation';
+import { forwardRef, useImperativeHandle, useMemo } from 'react';
+import useResponsive from 'utils/useResponsive';
+
+export default forwardRef(function PoolsAmount(props, ref) {
+  const {
+    pointsState,
+    pointsWithdraw,
+    tokenWithdraw,
+    LPWithdraw,
+    pointsPoolsAmount,
+    tokenPoolsAmount,
+    LpPoolsAmount,
+    confirmModalType,
+    confirmModalVisible,
+    confirmModalLoading,
+    confirmModalContent,
+    confirmModalStatus,
+    confirmModalTransactionId,
+    confirmModalOnClose,
+    confirmModalOnConfirm,
+    pointsEarlyStakeDisabled,
+    fetchData,
+  } = useRewardsAggregation();
+
+  useImperativeHandle(ref, () => ({
+    refresh: () => {
+      fetchData({ needLoading: false });
+    },
+  }));
+
+  const { isSM, isMD } = useResponsive();
+
+  const pointsWithdrawDisabled = useMemo(() => {
+    return BigNumber(pointsPoolsAmount.rewardsTotal).isZero();
+  }, [pointsPoolsAmount.rewardsTotal]);
+
+  const pointsStakeDisabled = useMemo(() => {
+    return BigNumber(pointsPoolsAmount.stakeTotal || 0).lt(10);
+  }, [pointsPoolsAmount.stakeTotal]);
+
+  const tokenWithdrawDisabled = useMemo(() => {
+    return BigNumber(tokenPoolsAmount.rewardsTotal).isZero();
+  }, [tokenPoolsAmount.rewardsTotal]);
+
+  const lpWithdrawDisabled = useMemo(() => {
+    return BigNumber(LpPoolsAmount.rewardsTotal).isZero();
+  }, [LpPoolsAmount.rewardsTotal]);
+
+  const stakeDisabledTip = useMemo(() => {
+    return pointsStakeDisabled
+      ? BigNumber(pointsPoolsAmount.stakeTotal || 0).gt(ZERO)
+        ? `Min staking 10 ${pointsPoolsAmount.rewardsTokenName}`
+        : undefined
+      : pointsEarlyStakeDisabled
+      ? 'Stake has expired, cannot be added stake. Please renew the staking first.'
+      : undefined;
+  }, [
+    pointsEarlyStakeDisabled,
+    pointsPoolsAmount.rewardsTokenName,
+    pointsPoolsAmount.stakeTotal,
+    pointsStakeDisabled,
+  ]);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-4 md:gap-[24px]">
+      {/* Points */}
+      <div className="col-span-1 md:col-span-2 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg">
+        <div className="text-xl text-neutralTitle font-semibold">XPSGR Points Pools</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div className="p-4 bg-brandBg rounded-xl">
+            <div className="flex gap-1 items-center">
+              <span className="text-base font-medium text-neutralTertiary">Stakeable Rewards</span>
+              <CommonTooltip title="Stake XPSGR pool to earn more with all claimed SGR rewards (including those in the lock-up period)." />
+            </div>
+            <div className="mt-2 break-all text-neutralTitle flex gap-2 items-end">
+              <span className="text-lg font-semibold">{pointsPoolsAmount.stakeTotal}</span>
+              <span className="text-base font-normal">{pointsPoolsAmount.rewardsTokenName}</span>
+            </div>
+            <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
+              {pointsPoolsAmount.stakeTotalUSD}
+            </div>
+            <div className="pt-6 mt-auto">
+              <ToolTip title={stakeDisabledTip}>
+                <Button
+                  onClick={pointsState}
+                  block={isMD}
+                  size="medium"
+                  type="primary"
+                  className="!min-w-[120px] !rounded-md !mx-auto"
+                  disabled={pointsEarlyStakeDisabled}
+                >
+                  Stake
+                </Button>
+              </ToolTip>
+            </div>
+          </div>
+          <div className="p-4 bg-brandBg rounded-xl">
+            <div className="flex gap-1 items-center">
+              <span className="text-base font-medium text-neutralTertiary">
+                Withdrawable Rewards
+              </span>
+              <CommonTooltip title="After staking in the XPSGR pool, claimed SGR rewards can be withdrawn to the wallet after the lock-up period, while staking rewards cannot be withdrawn." />
+            </div>
+            <div className="text-neutralTitle mt-2 break-all flex gap-2 items-end">
+              <span className="text-lg font-semibold">{pointsPoolsAmount.rewardsTotal}</span>
+              <span className="text-base font-normal">{pointsPoolsAmount.rewardsTokenName}</span>
+            </div>
+            <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
+              {pointsPoolsAmount.rewardsTotalUSD}
+            </div>
+            <div className="mt-auto  pt-6">
+              <Button
+                size="medium"
+                block={isMD}
+                type="primary"
+                className="!min-w-[120px] !rounded-md !mx-auto"
+                disabled={pointsWithdrawDisabled}
+                onClick={pointsWithdraw}
+              >
+                Withdraw
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* SGR */}
+      <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg flex flex-col">
+        <div className="text-xl text-neutralTitle font-semibold">SGR Pool</div>
+        <div className="p-4 bg-brandBg rounded-xl mt-4 flex-1 flex flex-col">
+          <div className="flex items-center gap-1">
+            <span className="text-base font-medium text-neutralTertiary">Withdrawable Rewards</span>
+            <CommonTooltip
+              title={`After staking in the SGR pool, rewards can be withdrawn to the wallet after the lock-up period.`}
+            />
+          </div>
+          <div className="flex gap-2 text-neutralTitle items-end mt-2 break-all">
+            <span className="text-lg font-semibold">{tokenPoolsAmount.rewardsTotal}</span>
+            <span className="text-base font-normal">{tokenPoolsAmount.rewardsTokenName}</span>
+          </div>
+          <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
+            {tokenPoolsAmount.rewardsTotalUSD}
+          </div>
+          <div className="pt-6 mt-auto">
+            <Button
+              size="medium"
+              block={isMD}
+              type="primary"
+              className="!min-w-[120px] !mx-auto !rounded-md"
+              disabled={tokenWithdrawDisabled}
+              onClick={tokenWithdraw}
+            >
+              Withdraw
+            </Button>
+          </div>
+        </div>
+      </div>
+      {/* Lp */}
+      <div className="col-span-1 md:col-span-1 border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg flex flex-col">
+        <div className="text-xl text-neutralTitle font-semibold">LP Pool</div>
+        <div className="p-4 bg-brandBg rounded-xl mt-4 flex-1 flex flex-col">
+          <div className="flex items-center gap-1">
+            <span className="text-base font-medium text-neutralTertiary">Withdrawable Rewards</span>
+            <CommonTooltip
+              title={`After staking in the ELF-USDT LP pool, rewards can be withdrawn to the wallet after the lock-up period.`}
+            />
+          </div>
+          <div className="flex gap-2 items-end text-neutralTitle mt-2 break-all">
+            <span className="text-lg font-semibold">{LpPoolsAmount.rewardsTotal}</span>
+            <span className="text-base font-normal">{LpPoolsAmount.rewardsTokenName}</span>
+          </div>
+          <div className="mt-1 text-sm text-neutralSecondary font-medium break-all">
+            {LpPoolsAmount.rewardsTotalUSD}
+          </div>
+          <div className="pt-6 mt-auto">
+            <Button
+              size="medium"
+              block={isMD}
+              type="primary"
+              className="!min-w-[120px] !mx-auto !rounded-md items-end"
+              disabled={lpWithdrawDisabled}
+              onClick={LPWithdraw}
+            >
+              Withdraw
+            </Button>
+          </div>
+        </div>
+      </div>
+      <ConfirmModal
+        type={confirmModalType}
+        content={confirmModalContent}
+        status={confirmModalStatus}
+        loading={confirmModalLoading}
+        visible={confirmModalVisible}
+        onClose={confirmModalOnClose}
+        onConfirm={confirmModalOnConfirm}
+        transactionId={confirmModalTransactionId}
+      />
+    </div>
+  );
+});

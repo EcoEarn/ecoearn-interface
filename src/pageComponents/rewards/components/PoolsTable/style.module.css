@@ -1,0 +1,23 @@
+.table {
+  @apply border-[1px] border-solid border-neutralBorder rounded-[24px] overflow-hidden;
+  :global{
+    .aelfd-table-thead .aelfd-table-cell{
+      @apply !px-6;
+    }
+    .aelfd-table-tbody  .aelfd-table-cell {
+      @apply !py-[40px] !px-6;
+    }
+    .aelfd-table-row {
+      &:last-child td {
+        @apply !border-b-0;
+      }
+    }
+    .aelfd-table-filter-column{
+      @apply justify-start;
+    }
+
+    .aelfd-table-filter-column .aelfd-table-column-title{
+      @apply flex-grow-0;
+    }
+  }
+}

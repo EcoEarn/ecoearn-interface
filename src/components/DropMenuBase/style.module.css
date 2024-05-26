@@ -1,0 +1,11 @@
+.dropdownCustom {
+  @apply rounded-lg border-solid border-neutralBorder border-[1px] overflow-hidden bg-neutralWhiteBg;
+  :global{
+    .earn-dropdown-menu {
+      @apply p-0;
+    }
+    .earn-dropdown-menu-item {
+      @apply !py-3 !px-4 lg:!text-base !font-medium !text-neutralPrimary;
+    }
+  }
+}
