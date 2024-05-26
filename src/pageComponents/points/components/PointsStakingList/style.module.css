@@ -1,0 +1,29 @@
+.segmented{
+  background: none;
+  @apply border-neutralBorder rounded-lg p-1 border-[1px] border-solid;
+  :global{
+    .earn-segmented-group{
+      @apply gap-1;
+    }
+    .earn-segmented-item {
+      @apply min-w-[126px] rounded-md flex justify-center items-center font-medium text-base h-[40px];
+    }
+    .earn-segmented-item-selected {
+      @apply font-semibold;
+    }
+  }
+}
+
+.card-tag{
+  @apply absolute right-0 top-0 rounded-tr-[12px] lg:rounded-tr-[24px] rounded-bl-[12px] py-1 px-6;
+  /* stylelint-disable-next-line declaration-empty-line-before */
+  background: linear-gradient(273deg, #FFE68F 7.43%, #F2CF4F 80.41%);
+}
+.tag-text {
+  background: linear-gradient(180deg, #AC5C1B 29.17%, #603915 81.25%);
+  background-clip: text;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  @apply font-semibold text-xs;
+}
