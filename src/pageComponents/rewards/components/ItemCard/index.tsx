@@ -1,7 +1,12 @@
 import { Flex } from 'antd';
 import dayjs from 'dayjs';
 import { divDecimals } from 'utils/calculate';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import {
+  formatTokenAmount,
+  formatTokenPrice,
+  formatTokenSymbol,
+  formatUSDPrice,
+} from 'utils/format';
 import CountDownLock from '../CountDownLock';
 import { useMemo } from 'react';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';

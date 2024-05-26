@@ -7,6 +7,7 @@ import {
   durationFromNow,
   formatNumberWithDecimalPlaces,
   formatTokenAmount,
+  formatTokenSymbol,
   formatUSDAmount,
   formatUSDPrice,
 } from 'utils/format';
@@ -126,7 +127,7 @@ export default function StackCard({
           type={type}
           icons={icons}
           rate={rate}
-          tokenName={stakeSymbol || '--'}
+          tokenName={stakeSymbol}
           projectName={projectOwner || '--'}
         />
         <Description
@@ -206,7 +207,7 @@ export default function StackCard({
                   <ToolTip title="The number of rewards included">
                     <span>{stakedStr}</span>
                   </ToolTip>
-                  <span>{stakeSymbol}</span>
+                  <span>{formatTokenSymbol(stakeSymbol || '')}</span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
                   {formatUSDPrice(divDecimals(stakedInUsD || 0, decimal))}

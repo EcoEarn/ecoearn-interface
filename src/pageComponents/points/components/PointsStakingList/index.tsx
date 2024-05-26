@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import styles from './style.module.css';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useCheckLoginAndToken } from 'hooks/useWallet';
-import { formatNumber, formatTokenPrice } from 'utils/format';
+import { formatNumber, formatTokenPrice, formatTokenSymbol } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 import ConfirmModal, { ConfirmModalTypeEnum } from '../../../../components/ConfirmModal';
 import usePointsPoolService, {
@@ -63,11 +63,11 @@ export function PointsStakeItem({
   }, [formatNumberOverMillion, isLogin, item.decimal, item.staked]);
 
   const stakeSymbol = useMemo(() => {
-    return isLogin ? item.stakeTokenName : undefined;
+    return isLogin ? formatTokenSymbol(item.stakeTokenName) : undefined;
   }, [isLogin, item.stakeTokenName]);
 
   const earnSymbol = useMemo(() => {
-    return isLogin ? item.rewardsTokenName : undefined;
+    return isLogin ? formatTokenSymbol(item.rewardsTokenName) : undefined;
   }, [isLogin, item.rewardsTokenName]);
 
   const earned = useMemo(() => {

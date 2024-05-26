@@ -4,6 +4,7 @@ import { Flex } from 'antd';
 import clsx from 'clsx';
 import RateTag from 'components/RateTag';
 import TokenTextIcon from 'components/TokenTextIcon';
+import { formatTokenSymbol } from 'utils/format';
 
 export enum PoolTypeEnum {
   Points = 0,
@@ -67,7 +68,7 @@ const StackToken = memo(
         )}
         <div className="flex flex-col flex-1">
           <div className="flex items-center justify-between lg:justify-start gap-4 text-xl font-semibold text-neutralTitle">
-            <span>{tokenName || '--'}</span>
+            <span>{tokenName ? formatTokenSymbol(tokenName) : '--'}</span>
             {!!rate && <RateTag value={Number(rate) * 100} />}
           </div>
           <div className="text-base font-medium text-neutralTertiary">{projectName}</div>

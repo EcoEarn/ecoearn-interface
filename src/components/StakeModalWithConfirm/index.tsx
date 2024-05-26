@@ -14,6 +14,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { ISendResult } from 'types';
 import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
+import { formatTokenSymbol } from 'utils/format';
 
 interface IStackModalProps {
   type: StakeType;
@@ -57,7 +58,7 @@ function StackModalWithConfirm({
     tokenSymbol: '',
   });
   const [transactionId, setTransactionId] = useState('');
-  const { stakeSymbol = '--', staked, unlockTime = '', decimal = 8 } = stakeData || {};
+  const { stakeSymbol, staked, unlockTime = '', decimal = 8 } = stakeData || {};
 
   const getNewUnlockTimeStamp = useCallback(
     (period: string) =>
@@ -98,7 +99,7 @@ function StackModalWithConfirm({
           amount,
           period,
           unlockDateTimeStamp: dayjs().add(seconds, 'second').valueOf(),
-          tokenSymbol: stakeSymbol,
+          tokenSymbol: stakeSymbol ? formatTokenSymbol(stakeSymbol) : '--',
         });
         return;
       }
@@ -110,7 +111,7 @@ function StackModalWithConfirm({
         unlockDateTimeStamp: period ? undefined : unlockTime,
         oldDateTimeStamp: period ? unlockTime : undefined,
         newDateTimeStamp: period ? getNewUnlockTimeStamp(period) : undefined,
-        tokenSymbol: stakeSymbol,
+        tokenSymbol: stakeSymbol ? formatTokenSymbol(stakeSymbol) : '--',
       });
       return;
     },

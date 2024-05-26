@@ -254,7 +254,8 @@ function StackModal({
   ]);
 
   const originAmountStr = useMemo(() => {
-    if (typeIsAdd && ZERO.plus(amount).gt(ZERO)) {
+    const amountNum = amount.replaceAll(',', '');
+    if (typeIsAdd && ZERO.plus(amountNum).gt(ZERO)) {
       if (isFreezeAmount)
         return formatNumberWithDecimalPlaces(divDecimals(freezeAmount, decimal).toFixed());
       return formatNumberWithDecimalPlaces(stakedAmount);

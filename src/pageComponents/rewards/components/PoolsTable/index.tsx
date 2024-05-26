@@ -3,7 +3,7 @@ import { Flex, TableColumnsType } from 'antd';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import CountDownLock from '../CountDownLock';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { PoolType } from 'types/stack';
 import { divDecimals } from 'utils/calculate';
