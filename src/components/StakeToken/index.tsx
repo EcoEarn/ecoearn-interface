@@ -4,11 +4,16 @@ import { Flex } from 'antd';
 import clsx from 'clsx';
 import RateTag from 'components/RateTag';
 import TokenTextIcon from 'components/TokenTextIcon';
-import { PoolType } from 'types/stack';
+
+export enum PoolTypeEnum {
+  Points = 0,
+  Token = 1,
+  Lp = 2,
+}
 
 interface IStackTokenProps {
   className?: string;
-  type?: PoolType;
+  type?: PoolTypeEnum;
   icons?: Array<string>;
   rate?: string | number;
   tokenName?: string;
@@ -18,7 +23,7 @@ interface IStackTokenProps {
 const StackToken = memo(
   ({
     className,
-    type = PoolType.TOKEN,
+    type = PoolTypeEnum.Token,
     icons = [],
     rate,
     tokenName,
@@ -26,14 +31,18 @@ const StackToken = memo(
   }: IStackTokenProps) => {
     const symbolTextList = useMemo(
       () =>
-        type === PoolType.LP ? tokenName?.split(' ')?.[1].split('-') || [tokenName] : [tokenName],
+        type === PoolTypeEnum.Lp
+          ? tokenName?.split(' ')?.[1].split('-') || [tokenName]
+          : [tokenName],
       [tokenName, type],
     );
 
-    const tokenIconList = useMemo(
-      () => (icons?.length <= 0 ? symbolTextList : icons),
-      [icons, symbolTextList],
-    );
+    const tokenIconList = useMemo(() => {
+      if (type === PoolTypeEnum.Points) {
+        return [];
+      }
+      return icons?.length <= 0 ? symbolTextList : icons;
+    }, [icons, symbolTextList, type]);
 
     return (
       <div

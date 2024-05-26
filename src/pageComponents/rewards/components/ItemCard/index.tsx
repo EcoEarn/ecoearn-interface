@@ -4,8 +4,7 @@ import { divDecimals } from 'utils/calculate';
 import { formatTokenPrice, formatUSDPrice } from 'utils/format';
 import CountDownLock from '../CountDownLock';
 import { useMemo } from 'react';
-import StakeToken from 'components/StakeToken';
-import { PoolType } from 'types/stack';
+import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
 
@@ -20,18 +19,14 @@ export default function ItemCard({
 }) {
   const renderSymbol = useMemo(() => {
     const { tokenIcon, tokenName, projectOwner } = item;
-    if (item.poolType === 'Points') {
-      return <div className="text-base text-neutralPrimary">{item.tokenName}</div>;
-    } else {
-      return (
-        <StakeToken
-          type={item.poolType as PoolType}
-          icons={tokenIcon}
-          tokenName={tokenName}
-          projectName={projectOwner}
-        />
-      );
-    }
+    return (
+      <StakeToken
+        type={item.poolType as unknown as PoolTypeEnum}
+        icons={tokenIcon}
+        tokenName={tokenName}
+        projectName={projectOwner}
+      />
+    );
   }, [item]);
   return (
     <Flex
@@ -54,7 +49,9 @@ export default function ItemCard({
             { decimalPlaces: 2 },
           )} ${item.rewardsToken}`}</span>
           <span className="text-neutralSecondary mt-1 font-medium">
-            {formatUSDPrice(item.rewardsInUsd, { decimalPlaces: 2 })}
+            {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
+              decimalPlaces: 2,
+            })}
           </span>
         </Flex>
       </Flex>

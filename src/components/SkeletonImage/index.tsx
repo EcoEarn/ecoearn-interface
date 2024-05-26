@@ -33,8 +33,8 @@ function SkeletonImage(props: ISkeletonImage) {
   return (
     <div
       style={{
-        width: fallback ? width : 0,
-        height: fallback ? height : 0,
+        width: fallback ? width : undefined,
+        height: fallback ? height : undefined,
       }}
       className={clsx('flex justify-center items-center relative', className)}
     >

@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import CountDownLock from '../CountDownLock';
 import { formatTokenPrice, formatUSDPrice } from 'utils/format';
-import StakeToken from 'components/StakeToken';
+import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { PoolType } from 'types/stack';
 import { divDecimals } from 'utils/calculate';
 import { AELFDProvider } from 'aelf-design';
@@ -49,20 +49,14 @@ export default function PoolsTable({
         filterIcon: <DownOutlined />,
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
-          if (item.poolType === 'Points') {
-            return (
-              <div className="text-xl font-semibold text-neutralPrimary">{item.tokenName}</div>
-            );
-          } else {
-            return (
-              <StakeToken
-                type={item.poolType as PoolType}
-                icons={tokenIcon}
-                tokenName={tokenName}
-                projectName={projectOwner}
-              />
-            );
-          }
+          return (
+            <StakeToken
+              type={item.poolType as unknown as PoolTypeEnum}
+              icons={tokenIcon}
+              tokenName={tokenName}
+              projectName={projectOwner}
+            />
+          );
         },
       },
       {
@@ -83,7 +77,9 @@ export default function PoolsTable({
                 { decimalPlaces: 2 },
               )} ${item.rewardsToken}`}</span>
               <span className="text-sm text-neutralSecondary mt-2 font-medium">
-                {formatUSDPrice(item.rewardsInUsd, { decimalPlaces: 2 })}
+                {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
+                  decimalPlaces: 2,
+                })}
               </span>
             </Flex>
           );

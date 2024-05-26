@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { Button, ToolTip } from 'aelf-design';
 import Description from 'components/StakeCardDescription';
-import StackToken from 'components/StakeToken';
+import StackToken, { PoolTypeEnum } from 'components/StakeToken';
 import { ZERO } from 'constants/index';
 import {
   durationFromNow,
   formatNumberWithDecimalPlaces,
   formatTokenAmount,
   formatUSDAmount,
+  formatUSDPrice,
 } from 'utils/format';
 import styles from './style.module.css';
 import dayjs from 'dayjs';
@@ -20,7 +21,7 @@ import Renewal from 'components/Renewal';
 import useUnlockCount from './hooks/useUnlockCount';
 
 interface IStackCardProps {
-  type: PoolType | string;
+  type: PoolTypeEnum;
   data: IStakePoolData;
   renewText: Array<IRenewText>;
   isLogin: boolean;
@@ -122,7 +123,7 @@ export default function StackCard({
       <div className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-start">
         <StackToken
           className="lg:min-w-[280px]"
-          type={type as PoolType}
+          type={type}
           icons={icons}
           rate={rate}
           tokenName={stakeSymbol || '--'}
@@ -140,7 +141,7 @@ export default function StackCard({
           valueTextAlign="right"
           label="Total Staked"
           value={formatNumberWithDecimalPlaces(divDecimals(totalStake, decimal))}
-          extra={`$ ${formatNumberWithDecimalPlaces(totalStakeInUsd || 0)}`}
+          extra={`${formatUSDPrice(divDecimals(totalStakeInUsd || 0, decimal))}`}
         />
       </div>
 
@@ -177,7 +178,7 @@ export default function StackCard({
                   {formatTokenAmount(divDecimals(earned, decimal).toFixed())}
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
-                  {formatUSDAmount(earnedInUsd || 0)}
+                  {formatUSDPrice(divDecimals(earnedInUsd || 0, decimal))}
                 </div>
               </div>
             </div>
@@ -208,7 +209,7 @@ export default function StackCard({
                   <span>{stakeSymbol}</span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
-                  $ {formatNumberWithDecimalPlaces(stakedInUsD || 0)}
+                  {formatUSDPrice(divDecimals(stakedInUsD || 0, decimal))}
                 </div>
               </div>
             </div>

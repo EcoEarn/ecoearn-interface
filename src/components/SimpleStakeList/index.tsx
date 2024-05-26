@@ -1,5 +1,6 @@
 import StackCard from 'components/StakeCard';
 import useSimpleStakeListService from './hooks/useSimpleStakeListService';
+import { PoolTypeEnum } from 'components/StakeToken';
 
 export interface IStakeListProps {
   title: string;
@@ -24,7 +25,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
         {stakeData.map((item, index) => {
           return (
             <StackCard
-              type={poolType}
+              type={poolType === 'Lp' ? PoolTypeEnum.Lp : PoolTypeEnum.Token}
               key={index}
               data={item}
               isLogin={isLogin}
