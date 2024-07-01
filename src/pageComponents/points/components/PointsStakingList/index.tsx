@@ -17,6 +17,8 @@ import { divDecimals } from 'utils/calculate';
 import Empty from 'components/Empty';
 import { ZERO } from 'constants/index';
 import CommonTooltip from 'components/CommonTooltip';
+import { PoolType } from 'types/stake';
+import { useRouter } from 'next/navigation';
 
 const formatMin = 1000000;
 
@@ -77,6 +79,14 @@ export function PointsStakeItem({
   const claimDisabled = useMemo(() => {
     return BigNumber(item.realEarned).lte(ZERO);
   }, [item.realEarned]);
+
+  const claimDisabledTip = useMemo(() => {
+    if (!isLogin) return;
+    if (BigNumber(item.staked || 0).isZero()) return;
+    if (claimDisabled) {
+      return 'Rewards will be distributed at 00:00 every day.';
+    }
+  }, [claimDisabled, isLogin, item.staked]);
 
   return (
     <div className="rounded-lg md:rounded-[24px] px-4 py-6 md:p-6 border-[1px] border-solid border-neutralBorder bg-white relative">
@@ -178,12 +188,7 @@ export function PointsStakeItem({
               )}
             </Flex>
           </Flex>
-          <ToolTip
-            overlayStyle={{ maxWidth: '150px' }}
-            title={
-              claimDisabled && isLogin ? 'Rewards are distributed at 0:00 every day.' : undefined
-            }
-          >
+          <ToolTip overlayStyle={{ maxWidth: '150px' }} title={claimDisabledTip}>
             <Button
               size="medium"
               type="primary"
@@ -201,64 +206,26 @@ export function PointsStakeItem({
 }
 
 export default function PointsStakingList() {
-  const { currentList, setCurrentList, data, fetchData, onClaim } = usePointsPoolService();
-  const { isLogin } = useGetLoginStatus();
-  const { checkLogin } = useCheckLoginAndToken();
-  const { isLG } = useResponsive();
-  const { schrodingerUrl } = useGetCmsInfo() || {};
-  const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [curItem, setCurItem] = useState<IPointsPoolItem>();
-  const [status, setStatus] = useState<'normal' | 'success' | 'error'>('normal');
-  const [transactionId, setTransactionId] = useState<string>();
-
-  const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
-    { label: 'All', value: ListTypeEnum.All },
-    { label: 'Staked', value: ListTypeEnum.Staked },
-  ];
-
-  const handleSegmentChange = useCallback(
-    (value: string) => {
-      setCurrentList(value as ListTypeEnum);
-    },
-    [setCurrentList],
-  );
-
-  const handleGain = useCallback(() => {
-    window.open(schrodingerUrl, '_blank');
-  }, [schrodingerUrl]);
-
-  const handleClaim = useCallback((item: IPointsPoolItem) => {
-    setCurItem(item);
-    setModalVisible(true);
-  }, []);
-
-  const handleConfirm = useCallback(async () => {
-    if (!curItem) return;
-    setLoading(true);
-    try {
-      const transactionId = await onClaim(curItem);
-      if (transactionId) {
-        setStatus('success');
-        setTransactionId(transactionId);
-      } else {
-        throw new Error('transactionId empty');
-      }
-    } catch (error) {
-      console.error('Points Claim error', error);
-      setStatus('error');
-    } finally {
-      setLoading(false);
-    }
-  }, [curItem, onClaim]);
-
-  const resetState = useCallback(() => {
-    setLoading(false);
-    setModalVisible(false);
-    setStatus('normal');
-    setTransactionId('');
-    setCurItem(undefined);
-  }, []);
+  const {
+    currentList,
+    data,
+    status,
+    fetchData,
+    curItem,
+    loading,
+    modalVisible,
+    setModalVisible,
+    transactionId,
+    resetState,
+    handleConfirm,
+    handleEarlyStake,
+    isLG,
+    handleSegmentChange,
+    segmentedOptions,
+    handleClaim,
+    handleGain,
+  } = usePointsPoolService();
+  const router = useRouter();
 
   return (
     <>
@@ -279,6 +246,11 @@ export default function PointsStakingList() {
         }}
         onConfirm={handleConfirm}
         transactionId={transactionId}
+        onEarlyStake={handleEarlyStake}
+        onGoRewards={() => {
+          setModalVisible(false);
+          router.push('/rewards');
+        }}
       />
       <Segmented
         className={clsx('mt-6 lg:mt-12', styles.segmented)}

@@ -47,18 +47,18 @@ export default function useRewardsListMobileService() {
     try {
       const res = await getRewardsList(requestParams);
       loading.current = false;
-      setTotal(res.totalCount ?? 0);
+      setTotal(res?.totalCount ?? 0);
       if (current > 1) {
-        setDataSource((preData) => [...preData, ...res.items]);
+        setDataSource((preData) => [...preData, ...(res?.items || [])]);
       } else {
-        setDataSource(res.items);
+        setDataSource(res?.items || []);
       }
-      if (current * pageSize > res.totalCount) {
+      if (current * pageSize > res?.totalCount) {
         setHasMore(false);
       } else {
         setHasMore(true);
       }
-      if (current === 1 && poolType === 'All' && res.items?.length) {
+      if (current === 1 && poolType === 'All' && res?.items?.length) {
         setHasHistoryData(true);
       }
     } finally {

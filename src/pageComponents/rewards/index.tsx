@@ -28,7 +28,7 @@ export default function Rewards() {
   const renderEmpty = (
     <Empty
       emptyBtnText="Stake"
-      emptyText="You have not claimed the rewards."
+      emptyText="Participating in staking can earn rewards."
       onClick={() => {
         router.push('/simple');
       }}
@@ -46,13 +46,13 @@ export default function Rewards() {
       </h2>
       <div className="text-base text-neutralPrimary font-medium flex flex-col gap-1 mt-2 lg:mt-4">
         <p>
-          There is a lock-up period for rewards you claimed, and the period varies among different
-          mining pools.
+          There is a 90-day release period for your claimed rewards, and they can only be withdrawn
+          after the release period expires.
         </p>
-        <p>The rewards can only be withdrawn after the lock-up period is ended.</p>
         <p>
-          After staking points in the XPSGR mining pool, the SGR rewards claimed can be staked
-          again, including SGR rewards during the lock-up period.
+          After staking, you can restake your claimed SGR rewards early to the SGR pool, or stake
+          them early to the Farms through adding liquidity. Rewards that can be staked early include
+          frozen and withdrawable amounts.
         </p>
       </div>
       {isLogin && (
@@ -60,7 +60,8 @@ export default function Rewards() {
           <div className="mt-6 sm:mt-8 lg:mt-12">
             <PoolsAmount ref={rewardDataRef} />
           </div>
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-6">
+            <div className="mb-4 text-base font-semibold text-neutralTitle">Claim Record</div>
             {isMD ? (
               <RewardsListMobile
                 updateHasHistoryDate={updateHasHistoryDate}

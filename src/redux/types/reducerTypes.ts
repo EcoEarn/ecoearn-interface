@@ -28,12 +28,17 @@ export interface ICMSInfo {
   aprX: string;
   pointsContractAddress: string;
   tokensContractAddress: string;
+  rewardsContractAddress: string;
   caContractAddress: string;
   multiTokenContractAddress: string;
   awakenLpTokenContractAddress03: string;
   awakenLpTokenContractAddress01: string;
   awakenLpTokenContractAddress005: string;
+  awakenLpSwapContractAddress03: string;
+  awakenLpSwapContractAddress01: string;
+  awakenLpSwapContractAddress005: string;
   awakenSGRUrl: string;
+  awakenUrl: string;
   stakeNotes: string[];
   addStakeNotes: string[];
   extendStakeNotes: string[];

@@ -1,0 +1,7 @@
+.add-modal{
+  :global{
+    .earn-modal-title{
+      @apply !w-full;
+    }
+  }
+}

@@ -5,34 +5,38 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { ISendResult } from 'types';
 import { tokenClaim } from 'contract/tokenStaking';
 import { divDecimals } from 'utils/calculate';
+import { useRouter } from 'next/navigation';
 
 interface IClaimModalProps {
   amount: string | number;
   releasePeriod: string | number;
   tokenSymbol: string;
   decimal: number;
-  stakeId: string;
+  poolId: string;
   onStake: (amount: number | string, period: number | string) => Promise<ISendResult>;
   onSuccess?: () => void;
+  onEarlyStake?: () => void;
 }
 
 function ClaimModal({
   amount,
   tokenSymbol,
   decimal = 8,
-  stakeId,
+  poolId,
   onSuccess,
   releasePeriod,
+  onEarlyStake,
 }: IClaimModalProps) {
   const modal = useModal();
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
   const [loading, setLoading] = useState(false);
   const [transactionId, setTransactionId] = useState('');
+  const router = useRouter();
 
   const onConfirm = useCallback(async () => {
     try {
       setLoading(true);
-      const { TransactionId } = await tokenClaim(stakeId);
+      const { TransactionId } = await tokenClaim(poolId);
       setTransactionId(TransactionId);
       setStatus('success');
     } catch (error) {
@@ -41,7 +45,7 @@ function ClaimModal({
     } finally {
       setLoading(false);
     }
-  }, [stakeId]);
+  }, [poolId]);
 
   const onClose = useCallback(() => {
     setLoading(false);
@@ -57,8 +61,18 @@ function ClaimModal({
       loading={loading}
       content={{ amount: divDecimals(amount, decimal).toFixed(2), tokenSymbol, releasePeriod }}
       onClose={onClose}
+      afterClose={() => {
+        modal.remove();
+      }}
       onConfirm={onConfirm}
       transactionId={transactionId}
+      onEarlyStake={() => {
+        onEarlyStake?.();
+      }}
+      onGoRewards={() => {
+        modal.hide();
+        router.push('/rewards');
+      }}
     />
   );
 }

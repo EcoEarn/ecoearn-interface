@@ -21,10 +21,12 @@ export interface IWithdrawParams {
 }
 
 export interface IGetRewardResult {
-  stake_id: number;
-  address: string;
-  symbol: string;
-  amount: number;
+  rewardInfos: Array<{
+    stake_id: number;
+    address: string;
+    symbol: string;
+    amount: number;
+  }>;
 }
 
 export interface IGetBalanceParams {

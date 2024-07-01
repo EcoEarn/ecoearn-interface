@@ -36,7 +36,7 @@ export interface IContractError extends Error {
   errorMessage?: {
     message: string;
     name?: string;
-    stack?: string;
+    stake?: string;
   };
   Error?: string;
   from?: string;
@@ -64,6 +64,10 @@ export interface CallContractParams<T> {
   contractAddress: string;
   methodName: string;
   args: T;
+}
+
+export interface ISwapContractResult {
+  results: Array<any>;
 }
 
 export interface IDiscoverInfo {
@@ -100,3 +104,15 @@ export interface IAccountInfo {
   token?: string;
   expirationTime?: number;
 }
+
+export type Reserves = {
+  [key: string]: any;
+};
+
+export type Inputs = {
+  [key: string]: any;
+};
+
+export type Tokens = {
+  [key: string]: any;
+};

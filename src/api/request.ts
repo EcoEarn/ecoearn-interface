@@ -1,6 +1,7 @@
 import { ICMSInfo } from 'redux/types/reducerTypes';
-import request, { cmsRequest, tokenRequest } from './axios';
+import request, { awakenRequest, cmsRequest, tokenRequest } from './axios';
 import qs from 'qs';
+import { PoolType } from 'types/stake';
 
 export const fetchToken = async (data: ITokenParams) => {
   return tokenRequest.post<
@@ -12,7 +13,7 @@ export const fetchToken = async (data: ITokenParams) => {
   >('/token', qs.stringify(data) as any);
 };
 
-export const fetchStackingPoolsData = async (
+export const fetchStakingPoolsData = async (
   data: IFetchStakeParams,
 ): Promise<IStakingPoolResult> => {
   return request.post('/app/simple/staking/pools', data);
@@ -68,11 +69,9 @@ export const getRewardsList = async (data: IRewardListParams): Promise<IRewardLi
   return request.post('/app/rewards/list', data);
 };
 
-export const getEarlyStakeInfo = async (data: {
-  tokenName: string;
-  address: string;
-  chainId: Chain;
-}): Promise<IEarlyStakeInfo> => {
+export const getEarlyStakeInfo = async (
+  data: IGetEarlyStakeInfoParams,
+): Promise<IEarlyStakeInfo> => {
   return request.post('/app/points/staking/early/stake/info', data);
 };
 
@@ -85,4 +84,72 @@ export const getPoolTotalStaked = async (data: {
 
 export const getCmsInfo = async (): Promise<{ data: ICMSInfo }> => {
   return cmsRequest.get('/items/config');
+};
+
+export const getTokenPrice = async (params: IGetUsdPriceParams): Promise<string> => {
+  return awakenRequest.get('/api/app/token/price', { params });
+};
+
+export const getSwapTransactionFee = async (): Promise<{ transactionFee: string }> => {
+  return awakenRequest.get('/api/app/transaction-fee');
+};
+
+export const earlyStakeSign = async (data: IEarlyStakeSignParams): Promise<IEarlyStakeSignData> => {
+  return request.post('/app/rewards/early/stake/signature', data);
+};
+
+export const earlyStake = async (data: IEarlyStakeParams): Promise<string> => {
+  return request.post('/app/rewards/early/stake', data);
+};
+
+export const withdrawSign = async (data: IWithdrawSignParams): Promise<IEarlyStakeSignData> => {
+  return request.post('/app/rewards/withdraw/signature', data);
+};
+
+export const withdraw = async (data: IEarlyStakeParams): Promise<string> => {
+  return request.post('/app/rewards/withdraw', data);
+};
+
+export const myLiquidity = async (data: { address: string }): Promise<Array<ILiquidityItem>> => {
+  return request.post('/app/farm/my/liquidity', data);
+};
+
+export const liquidityMarket = async (data: {
+  address: string;
+}): Promise<Array<ILiquidityItem>> => {
+  return request.post('/app/farm/market', data);
+};
+
+export const addLiquiditySign = async (
+  data: IAddLiquiditySignParams,
+): Promise<IEarlyStakeSignData> => {
+  return request.post('/app/rewards/add/liquidity/signature', data);
+};
+
+export const addLiquidity = async (data: IAddLiquidityParams): Promise<string> => {
+  return request.post('/app/rewards/add/liquidity', data);
+};
+
+export const cancelSign = async (data: any): Promise<any> => {
+  return request.post('/app/rewards/cancel/signature', data);
+};
+
+export const liquidityStakeSign = async (
+  data: ILiquidityStakeSignParams,
+): Promise<IEarlyStakeSignData> => {
+  return request.post('/app/rewards/liquidity/stake/signature', data);
+};
+
+export const liquidityStake = async (data: IAddLiquidityParams): Promise<string> => {
+  return request.post('/app/rewards/liquidity/stake', data);
+};
+
+export const liquidityRemoveSign = async (
+  data: ILiquidityRemoveSignParams,
+): Promise<IEarlyStakeSignData> => {
+  return request.post('/app/rewards/remove/liquidity/signature', data);
+};
+
+export const liquidityRemove = async (data: IAddLiquidityParams): Promise<string> => {
+  return request.post('/app/rewards/remove/liquidity', data);
 };

@@ -1,8 +1,5 @@
-import { memo, ReactNode, useMemo } from 'react';
-import { ToolTip } from 'aelf-design';
-import { ReactComponent as QuestionSVG } from 'assets/img/questionCircleOutlined.svg';
+import { memo, ReactNode } from 'react';
 import clsx from 'clsx';
-import useResponsive from 'hooks/useResponsive';
 import CommonTooltip from 'components/CommonTooltip';
 
 interface ITextProps {
@@ -16,20 +13,11 @@ interface ITextProps {
 }
 
 const Description = memo(
-  ({ className, valueTextAlign = 'left', label, value, tip, extra, icon }: ITextProps) => {
-    const { isLG } = useResponsive();
-
-    const flexType = useMemo(() => {
-      if (isLG) return 'start';
-      if (valueTextAlign === 'right') return 'end';
-      if (valueTextAlign === 'left') return 'start';
-      return 'center';
-    }, [isLG, valueTextAlign]);
-
+  ({ className, label, value, tip, extra, icon, valueTextAlign = 'left' }: ITextProps) => {
     return (
       <div
         className={clsx(
-          'flex justify-between text-neutralTitle text-lg font-medium lg:flex-col lg:justify-start',
+          'flex justify-between text-neutralTitle text-lg font-medium lg:flex-col lg:justify-start gap-2',
           className,
         )}
       >
@@ -41,17 +29,21 @@ const Description = memo(
           <span>{label}</span>
           {tip && <CommonTooltip title={tip} />}
         </div>
-        <div className="text-base md:text-lg">
+        <div
+          className={clsx(
+            'text-base md:text-lg flex flex-col',
+            valueTextAlign === 'left' ? 'items-start' : 'items-end',
+          )}
+        >
           <div
-            className={clsx(
-              'flex font-semibold text-neutralTitle',
-              flexType === 'end' ? 'justify-end' : 'justify-start',
-            )}
+            className={clsx('flex font-semibold gap-2 text-neutralTitle items-center break-all')}
           >
-            <span className={clsx(icon && 'mr-2', isLG && 'text-right')}>{value}</span>
+            <span>{value}</span>
             {icon}
           </div>
-          <div className="text-sm font-medium text-right text-neutralSecondary">{extra}</div>
+          {extra && (
+            <div className="text-sm font-medium text-neutralSecondary break-all">{extra}</div>
+          )}
         </div>
       </div>
     );

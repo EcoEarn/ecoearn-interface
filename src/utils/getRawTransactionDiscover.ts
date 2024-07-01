@@ -99,6 +99,7 @@ export const createManagerForwardCall = async ({
   caHash,
   instance,
 }: TCreateHandleManagerForwardCall) => {
+  console.log('=====res');
   const res = await handleManagerForwardCall({
     paramsOption: {
       contractAddress,
@@ -109,6 +110,7 @@ export const createManagerForwardCall = async ({
     functionName: 'ManagerForwardCall',
     instance,
   });
+  console.log('=====res111');
 
   res.args = Buffer.from(AElf.utils.uint8ArrayToHex(res.args), 'hex').toString('base64');
 
@@ -143,9 +145,11 @@ export const getRawTransactionDiscover = async ({
 }: any) => {
   try {
     const instance = aelf.getAelfInstance(rpcUrl);
+
     const rst = await did.services.communityRecovery.getHolderInfoByManager({
       caAddresses: [caAddress],
     } as any);
+
     const caHash: string = rst[0].caHash || '';
     const managerForwardCall = await createManagerForwardCall({
       caContractAddress,
@@ -161,6 +165,7 @@ export const getRawTransactionDiscover = async ({
     const aelfInstance = getAElf(rpcUrl);
     const { BestChainHeight, BestChainHash } = await aelfInstance.chain.getChainStatus();
     const provider = await deleteProvider({ providerName: 'Portkey' });
+
     if (!provider) return;
     const fromManagerAddress = await provider.request({
       method: MethodsWallet.GET_WALLET_CURRENT_MANAGER_ADDRESS,

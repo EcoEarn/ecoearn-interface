@@ -4,20 +4,26 @@ import ConfirmModal from 'components/ConfirmModal';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { tokenClaim, tokenUnlock } from 'contract/tokenStaking';
 import { singleMessage } from '@portkey/did-ui-react';
+import { IEarlyStakeProps } from 'hooks/useEarlyStake';
+import { useRouter } from 'next/navigation';
+import { formatTokenSymbol } from 'utils/format';
 
 interface IUnlockModalProps {
+  amount: string;
   amountFromWallet: string;
-  amountFromStake: string;
+  amountFromEarlyStake: string;
   autoClaimAmount: string;
   poolId: string;
   tokenSymbol: string;
   rewardsSymbol: string;
   releasePeriod: string | number;
   onSuccess?: () => void;
+  onEarlyStake?: () => void;
 }
 
 function UnlockModal({
-  amountFromStake,
+  amount,
+  amountFromEarlyStake,
   amountFromWallet,
   autoClaimAmount,
   poolId,
@@ -25,11 +31,13 @@ function UnlockModal({
   rewardsSymbol,
   releasePeriod,
   onSuccess,
+  onEarlyStake,
 }: IUnlockModalProps) {
   const modal = useModal();
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
   const [loading, setLoading] = useState(false);
   const [TransactionId, setTransactionId] = useState('');
+  const router = useRouter();
 
   const onConfirm = useCallback(async () => {
     try {
@@ -66,16 +74,27 @@ function UnlockModal({
       status={status}
       loading={loading}
       content={{
-        amountFromStake,
+        amount,
+        amountFromEarlyStake,
         autoClaimAmount,
         amountFromWallet,
-        tokenSymbol,
-        rewardsSymbol,
+        tokenSymbol: formatTokenSymbol(tokenSymbol),
+        rewardsSymbol: formatTokenSymbol(rewardsSymbol),
         releasePeriod,
       }}
       onClose={onClose}
+      afterClose={() => {
+        modal.remove();
+      }}
       onConfirm={onConfirm}
       transactionId={TransactionId}
+      onEarlyStake={() => {
+        onEarlyStake?.();
+      }}
+      onGoRewards={() => {
+        modal.hide();
+        router.push('/rewards');
+      }}
     />
   );
 }
