@@ -130,5 +130,9 @@ const cmsRequest = new Request({
   baseURL: '/cms',
 });
 
+const awakenRequest = new Request({
+  baseURL: '/awakenApi',
+});
+
 export default new Request({});
-export { tokenRequest, cmsRequest };
+export { tokenRequest, cmsRequest, awakenRequest };

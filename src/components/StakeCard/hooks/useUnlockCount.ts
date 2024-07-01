@@ -11,18 +11,24 @@ export default function useUnlockCount({
   unlockWindowDuration: string | number;
   stakingPeriod: string | number;
 }) {
-  const [isUnLocked, setIsUnLocked] = useState(false);
+  const [isUnLocked, setIsUnLocked] = useState<boolean | null>(null);
   const [unlockTime, setUnLockTime] = useState(0);
 
-  useInterval(() => {
-    const { isUnLocked, unlockTime } = getTargetUnlockTimeStamp(
-      stakingPeriod,
-      lastOperationTime,
-      unlockWindowDuration,
-    );
-    setUnLockTime(unlockTime);
-    setIsUnLocked(isUnLocked);
-  }, 1000);
+  useInterval(
+    () => {
+      const { isUnLocked, unlockTime } = getTargetUnlockTimeStamp(
+        stakingPeriod,
+        lastOperationTime,
+        unlockWindowDuration,
+      );
+      setUnLockTime(unlockTime);
+      setIsUnLocked(isUnLocked);
+    },
+    1000,
+    {
+      immediate: true,
+    },
+  );
 
   const [countdown, { days, hours, minutes }] = useCountDown({
     targetDate: Number(unlockTime),

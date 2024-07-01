@@ -127,7 +127,9 @@ export const tokenWithdraw = async (
 ): Promise<ISendResult> => await tokenStakingContractRequest('Withdraw', params, options);
 
 export const GetReward = async (
-  params: string,
+  params: {
+    stakeIds: Array<string>;
+  },
   options?: IContractOptions,
 ): Promise<IGetRewardResult> =>
   (await tokenStakingContractRequest('GetReward', params, {

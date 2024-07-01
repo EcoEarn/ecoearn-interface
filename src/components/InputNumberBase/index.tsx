@@ -8,6 +8,7 @@ interface IInputNumberBaseProps extends Omit<InputProps, 'type' | 'onChange'> {
   decimal?: number;
   onChange?: (val: string) => void;
   suffixText?: string;
+  allowZero?: boolean;
   suffixClick?: (val: string) => void;
 }
 
@@ -18,6 +19,7 @@ export default function InputNumberBase({
   onChange,
   suffixText,
   suffixClick,
+  allowZero = true,
   ...rest
 }: IInputNumberBaseProps) {
   const onClick = useCallback(() => {
@@ -44,7 +46,11 @@ export default function InputNumberBase({
       const parseStr = inputVal.replaceAll(',', '');
       let val = '';
       console.log('onchange', inputVal);
+      const regex = /^[1-9]\d*$/;
+
       if (!parseStr || !isPotentialNumber(parseStr)) {
+        val = '';
+      } else if (!regex.test(parseStr) && !allowZero) {
         val = '';
       } else if (inputVal.endsWith('.')) {
         val = inputVal;
@@ -58,7 +64,7 @@ export default function InputNumberBase({
       console.log('onInputChange', val);
       onChange?.(val);
     },
-    [decimal, onChange],
+    [allowZero, decimal, onChange],
   );
 
   return (

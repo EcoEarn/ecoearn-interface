@@ -10,6 +10,24 @@ interface ITokenParams {
   source: string;
 }
 
+interface IStakeInfoItem {
+  stakeId?: string | number;
+  earned?: string | number;
+  earnedInUsd?: string | number;
+  staked?: string;
+  stakedInUsD?: string;
+  unlockTime?: number | string;
+  stakeApr?: string | number;
+  stakedAmount?: string;
+  earlyStakedAmount?: string;
+  stakedTime?: number;
+  period?: number;
+  boostedAmount?: number | string;
+  decimal?: number;
+  stakingPeriod?: number | string;
+  lastOperationTime?: number | string;
+}
+
 interface IStakePoolData {
   icons?: Array<string>;
   poolName?: string;
@@ -44,9 +62,13 @@ interface IStakePoolData {
   releasePeriod?: number | string;
   lastOperationTime?: number | string;
   minimumClaimAmount?: number | string;
+  stakeInfos?: Array<IStakeInfoItem>;
+  latestClaimTime?: string | number;
+  usdRate?: number | string;
+  longestReleaseTime?: number | string;
 }
 
-type TStackPoolDataKey = keyof IStakePoolData;
+type TStakePoolDataKey = keyof IStakePoolData;
 interface IStakingItem {
   dappName: string;
   icon: string;
@@ -108,29 +130,81 @@ interface ICreateTradeParams {
 }
 
 interface IPoolRewardsData {
+  dappId: string;
   pointsPoolAgg: {
-    total: number;
-    totalInUsd: number;
-    rewardsTotal: number;
-    rewardsTotalInUsd: number;
+    claimInfos: Array<{
+      claimId: string;
+      releaseTime: number;
+    }>;
+    withdrawableClaimInfos: Array<{
+      claimId: string;
+      releaseTime: number;
+    }>;
+    totalRewards: string;
+    totalRewardsInUsd: string;
     rewardsTokenName: string;
-    decimal: number;
-    stakeClaimIds: Array<string>;
-    withDrawClaimIds: Array<string>;
+    decimal: string;
+    withdrawn: string;
+    withdrawnInUsd: string;
+    frozen: string;
+    frozenInUsd: string;
+    withdrawable: string;
+    withdrawableInUsd: string;
+    earlyStakedAmount: string;
+    earlyStakedAmountInUsd: string;
+    nextRewardsRelease: number;
+    nextRewardsReleaseAmount: string;
+    allRewardsRelease: boolean;
   };
   tokenPoolAgg: {
-    rewardsTotal: number;
-    rewardsTotalInUsd: number;
+    claimInfos: Array<{
+      claimId: string;
+      releaseTime: number;
+    }>;
+    withdrawableClaimInfos: Array<{
+      claimId: string;
+      releaseTime: number;
+    }>;
+    totalRewards: string;
+    totalRewardsInUsd: string;
     rewardsTokenName: string;
-    decimal: number;
-    withDrawClaimIds: Array<string>;
+    decimal: string;
+    withdrawn: string;
+    withdrawnInUsd: string;
+    frozen: string;
+    frozenInUsd: string;
+    withdrawable: string;
+    withdrawableInUsd: string;
+    earlyStakedAmount: string;
+    earlyStakedAmountInUsd: string;
+    nextRewardsRelease: number;
+    nextRewardsReleaseAmount: string;
+    allRewardsRelease: boolean;
   };
   lpPoolAgg: {
-    rewardsTotal: number;
-    rewardsTotalInUsd: number;
+    claimInfos: Array<{
+      claimId: string;
+      releaseTime: number;
+    }>;
+    withdrawableClaimInfos: Array<{
+      claimId: string;
+      releaseTime: number;
+    }>;
+    totalRewards: string;
+    totalRewardsInUsd: string;
     rewardsTokenName: string;
-    decimal: number;
-    withDrawClaimIds: Array<string>;
+    decimal: string;
+    withdrawn: string;
+    withdrawnInUsd: string;
+    frozen: string;
+    frozenInUsd: string;
+    withdrawable: string;
+    withdrawableInUsd: string;
+    earlyStakedAmount: string;
+    earlyStakedAmountInUsd: string;
+    nextRewardsRelease: number;
+    nextRewardsReleaseAmount: string;
+    allRewardsRelease: boolean;
   };
 }
 
@@ -161,6 +235,14 @@ interface IRewardListData {
   totalCount: number;
 }
 
+interface IGetEarlyStakeInfoParams {
+  tokenName: string;
+  address: string;
+  chainId: Chain;
+  poolType: PoolType;
+  rate: string | number;
+}
+
 interface IEarlyStakeInfo {
   stakeSymbol: string;
   stakeId: string;
@@ -176,6 +258,7 @@ interface IEarlyStakeInfo {
   unlockWindowDuration?: number | string;
   stakingPeriod?: number | string;
   lastOperationTime?: number | string;
+  subStakeInfos: Array<IStakeInfoItem>;
 }
 
 interface IFetchStakeParams {
@@ -186,4 +269,99 @@ interface IFetchStakeParams {
   maxResultCount: number;
   address: string;
   chainId: Chain;
+}
+
+interface IGetUsdPriceParams {
+  chainId: ChainId;
+  TokenAddress: string;
+  Symbol: string;
+}
+
+interface IEarlyStakeSignParams {
+  amount: number;
+  poolType: import('types/stake').PoolType;
+  address: string;
+  claimInfos: Array<{
+    claimId: string;
+    releaseTime: number;
+  }>;
+  dappId: string;
+  poolId: string;
+  period: number;
+}
+
+interface IWithdrawSignParams {
+  amount: number;
+  poolType: import('types/stake').PoolType;
+  address: string;
+  claimInfos: Array<{
+    claimId: string;
+    releaseTime: number;
+  }>;
+  dappId: string;
+}
+
+interface IEarlyStakeSignData {
+  signature: string;
+  seed: Array<number>;
+  expirationTime: number;
+}
+
+interface IEarlyStakeParams {
+  chainId: ChainId;
+  rawTransaction: string;
+}
+
+interface ILiquidityItem {
+  banlance: string | number;
+  decimal: number;
+  icons: Array<string>;
+  lpSymbol: string;
+  rate: number | string;
+  tokenAAmount: string | number;
+  tokenASymbol: string;
+  tokenBAmount: string | number;
+  tokenBSymbol: string;
+  value: string | number;
+  liquidityIds: Array<any>;
+  usdDecimal: number;
+  ecoEarnBanlance?: string;
+  ecoEarnTokenAAmount?: string;
+  ecoEarnTokenBAmount?: string;
+  lpAmount?: string;
+}
+
+interface IAddLiquidityParams {
+  chainId: Chain;
+  rawTransaction: string;
+}
+
+interface IAddLiquiditySignParams {
+  amount: string | number;
+  poolType: string;
+  address: string;
+  dappId: string;
+  claimInfos: Array<{ claimId: string; releaseTime: string | number }>;
+  poolId: string | number;
+  period: number;
+  tokenAMin: string | number;
+  tokenBMin: string | number;
+}
+
+interface ILiquidityStakeSignParams {
+  lpAmount: string | number;
+  poolId: string | number;
+  period: number;
+  address: string;
+  dappId: string;
+  liquidityIds: Array<any>;
+}
+
+interface ILiquidityRemoveSignParams {
+  lpAmount: string | number;
+  address: string;
+  dappId: string;
+  tokenAMin: string | number;
+  tokenBMin: string | number;
+  liquidityIds: Array<any>;
 }

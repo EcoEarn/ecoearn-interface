@@ -1,6 +1,6 @@
-import StackModal from 'components/StakeModal';
-import { useCallback, useState } from 'react';
-import { StakeType } from 'types/stack';
+import StakeModal from 'components/StakeModal';
+import { ReactNode, useCallback, useState } from 'react';
+import { PoolType, StakeType } from 'types/stake';
 import {
   ConfirmModalTypeEnum,
   TConfirmModalStatus,
@@ -15,36 +15,49 @@ import { ISendResult } from 'types';
 import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
 import { formatTokenSymbol } from 'utils/format';
+import { useRouter } from 'next/navigation';
 
-interface IStackModalProps {
+interface IStakeModalProps {
   type: StakeType;
   isFreezeAmount?: boolean;
-  freezeAmount: string | number;
+  freezeAmount?: string | number;
+  customAmountModule?: ReactNode;
   isFreezePeriod?: boolean;
+  isStakeRewards?: boolean;
   freezePeriod?: number | string;
   earlyAmount?: number | string;
   isEarlyStake?: boolean;
+  balanceDec?: string;
   balance?: string;
+  modalTitle?: string;
   stakeData: IStakePoolData;
-  onStake: (amount: number | string, period: number | string) => Promise<ISendResult | void>;
+  onStake: (
+    amount: number | string,
+    period: number | string,
+    poolId?: number | string,
+  ) => Promise<ISendResult | void>;
   onSuccess: () => void;
 }
 
 type TStakeExtendContent = Partial<IStakeContent> | IExtendedLockupContent;
 
-function StackModalWithConfirm({
+function StakeModalWithConfirm({
   type,
   stakeData,
   isFreezeAmount,
   freezeAmount,
+  customAmountModule,
   isFreezePeriod,
+  isStakeRewards,
   freezePeriod,
   earlyAmount,
   isEarlyStake,
+  balanceDec,
+  modalTitle,
   onStake,
   onSuccess,
   balance,
-}: IStackModalProps) {
+}: IStakeModalProps) {
   const modal = useModal();
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
@@ -58,7 +71,8 @@ function StackModalWithConfirm({
     tokenSymbol: '',
   });
   const [transactionId, setTransactionId] = useState('');
-  const { stakeSymbol, staked, unlockTime = '', decimal = 8 } = stakeData || {};
+  const { stakeSymbol, staked, unlockTime = '', decimal = 8, poolId } = stakeData || {};
+  const router = useRouter();
 
   const getNewUnlockTimeStamp = useCallback(
     (period: string) =>
@@ -74,7 +88,7 @@ function StackModalWithConfirm({
 
   const setConfirmContent = useCallback(
     (amount: string, period: string) => {
-      console.log('stake--type', type);
+      console.log('stake--type', type, amount);
       const _staked = divDecimals(staked, decimal).toFixed();
       if (type === StakeType.EXTEND) {
         setContent({
@@ -138,20 +152,21 @@ function StackModalWithConfirm({
       try {
         setLoading(true);
         const { amount, period } = content as TStakeExtendContent;
-        const res = await onStake(amount || '', period || '');
-        if (res) {
-          const { TransactionId } = res;
+        const res = await onStake(amount || '', period || '', poolId);
+        if (res?.TransactionId) {
           setStatus('success');
-          setTransactionId(TransactionId);
+          setTransactionId(res?.TransactionId);
+        } else {
+          throw Error('no TransactionId');
         }
       } catch (error) {
-        console.log('===stake error', error);
+        console.error('===stake error', error);
         setStatus('error');
       } finally {
         setLoading(false);
       }
     },
-    [onStake],
+    [onStake, poolId],
   );
 
   const onConfirmClose = useCallback(() => {
@@ -165,14 +180,18 @@ function StackModalWithConfirm({
 
   return (
     <>
-      <StackModal
+      <StakeModal
         visible={modal.visible}
         isFreezeAmount={isFreezeAmount}
         isFreezePeriod={isFreezePeriod}
         freezePeriod={freezePeriod}
         freezeAmount={freezeAmount}
+        isStakeRewards={isStakeRewards}
+        customAmountModule={customAmountModule}
+        modalTitle={modalTitle}
         earlyAmount={earlyAmount}
         isEarlyStake={isEarlyStake}
+        balanceDec={balanceDec}
         type={type}
         balance={balance}
         onClose={onClose}
@@ -188,9 +207,13 @@ function StackModalWithConfirm({
         transactionId={transactionId}
         onClose={onConfirmClose}
         onConfirm={onConfirm}
+        onGoRewards={() => {
+          setVisible(false);
+          router.push('/rewards');
+        }}
       />
     </>
   );
 }
 
-export default NiceModal.create(StackModalWithConfirm);
+export default NiceModal.create(StakeModalWithConfirm);

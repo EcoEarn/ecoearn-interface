@@ -5,11 +5,11 @@ import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
 import { useModal } from '@ebay/nice-modal-react';
 import ClaimModal from 'components/ClaimModal';
 import { singleMessage } from '@portkey/did-ui-react';
-import { StakeType } from 'types/stack';
+import { PoolType, StakeType } from 'types/stake';
 import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
 import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
-import { fetchStackingPoolsData } from 'api/request';
+import { fetchStakingPoolsData } from 'api/request';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import dayjs from 'dayjs';
 import { GetBalance } from 'contract/multiToken';
@@ -18,8 +18,11 @@ import { divDecimals, getTargetUnlockTimeStamp, timesDecimals } from 'utils/calc
 import { checkAllowanceAndApprove } from 'utils/aelfUtils';
 import useLoading from 'hooks/useLoading';
 import { useInterval } from 'ahooks';
-
-type TFeeType = 0.0005 | 0.001 | 0.003;
+import useEarlyStake from 'hooks/useEarlyStake';
+import { useRouter } from 'next/navigation';
+import { formatTokenSymbol } from 'utils/format';
+import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
+import { ZERO } from 'constants/index';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -35,20 +38,29 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const unlockModal = useModal(UnlockModal);
   const { wallet } = useWalletService();
   const { showLoading, closeLoading } = useLoading();
-  const {
-    curChain,
-    tokensContractAddress,
-    awakenLpTokenContractAddress005,
-    awakenLpTokenContractAddress01,
-    awakenLpTokenContractAddress03,
-  } = useGetCmsInfo() || {};
+  const router = useRouter();
+  const { curChain, tokensContractAddress } = useGetCmsInfo() || {};
+  const { stake: earlyStake } = useEarlyStake();
+  const { getAddress } = useGetAwakenContract();
+
+  const goLiquidity = useCallback(() => {
+    if (!isLogin) {
+      checkLogin({
+        onSuccess: () => {
+          router.push('/liquidity');
+        },
+      });
+      return;
+    }
+    router.push('/liquidity');
+  }, [checkLogin, isLogin, router]);
 
   const getStakeData = useCallback(
     async (props?: IFetchDataProps) => {
       const { withLoading = true } = props || {};
       withLoading && showLoading();
       try {
-        const { pools, textNodes } = await fetchStackingPoolsData({
+        const { pools, textNodes } = await fetchStakingPoolsData({
           poolType,
           sorting: '',
           name: '',
@@ -92,24 +104,32 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
 
   const onClaim = useCallback(
     (stakeData: IStakePoolData) => {
-      const { earnedSymbol = '--', stakeId, earned, decimal, releasePeriod } = stakeData;
+      const { earnedSymbol = '--', stakeId, earned, decimal, releasePeriod, poolId } = stakeData;
       claimModal.show({
         amount: earned,
         tokenSymbol: earnedSymbol,
         decimal,
-        stakeId: String(stakeId) || '',
+        poolId: String(poolId) || '',
         releasePeriod,
         onSuccess: () => getStakeData(),
+        onEarlyStake: () => {
+          earlyStake({
+            poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
+            onSuccess: () => {
+              claimModal.remove();
+            },
+          });
+        },
       });
     },
-    [claimModal, getStakeData],
+    [claimModal, earlyStake, getStakeData, poolType],
   );
 
   const onUnlock = useCallback(
     async (stakeData: IStakePoolData) => {
       const {
         stakeId = '',
-        stakedAmount,
+        staked,
         earlyStakedAmount,
         stakeSymbol,
         earnedSymbol,
@@ -123,17 +143,38 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       }
       try {
         showLoading();
-        const { amount: claimAmount } = await GetReward(String(stakeData.stakeId));
+        const { rewardInfos } = await GetReward({
+          stakeIds: [String(stakeData.stakeId)],
+        });
+
         closeLoading();
         unlockModal.show({
-          autoClaimAmount: divDecimals(claimAmount, decimal || 8).toString(),
-          amountFromStake: divDecimals(earlyStakedAmount, decimal || 8).toString(),
-          amountFromWallet: divDecimals(stakedAmount, decimal || 8).toString(),
+          amount: divDecimals(staked, decimal || 8).toString(),
+          autoClaimAmount: divDecimals(rewardInfos?.[0]?.amount, decimal || 8).toString(),
+          amountFromEarlyStake:
+            poolType === PoolType.LP
+              ? '0'
+              : divDecimals(earlyStakedAmount, decimal || 8).toString(),
+          amountFromWallet:
+            poolType === PoolType.LP
+              ? '0'
+              : divDecimals(
+                  ZERO.plus(staked || 0).minus(earlyStakedAmount || 0),
+                  decimal || 8,
+                ).toString(),
           tokenSymbol: stakeSymbol,
           rewardsSymbol: earnedSymbol,
           poolId,
           releasePeriod,
           onSuccess: () => getStakeData(),
+          onEarlyStake: () => {
+            earlyStake({
+              poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
+              onSuccess: () => {
+                unlockModal.remove();
+              },
+            });
+          },
         });
       } catch (error) {
         console.error('GetReward error', error);
@@ -145,23 +186,14 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         closeLoading();
       }
     },
-    [closeLoading, getStakeData, showLoading, unlockModal],
+    [closeLoading, earlyStake, getStakeData, poolType, showLoading, unlockModal],
   );
 
   const getLpTokenContractAddress = useCallback(
     (feeType: TFeeType): string | undefined => {
-      const feeContractList = {
-        [0.0005]: awakenLpTokenContractAddress005,
-        [0.001]: awakenLpTokenContractAddress01,
-        [0.003]: awakenLpTokenContractAddress03,
-      };
-      return feeContractList[feeType];
+      return getAddress(feeType)?.token;
     },
-    [
-      awakenLpTokenContractAddress005,
-      awakenLpTokenContractAddress01,
-      awakenLpTokenContractAddress03,
-    ],
+    [getAddress],
   );
 
   const checkApproveParams = useCallback(
@@ -209,19 +241,24 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           closeLoading();
         }
       }
+      const symbol = formatTokenSymbol(stakeData?.stakeSymbol || '');
+      const balanceDec =
+        poolType === 'Token'
+          ? `It is the amount of ${symbol} held in your wallet`
+          : `It is the amount of LP you hold in AwakenSwap`;
       stakeModal.show({
         isFreezeAmount: type === StakeType.RENEW ? true : false,
-        isFreezePeriod: type === StakeType.RENEW ? true : false,
-        freezePeriod: type === StakeType.RENEW ? stakeData.period : undefined,
         freezeAmount: type === StakeType.RENEW ? String(stakeData.staked) : undefined,
         type,
         stakeData,
+        balanceDec,
         balance: symbolBalance,
         onStake: async (amount, period) => {
+          const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
           if (type === StakeType.RENEW) {
             return await Renew({
               poolId: stakeData?.poolId || '',
-              period: stakeData?.stakingPeriod || 0,
+              period: periodInSeconds,
             });
           } else {
             await checkApproveParams(rate as TFeeType);
@@ -241,11 +278,10 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
               throw new Error('approve failed');
             }
             if (checked) {
-              const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
               return await tokenStake({
                 poolId: stakeData?.poolId || '',
                 amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
-                period: periodInSeconds || 0,
+                period: periodInSeconds,
               });
             }
           }
@@ -269,7 +305,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
 
   const onStake = useCallback(
     (stakeData: IStakePoolData) => {
-      console.log('onStack');
+      console.log('onStake');
       if (!isLogin) {
         return checkLogin();
       }
@@ -309,5 +345,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     isLogin,
     onRenewal,
     renewText,
+    earlyStake,
+    goLiquidity,
   };
 }

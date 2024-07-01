@@ -1,0 +1,7 @@
+.remove-modal{
+  :global{
+    .earn-modal-title{
+      @apply !w-full;
+    }
+  }
+}

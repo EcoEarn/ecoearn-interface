@@ -32,7 +32,7 @@ function CommonModal(props: ModalProps) {
       {...props}
       className={`${styles.modal} ${isLG && styles['modal-mobile']} ${
         isLG && !disableMobileLayout && styles['modal-full-screen']
-      } ${className || ''} ${!title && styles['modal-no-title']}`}
+      } ${className || ''}`}
       wrapClassName={`${styles['modal-wrap']} ${wrapClassName}`}
       title={
         <div>

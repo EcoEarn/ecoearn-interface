@@ -7,13 +7,13 @@
     max-width: calc(100vw - 32px);
     @apply overflow-hidden;
     :global(.earn-modal-content) {
-      @apply py-0 px-0 rounded-2xl max-h-[80vh] h-auto flex flex-col overflow-hidden bg-neutralWhiteBg;
+      @apply py-0 px-0 rounded-2xl max-h-[90vh] h-auto flex flex-col overflow-hidden bg-neutralWhiteBg;
 
       :global(.earn-modal-body) {
         @apply pb-0 px-8 pb-8 box-border border-0 flex-1 overflow-y-auto pt-0;
       }
       :global(.earn-modal-footer) {
-        @apply flex items-center justify-center px-0 border-neutralDivider border-t-0 pb-8 pt-0;
+        @apply flex items-center justify-center px-0 pb-8 pt-0 md:!py-8 !py-5;
         > button {
           @apply mr-4;
 
@@ -42,7 +42,7 @@
   .modal-mobile:global(.earn-modal) {
     :global(.earn-modal-content) {
       :global(.earn-modal-header) {
-        @apply px-[24px] py-0 h-[60px] flex items-center;
+        @apply px-[24px] py-0 h-[64px] flex items-center;
         :global(.earn-modal-title) {
           @apply text-xl;
         }
@@ -77,19 +77,9 @@
       }
 
       :global(.earn-modal-footer) {
-        @apply p-4;
+        @apply p-4 !border-solid !border-[1px] !border-b-0 !border-x-0 !border-neutralBorder;
       }
     }
   }
 }
 
-.modal-no-title{
-  :global{
-    .earn-modal-title{
-      @apply hidden;
-    }
-    .earn-modal-header{
-      @apply !h-0;
-    }
-  }
-}

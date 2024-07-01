@@ -215,3 +215,25 @@ export function formatTokenSymbol(symbol: string) {
   }
   return symbol;
 }
+
+export function getTargetClaimTime(time: string | number) {
+  const targetDate = dayjs(time);
+  const remainingDays = targetDate.diff(dayjs(), 'day');
+  const remainingHours = targetDate.diff(dayjs(), 'hour');
+  const remainingMinutes = targetDate.diff(dayjs(), 'minute');
+  if (remainingDays < 1) {
+    if (remainingHours < 1) {
+      if (remainingMinutes < 1) {
+        return '1m';
+      }
+      return `${remainingMinutes}m`;
+    }
+    return `${remainingHours}h`;
+  }
+  return `${remainingDays}d`;
+}
+
+export function getTokenSymbolFromLp(symbol: string) {
+  if (!symbol) return [];
+  return symbol.split(' ')?.[1]?.split('-');
+}
