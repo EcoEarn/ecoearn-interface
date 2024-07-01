@@ -2,7 +2,7 @@ import { Button } from 'aelf-design';
 import { Flex } from 'antd';
 import CommonModal from 'components/CommonModal';
 import dayjs from 'dayjs';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatTokenPrice } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 import { ReactComponent as SuccessIcon } from 'assets/img/result-success-icon.svg';
@@ -11,6 +11,9 @@ import { ExportOutlined } from '@ant-design/icons';
 import BigNumber from 'bignumber.js';
 import { ZERO } from 'constants/index';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
+import styles from './style.module.css';
 
 export enum ConfirmModalTypeEnum {
   Claim = 'claim',
@@ -26,6 +29,7 @@ export interface IClaimContent {
   amount?: number | string;
   tokenSymbol?: string;
   releasePeriod?: number | string;
+  vestingPeriod?: number | string;
 }
 
 export interface IWithDrawContent extends IClaimContent {
@@ -50,12 +54,14 @@ export interface IStakeContent {
 }
 
 export interface IUnLockContent {
-  amountFromStake?: string;
+  amount?: string | number;
+  amountFromEarlyStake?: string;
   amountFromWallet?: string;
   autoClaimAmount?: string;
   tokenSymbol?: string;
   rewardsSymbol?: string;
   releasePeriod?: number | string;
+  vestingPeriod?: number | string;
 }
 
 export type TConfirmModalContentType = IExtendedLockupContent &
@@ -68,22 +74,42 @@ export type TConfirmModalContentType = IExtendedLockupContent &
 export interface IConfirmModalProps {
   type?: ConfirmModalTypeEnum;
   onConfirm?: (content: TConfirmModalContentType) => void;
-  loading: boolean;
+  loading?: boolean;
   content?: TConfirmModalContentType;
   status: TConfirmModalStatus;
-  onClose: () => void;
+  onClose?: () => void;
+  afterClose?: () => void;
   transactionId?: string;
   visible: boolean;
+  onEarlyStake?: () => void;
+  onGoRewards?: () => void;
 }
 
 function ConfirmModal(props: IConfirmModalProps) {
-  const { content, onConfirm, loading, type, status, onClose, transactionId, visible } = props;
-  const { isLG } = useResponsive();
+  const {
+    content,
+    onConfirm,
+    loading,
+    type,
+    status,
+    onClose,
+    afterClose,
+    transactionId,
+    visible,
+    onEarlyStake,
+    onGoRewards,
+  } = props;
+  const { isLG, isXS } = useResponsive();
   const { explorerUrl } = useGetCmsInfo() || {};
+  const router = useRouter();
 
   const withDrawPeriod = useMemo(() => {
-    const withDrawPeriodDays = dayjs.duration(Number(content?.releasePeriod || 0), 'second').days();
-    return `${withDrawPeriodDays} ${withDrawPeriodDays > 1 ? 'days' : 'day'}`;
+    const withDrawPeriodDays = BigNumber(
+      dayjs.duration(Number(content?.releasePeriod || 0), 'second').asDays(),
+    )
+      .dp(2)
+      .toNumber();
+    return `${withDrawPeriodDays}-${withDrawPeriodDays > 1 ? 'days' : 'day'}`;
   }, [content?.releasePeriod]);
 
   const renderTitle = useMemo(() => {
@@ -129,6 +155,30 @@ function ConfirmModal(props: IConfirmModalProps) {
     );
   }, [status]);
 
+  const afterClaimAction = useMemo(() => {
+    return (
+      <Flex justify="center" gap={12} vertical={isXS}>
+        <Button
+          className="!rounded-lg !min-w-[200px]"
+          onClick={() => {
+            onGoRewards?.();
+          }}
+        >
+          {`Go to "Rewards"`}
+        </Button>
+        <Button
+          className="!rounded-lg !min-w-[200px]"
+          type="primary"
+          onClick={() => {
+            onEarlyStake?.();
+          }}
+        >
+          Stake to earn more
+        </Button>
+      </Flex>
+    );
+  }, [isXS, onEarlyStake, onGoRewards]);
+
   const renderContent = useMemo(() => {
     if (status !== 'normal') {
       return renderResult;
@@ -139,14 +189,14 @@ function ConfirmModal(props: IConfirmModalProps) {
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">You will claim </div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {`${formatTokenPrice(content?.amount || 0, { decimalPlaces: 2 })} ${
-              content?.tokenSymbol
-            }`}
+            {`${formatTokenPrice(content?.amount || 0)} ${content?.tokenSymbol}`}
           </div>
           <div className="text-sm font-normal text-neutralSecondary mt-4">
-            <span>{`Your claimed rewards can be withdrawn after `}</span>
+            <span>{`The rewards you claim have a `}</span>
             <span className="font-medium text-neutralTitle">{withDrawPeriod}</span>
-            <span> {`. To withdraw rewards, head over to "Rewards".`}</span>
+            <span>
+              {` release period. After claiming, the rewards will appear on the "Rewards" page.`}
+            </span>
           </div>
         </Flex>
       );
@@ -155,9 +205,7 @@ function ConfirmModal(props: IConfirmModalProps) {
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">You will withdraw</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {`${formatTokenPrice(content?.amount || 0, { decimalPlaces: 2 })} ${
-              content?.tokenSymbol
-            }`}
+            {`${formatTokenPrice(content?.amount || 0)} ${content?.tokenSymbol}`}
           </div>
         </Flex>
       );
@@ -168,9 +216,7 @@ function ConfirmModal(props: IConfirmModalProps) {
             BigNumber(content?.oldAmount || 0).gt(ZERO) ? 'add staking for' : 'stake'
           }`}</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {`${formatTokenPrice(content?.amount || 0, { decimalPlaces: 2 })} ${
-              content?.tokenSymbol
-            }`}
+            {`${formatTokenPrice(content?.amount || 0)} ${content?.tokenSymbol}`}
           </div>
           <Flex
             vertical
@@ -180,18 +226,11 @@ function ConfirmModal(props: IConfirmModalProps) {
               <Flex justify="space-between">
                 <span className="text-neutralSecondary">Staking amount</span>
                 <span className="text-neutralPrimary font-medium">
-                  <span>
-                    {formatTokenPrice(content?.oldAmount || 0, {
-                      decimalPlaces: 2,
-                    })}
-                  </span>
+                  <span>{formatTokenPrice(content?.oldAmount || 0)}</span>
                   <span>{' -> '}</span>
                   <span className="text-brandDefault">
                     {formatTokenPrice(
                       BigNumber(content?.amount || 0).plus(BigNumber(content?.oldAmount || 0)),
-                      {
-                        decimalPlaces: 2,
-                      },
                     )}
                   </span>
                 </span>
@@ -212,7 +251,9 @@ function ConfirmModal(props: IConfirmModalProps) {
                 </Flex>
                 <Flex justify="space-between">
                   <span className="text-neutralSecondary">{`Unlock on (new)`}</span>
-                  <span>{dayjs(Number(content?.newDateTimeStamp)).format('YYYY.MM.DD HH:mm')}</span>
+                  <span className="text-brandDefault">
+                    {dayjs(Number(content?.newDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
+                  </span>
                 </Flex>
               </Flex>
             )}
@@ -223,20 +264,20 @@ function ConfirmModal(props: IConfirmModalProps) {
       return (
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">
-            You will extend the lockup period by {content?.days} days
+            You will extend the lockup period by {content?.days || 0} days
           </div>
           <Flex
             vertical
             className="w-full gap-4 mt-10 rounded-lg bg-brandBg px-6 py-4 text-sm font-normal"
           >
             <Flex justify="space-between">
-              <span className="text-neutralSecondary">Original unlock date</span>
+              <span className="text-neutralSecondary">Unlock on (current)</span>
               <span className="text-neutralPrimary">
                 {dayjs(Number(content?.oldDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
               </span>
             </Flex>
             <Flex justify="space-between">
-              <span className="text-neutralSecondary">New unlock date</span>
+              <span className="text-neutralSecondary">Unlock on (new)</span>
               <span className="text-neutralPrimary">
                 {dayjs(Number(content?.newDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
               </span>
@@ -249,31 +290,20 @@ function ConfirmModal(props: IConfirmModalProps) {
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">You will unlock</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {formatTokenPrice(
-              BigNumber(content?.amountFromStake || 0).plus(
-                BigNumber(content?.amountFromWallet || 0),
-              ),
-              { decimalPlaces: 2 },
-            )}{' '}
-            {content?.tokenSymbol}
+            {formatTokenPrice(BigNumber(content?.amount || 0))} {content?.tokenSymbol}
           </div>
           {BigNumber(content?.amountFromWallet || 0).gt(ZERO) &&
-            BigNumber(content?.amountFromStake || 0).gt(ZERO) && (
+            BigNumber(content?.amountFromEarlyStake || 0).gt(ZERO) && (
               <>
                 <div className="text-sm font-normal text-neutralPrimary">
-                  Unlock principal{' '}
-                  {formatTokenPrice(content?.amountFromWallet || 0, {
-                    decimalPlaces: 2,
-                  })}{' '}
+                  Unlock principal {formatTokenPrice(content?.amountFromWallet || 0)}{' '}
                   {content?.tokenSymbol || ''} and reward{' '}
-                  {formatTokenPrice(content?.amountFromStake || 0, {
-                    decimalPlaces: 2,
-                  })}{' '}
+                  {formatTokenPrice(content?.amountFromEarlyStake || 0)}{' '}
                   {content?.rewardsSymbol || ''}
                 </div>
               </>
             )}
-          {BigNumber(content?.amountFromStake || 0).gt(ZERO) && (
+          {BigNumber(content?.amountFromEarlyStake || 0).gt(ZERO) && (
             <div className="text-sm font-normal mt-4 text-neutralSecondary">
               {`The unlocked amount is your staked ${content?.tokenSymbol} rewards,
                which will not be withdrawn to the wallet and will appear on the "Rewards" page after
@@ -286,8 +316,10 @@ function ConfirmModal(props: IConfirmModalProps) {
   }, [content, renderResult, status, type, withDrawPeriod]);
 
   const handleClose = useCallback(() => {
-    onClose();
+    onClose?.();
   }, [onClose]);
+
+  console.log('amountFromEarlyStake', content?.amountFromEarlyStake);
 
   const handleConfirm = useCallback(() => {
     if (status === 'normal') {
@@ -311,17 +343,24 @@ function ConfirmModal(props: IConfirmModalProps) {
   const renderFooter = useMemo(() => {
     return (
       <div className="flex flex-col text-center w-full">
-        <div className="lg:px-8 mx-auto w-full flex justify-center">
-          <Button
-            type="primary"
-            className="!rounded-lg !min-w-[200px]"
-            block={isLG}
-            onClick={handleConfirm}
-            loading={loading}
-          >
-            {renderConfirmBtnText}
-          </Button>
-        </div>
+        {status === 'success' &&
+        (type === ConfirmModalTypeEnum.Claim ||
+          (type === ConfirmModalTypeEnum.UnLock &&
+            !BigNumber(content?.autoClaimAmount || 0).isZero())) ? (
+          afterClaimAction
+        ) : (
+          <div className="lg:px-8 mx-auto w-full flex justify-center">
+            <Button
+              type="primary"
+              className="!rounded-lg !min-w-[200px]"
+              block={isLG}
+              onClick={handleConfirm}
+              loading={loading}
+            >
+              {renderConfirmBtnText}
+            </Button>
+          </div>
+        )}
         {status === 'normal' &&
           type === ConfirmModalTypeEnum.UnLock &&
           BigNumber(content?.autoClaimAmount || 0).gt(ZERO) && (
@@ -331,13 +370,16 @@ function ConfirmModal(props: IConfirmModalProps) {
               vertical
             >
               <span>
-                When unstaking, {content?.autoClaimAmount} {content?.rewardsSymbol} staking rewards
-                will be automatically claimed.
+                <span> When unstaking, </span>
+                <span className="font-medium text-neutralTitle">
+                  {formatTokenPrice(content?.autoClaimAmount || 0)} {content?.rewardsSymbol}
+                </span>
+                <span> staking rewards will be automatically claimed.</span>
               </span>
               <span>
-                <span>{`Your claimed rewards can be withdrawn after `}</span>
+                <span>{`The rewards you claim have a `}</span>
                 <span className="font-medium text-neutralTitle">{withDrawPeriod}</span>
-                <span>{`. To withdraw rewards, head over to "Rewards".`}</span>
+                <span>{` release period. After claiming, the rewards will appear on the "Rewards" page.`}</span>
               </span>
             </Flex>
           )}
@@ -357,6 +399,7 @@ function ConfirmModal(props: IConfirmModalProps) {
       </div>
     );
   }, [
+    afterClaimAction,
     content?.autoClaimAmount,
     content?.rewardsSymbol,
     explorerUrl,
@@ -372,13 +415,15 @@ function ConfirmModal(props: IConfirmModalProps) {
 
   return (
     <CommonModal
-      closable={status === 'normal'}
+      // closable={status === 'normal'}
       destroyOnClose
       open={visible}
       onCancel={handleClose}
+      afterClose={afterClose}
       title={renderTitle}
+      className={clsx(!renderTitle && styles['modal-no-title'])}
       footer={renderFooter}
-      disableMobileLayout={status !== 'normal'}
+      disableMobileLayout
     >
       {renderContent}
     </CommonModal>

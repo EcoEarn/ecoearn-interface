@@ -5,6 +5,7 @@ import {
   IContractError,
   IContractOptions,
   ISendResult,
+  ISwapContractResult,
   SupportedELFChainId,
 } from 'types';
 import { store } from 'redux/store';
@@ -98,12 +99,12 @@ export const GetBalance = async (
   params: IGetBalanceParams,
   contractAddress: string,
   options?: IContractOptions,
-): Promise<{ amount: number }> => {
+): Promise<{ amount: number; balance: number } & IContractError> => {
   try {
     const res = (await lpTokenContractRequest('GetBalance', contractAddress, params, {
       ...options,
       type: ContractMethodType.VIEW,
-    })) as { amount: number };
+    })) as { amount: number; balance: number } & IContractError;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);
@@ -135,6 +136,54 @@ export const Approve = async (
     const res = (await lpTokenContractRequest('Approve', contractAddress, params, {
       ...options,
     })) as IContractError;
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const GetReserves = async (
+  params: any,
+  contractAddress: string,
+  options?: IContractOptions,
+): Promise<ISwapContractResult & IContractError> => {
+  try {
+    const res = (await lpTokenContractRequest('GetReserves', contractAddress, params, {
+      ...options,
+      type: ContractMethodType.VIEW,
+    })) as ISwapContractResult & IContractError;
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const GetTotalSupply = async (
+  params: any,
+  contractAddress: string,
+  options?: IContractOptions,
+): Promise<ISwapContractResult & IContractError> => {
+  try {
+    const res = (await lpTokenContractRequest('GetTotalSupply', contractAddress, params, {
+      ...options,
+      type: ContractMethodType.VIEW,
+    })) as ISwapContractResult & IContractError;
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const GetTokenInfo = async (
+  params: any,
+  contractAddress: string,
+  options?: IContractOptions,
+): Promise<{ supply: string } & IContractError> => {
+  try {
+    const res = (await lpTokenContractRequest('GetTokenInfo', contractAddress, params, {
+      ...options,
+      type: ContractMethodType.VIEW,
+    })) as { supply: string } & IContractError;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);

@@ -10,7 +10,7 @@ interface IDaysSelectProps {
 
 export default function DaysSelect({ disabled = false, current, onSelect }: IDaysSelectProps) {
   return (
-    <div className="flex items-center justify-between gap-4 mt-4">
+    <div className="flex items-center justify-between gap-4">
       {DAYS_DURATION.map((item) => {
         return (
           <div

@@ -45,6 +45,13 @@ export default function ItemCard({
       <div>{renderSymbol}</div>
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
+          <span className="font-medium text-neutralSecondary">Stake Period</span>
+          <CommonTooltip title="Claimed rewards" className="ml-2" />
+        </Flex>
+        <span className="text-neutralTitle text-base font-semibold">30 Days</span>
+      </Flex>
+      <Flex className="text-base" justify="space-between" align="start">
+        <Flex align="center">
           <span className="font-medium text-neutralSecondary">Rewards</span>
           <CommonTooltip title="Claimed rewards" className="ml-2" />
         </Flex>
@@ -69,7 +76,7 @@ export default function ItemCard({
           {dayjs(Number(item.date)).format('YYYY.MM.DD HH:mm')}
         </span>
       </Flex>
-      <Flex className="text-base" justify="space-between" align="start">
+      {/* <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
           <span className="font-medium text-neutralSecondary">Lock-up period</span>
           <CommonTooltip
@@ -89,7 +96,7 @@ export default function ItemCard({
             />
           )}
         </span>
-      </Flex>
+      </Flex> */}
     </Flex>
   );
 }

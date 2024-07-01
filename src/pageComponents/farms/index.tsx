@@ -3,8 +3,8 @@ import SimpleStakeList from 'components/SimpleStakeList';
 export default function Farm() {
   return (
     <SimpleStakeList
-      title="Liquidity Staking"
-      description="Stake LP tokens to gain rewards."
+      title="Farms"
+      description="Stake LP tokens to earn high rewards efficiently."
       poolType="Lp"
     />
   );

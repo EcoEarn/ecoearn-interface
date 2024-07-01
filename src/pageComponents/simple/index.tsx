@@ -4,7 +4,7 @@ export default function Simple() {
   return (
     <SimpleStakeList
       title="Simple Staking"
-      description="Deposit and generate coins regularly to earn high rewards."
+      description="Stake tokens to earn high rewards with ease."
       poolType="Token"
     />
   );

@@ -1,18 +1,16 @@
-import { Pagination, Table, ToolTip } from 'aelf-design';
+import { Pagination } from 'aelf-design';
 import { Flex, TableColumnsType } from 'antd';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
-import CountDownLock from '../CountDownLock';
-import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
+import { formatTokenPrice, formatUSDPrice } from 'utils/format';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
-import { PoolType } from 'types/stack';
 import { divDecimals } from 'utils/calculate';
 import { AELFDProvider } from 'aelf-design';
 import { theme } from './config';
 import { AELFDProviderTheme } from 'provider/config';
-import styles from './style.module.css';
 import CommonTooltip from 'components/CommonTooltip';
 import { DownOutlined } from '@ant-design/icons';
+import CommonTable from 'components/CommonTable';
 
 export default function PoolsTable({
   page,
@@ -88,8 +86,9 @@ export default function PoolsTable({
       {
         key: 'Date',
         dataIndex: 'date',
+        align: 'right',
         title: (
-          <div className="flex items-center">
+          <div className="flex items-center justify-end">
             <span>Date</span>
             <CommonTooltip title="Time of claiming rewards" className="ml-1" />
           </div>
@@ -102,28 +101,8 @@ export default function PoolsTable({
           );
         },
       },
-      {
-        key: 'Look-up Period',
-        dataIndex: 'lockUpPeriod',
-        align: 'right',
-        title: (
-          <div className="flex items-center justify-end">
-            <span>Lock-up period</span>
-            <CommonTooltip
-              title="It indicates the lock-up period before rewards can be claimed."
-              className="ml-1"
-            />
-          </div>
-        ),
-        render: (text, item) => {
-          if (dayjs(text).isBefore(dayjs())) {
-            return <span className="text-base font-semibold text-neutralTitle">Unlocked</span>;
-          }
-          return <CountDownLock targetTimeStamp={text} onFinish={onCountDownFinish} />;
-        },
-      },
     ];
-  }, [onCountDownFinish]);
+  }, []);
 
   return (
     <AELFDProvider
@@ -132,14 +111,14 @@ export default function PoolsTable({
         components: { ...AELFDProviderTheme.components, ...theme.components },
       }}
     >
-      <Table
+      <CommonTable
         columns={columns}
-        rowKey={(record) => `${record.claimId}-${record.date}`}
+        //FIXME:
+        // rowKey={(record) => `${record.claimId}-${record.date}`}
         scroll={{ x: 'max-content' }}
         dataSource={dataList}
         onChange={onChange}
         loading={loading}
-        className={styles.table}
       />
       <div className="py-4">
         <Pagination

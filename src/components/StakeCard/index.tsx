@@ -1,27 +1,23 @@
 import { useMemo } from 'react';
 import { Button, ToolTip } from 'aelf-design';
 import Description from 'components/StakeCardDescription';
-import StackToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { ZERO } from 'constants/index';
 import {
-  durationFromNow,
   formatNumberWithDecimalPlaces,
   formatTokenAmount,
   formatTokenSymbol,
-  formatUSDAmount,
   formatUSDPrice,
 } from 'utils/format';
 import styles from './style.module.css';
 import dayjs from 'dayjs';
 import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
-import useCountDownLock from 'hooks/useCountDownLock';
-import { PoolType } from 'types/stack';
 import { MAX_STAKE_PERIOD } from 'constants/stake';
 import Renewal from 'components/Renewal';
 import useUnlockCount from './hooks/useUnlockCount';
 
-interface IStackCardProps {
+interface IStakeCardProps {
   type: PoolTypeEnum;
   data: IStakePoolData;
   renewText: Array<IRenewText>;
@@ -34,7 +30,7 @@ interface IStackCardProps {
   onRenewal?: (data: IStakePoolData) => void;
 }
 
-export default function StackCard({
+export default function StakeCard({
   type,
   data,
   renewText,
@@ -45,7 +41,7 @@ export default function StackCard({
   onExtend,
   onUnlock,
   onRenewal,
-}: IStackCardProps) {
+}: IStakeCardProps) {
   const {
     projectOwner,
     aprMax,
@@ -66,6 +62,7 @@ export default function StackCard({
     stakingPeriod,
     lastOperationTime,
     minimumClaimAmount,
+    latestClaimTime,
   } = data;
 
   const { countDisplay, isUnLocked, targetUnlockTimeStamp } = useUnlockCount({
@@ -74,7 +71,7 @@ export default function StackCard({
     lastOperationTime: lastOperationTime || 0,
   });
 
-  const showStackInfo = useMemo(
+  const showStakeInfo = useMemo(
     () => !BigNumber(data?.staked || '').isZero() && isLogin,
     [data?.staked, isLogin],
   );
@@ -86,18 +83,25 @@ export default function StackCard({
     )}% ~ ${formatNumberWithDecimalPlaces(ZERO.plus(aprMax).times(100))}%`;
   }, [aprMax, aprMin]);
 
-  const canClaim = useMemo(
-    () => ZERO.plus(divDecimals(earned, decimal)).gt(minimumClaimAmount || 0),
-    [decimal, earned, minimumClaimAmount],
-  );
+  const isClaimed = useMemo(() => {
+    return dayjs(latestClaimTime || 0).isAfter(targetUnlockTimeStamp);
+  }, [latestClaimTime, targetUnlockTimeStamp]);
+
+  const canClaim = useMemo(() => {
+    if (isUnLocked && !isClaimed) {
+      return ZERO.plus(divDecimals(earned, decimal)).gt(0);
+    }
+    return false;
+  }, [decimal, earned, isClaimed, isUnLocked]);
 
   const claimBtnTip = useMemo(() => {
-    return canClaim
-      ? undefined
-      : `The rewards amount is less than ${minimumClaimAmount} ${earnedSymbol} and cannot be claimed.`;
-  }, [canClaim, earnedSymbol, minimumClaimAmount]);
+    if (isUnLocked) {
+      return isClaimed ? 'Rewards will be claimed simultaneously upon unlocking.' : '';
+    }
+    return 'You cannot claim rewards during the lock-up period for staking.';
+  }, [isClaimed, isUnLocked]);
 
-  const unStackTip = useMemo(
+  const unStakeTip = useMemo(
     () => (!isUnLocked ? 'You cannot unlock during the lock-up period for staking.' : ''),
     [isUnLocked],
   );
@@ -120,10 +124,10 @@ export default function StackCard({
   }, [isUnLocked, targetUnlockTimeStamp]);
 
   return (
-    <div className="stack-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
-      <div className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-start">
-        <StackToken
-          className="lg:min-w-[280px]"
+    <div className="stake-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <StakeToken
+          className="w-full lg:w-[350px]"
           type={type}
           icons={icons}
           rate={rate}
@@ -131,22 +135,22 @@ export default function StackCard({
           projectName={projectOwner || '--'}
         />
         <Description
-          className="lg:min-w-[263px]"
+          className="w-full lg:w-[274px]"
           label="APR"
           value={aprRange}
           tip="It indicates APR range obtained based on the different staking cycles. A longer cycle will bring a higher APR."
         />
-        <Description label="Earn" value={earnedSymbol || '--'} />
+        <Description label="Earn" value={earnedSymbol || '--'} className="w-full lg:w-[140px]" />
         <Description
-          className="lg:min-w-[150px] items-start lg:items-end"
-          valueTextAlign="right"
+          className="w-full lg:w-[300px] items-start lg:items-end"
           label="Total Staked"
+          valueTextAlign="right"
           value={formatNumberWithDecimalPlaces(divDecimals(totalStake, decimal))}
           extra={`${formatUSDPrice(divDecimals(totalStakeInUsd || 0, decimal))}`}
         />
       </div>
 
-      {!showStackInfo && (
+      {!showStakeInfo && (
         <Button
           className="lg:w-[200px] lg:self-center !rounded-lg"
           type="primary"
@@ -158,8 +162,8 @@ export default function StackCard({
         </Button>
       )}
 
-      {showStackInfo && (
-        <div className="relative flex flex-col px-4 pt-10 pb-6 gap-6 md:flex-row md:justify-between bg-brandFooterBg md:px-8 md:py-8 md:gap-8 rounded-xl">
+      {showStakeInfo && isUnLocked !== null && (
+        <div className="relative flex flex-col px-4 pt-10 pb-6 gap-6 md:flex-row md:justify-between bg-brandFooterBg md:px-8 md:py-8 lg:gap-8 rounded-xl">
           <ToolTip title="APR from Staking">
             <div className={styles['apr-tag']}>
               <span className={styles['apr-text']}>
@@ -183,11 +187,11 @@ export default function StackCard({
                 </div>
               </div>
             </div>
-            <ToolTip title={claimBtnTip}>
+            <ToolTip title={claimBtnTip} overlayStyle={{ maxWidth: 205 }}>
               <Button
                 className="lg:w-[100px] !rounded-md xl:!mt-2"
                 type="primary"
-                ghost
+                ghost={canClaim}
                 size="medium"
                 disabled={!canClaim}
                 onClick={() => {
@@ -198,7 +202,7 @@ export default function StackCard({
               </Button>
             </ToolTip>
           </div>
-          <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] bg-neutralDivider"></div>
+          <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] xl:h-[100px] bg-neutralDivider"></div>
           <div className="flex flex-1 flex-col xl:flex-row justify-between md:max-w-[336px] gap-6 md:gap-4">
             <div className="flex justify-between md:flex-col md:justify-start md:gap-2">
               <div className="text-base text-neutralSecondary font-medium">Staked</div>
@@ -223,12 +227,12 @@ export default function StackCard({
                   onClick={() => {
                     onAdd?.(data);
                   }}
-                  disabled={isUnLocked}
+                  disabled={!!isUnLocked}
                 >
                   Add
                 </Button>
               </ToolTip>
-              <ToolTip title={unStackTip}>
+              <ToolTip title={unStakeTip}>
                 <Button
                   className="flex-1 lg:flex-initial lg:w-[100px] !rounded-md"
                   size="medium"
@@ -242,8 +246,8 @@ export default function StackCard({
               </ToolTip>
             </div>
           </div>
-          <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] bg-neutralDivider"></div>
-          <div className="flex flex-1 flex-col gap-6 xl:flex-row md:gap-4 ">
+          <div className="h-[1px] w-full md:w-[1px] md:h-[inherit] xl:h-[100px] bg-neutralDivider"></div>
+          <div className="flex flex-1 flex-col gap-6 xl:flex-row md:gap-4 md:max-w-[336px] justify-between">
             {isUnLocked ? (
               <Renewal
                 unlockTimeStamp={targetUnlockTimeStamp || ''}
@@ -263,9 +267,11 @@ export default function StackCard({
                     <div className="text-base font-semibold text-neutralTitle">
                       {isUnLocked ? 'Unlockable' : countDisplay}
                     </div>
-                    <div className="text-sm font-medium text-neutralDisable">
-                      Unlock on {dayjs(targetUnlockTimeStamp).format('YYYY-MM-DD HH:mm')}
-                    </div>
+                    {!!targetUnlockTimeStamp && (
+                      <div className="text-sm font-medium text-neutralDisable">
+                        Unlock on {dayjs(targetUnlockTimeStamp).format('YYYY-MM-DD HH:mm')}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <ToolTip title={stakingExpiredTip}>

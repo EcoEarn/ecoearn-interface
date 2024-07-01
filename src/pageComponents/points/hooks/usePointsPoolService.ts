@@ -2,16 +2,19 @@ import { sleep } from '@portkey/utils';
 import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
 import { useRequest } from 'ahooks';
 import { getPointsPoolList, pointsClaim, stakingClaim } from 'api/request';
-import { Claim } from 'contract/pointsStaking';
+import useEarlyStake from 'hooks/useEarlyStake';
 import useLoading from 'hooks/useLoading';
-import { useWalletService } from 'hooks/useWallet';
-import { config } from 'process';
-import { useCallback, useEffect, useState } from 'react';
+import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { ICMSInfo } from 'redux/types/reducerTypes';
+import { ISendResult } from 'types';
+import { PoolType } from 'types/stake';
+import { getTxResult } from 'utils/aelfUtils';
 import { timesDecimals } from 'utils/calculate';
 import { getRawTransaction } from 'utils/getRawTransaction';
+import { useResponsive } from 'utils/useResponsive';
 
 export enum ListTypeEnum {
   Staked = 'Staked',
@@ -20,14 +23,57 @@ export enum ListTypeEnum {
 
 export default function usePointsPoolService() {
   const [currentList, setCurrentList] = useState<ListTypeEnum>(ListTypeEnum.All);
-  const { isLogin } = useGetLoginStatus();
   const { showLoading, closeLoading } = useLoading();
   const { wallet, walletType } = useWalletService();
   const { pointsContractAddress, curChain, caContractAddress, ...config } = useGetCmsInfo() || {};
+  const { isLogin } = useGetLoginStatus();
+  const { checkLogin } = useCheckLoginAndToken();
+  const { isLG } = useResponsive();
+  const { schrodingerUrl } = useGetCmsInfo() || {};
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [curItem, setCurItem] = useState<IPointsPoolItem>();
+  const [status, setStatus] = useState<'normal' | 'success' | 'error'>('normal');
+  const [transactionId, setTransactionId] = useState<string>();
+  const { stake } = useEarlyStake();
 
-  const { run, data, loading, refresh } = useRequest(
+  const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
+    { label: 'All', value: ListTypeEnum.All },
+    { label: 'Staked', value: ListTypeEnum.Staked },
+  ];
+
+  const handleSegmentChange = useCallback(
+    (value: string) => {
+      setCurrentList(value as ListTypeEnum);
+    },
+    [setCurrentList],
+  );
+
+  const handleGain = useCallback(() => {
+    window.open(schrodingerUrl, '_blank');
+  }, [schrodingerUrl]);
+
+  const handleClaim = useCallback((item: IPointsPoolItem) => {
+    setCurItem(item);
+    setModalVisible(true);
+  }, []);
+
+  const resetState = useCallback(() => {
+    setLoading(false);
+    setModalVisible(false);
+    setStatus('normal');
+    setTransactionId('');
+    setCurItem(undefined);
+  }, []);
+
+  const {
+    run,
+    data,
+    loading: requestLoading,
+    refresh,
+  } = useRequest(
     () => {
-      if (!isLogin && currentList === ListTypeEnum.Staked) return Promise.resolve(null);
+      if (!wallet.address && currentList === ListTypeEnum.Staked) return Promise.resolve(null);
       return getPointsPoolList({
         type: currentList,
         sorting: '',
@@ -43,52 +89,101 @@ export default function usePointsPoolService() {
   );
 
   useEffect(() => {
-    if (loading) {
+    if (requestLoading) {
       showLoading();
     } else {
       closeLoading();
     }
-  }, [closeLoading, loading, showLoading]);
+  }, [closeLoading, loading, requestLoading, showLoading]);
 
   const onClaim = useCallback(
     async (item: IPointsPoolItem) => {
       const amount = timesDecimals(item.earned, item?.decimal || 8).toNumber();
-      const { signature, seed, expirationTime } = await stakingClaim({
-        amount,
-        poolId: String(item.poolId),
-        address: wallet.address,
-      });
+      const { signature, seed, expirationTime } =
+        (await stakingClaim({
+          amount,
+          poolId: String(item.poolId),
+          address: wallet.address,
+        })) || {};
       if (!signature || !seed || !expirationTime) throw Error('sign error');
       try {
-        const rawTransaction = await getRawTransaction({
-          walletInfo: wallet,
-          walletType,
-          caContractAddress: caContractAddress || '',
-          contractAddress: pointsContractAddress || '',
-          methodName: 'Claim',
-          params: {
-            poolId: String(item.poolId || ''),
-            account: wallet.address,
-            amount,
-            seed,
-            signature,
-            expirationTime,
-          },
-          rpcUrl: (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`],
-          chainId: curChain!,
-        });
+        const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
+        let rawTransaction = null;
+        try {
+          rawTransaction = await getRawTransaction({
+            walletInfo: wallet,
+            walletType,
+            caContractAddress: caContractAddress || '',
+            contractAddress: pointsContractAddress || '',
+            methodName: 'Claim',
+            params: {
+              poolId: String(item.poolId || ''),
+              account: wallet.address,
+              amount,
+              seed,
+              signature,
+              expirationTime,
+            },
+            rpcUrl,
+            chainId: curChain!,
+          });
+        } catch (error) {
+          throw Error('getRawTransaction error');
+        }
         console.log('rawTransaction', rawTransaction);
+        if (!rawTransaction) throw Error('rawTransaction empty');
         const TransactionId = await pointsClaim({
           chainId: curChain!,
           rawTransaction: rawTransaction || '',
         });
-        return TransactionId;
+        if (TransactionId) {
+          const { TransactionId: resultTransactionId } = await getTxResult(
+            TransactionId,
+            rpcUrl,
+            curChain!,
+          );
+          if (resultTransactionId) {
+            return resultTransactionId;
+          } else {
+            throw Error('transaction error');
+          }
+        } else {
+          throw Error('no TransactionId');
+        }
       } catch (error) {
         throw Error('claim error');
       }
     },
     [caContractAddress, config, curChain, pointsContractAddress, wallet, walletType],
   );
+
+  const handleConfirm = useCallback(async () => {
+    if (!curItem) return;
+    setLoading(true);
+    try {
+      const transactionId = await onClaim(curItem);
+      if (transactionId) {
+        setStatus('success');
+        setTransactionId(transactionId);
+      } else {
+        throw new Error('transactionId empty');
+      }
+    } catch (error) {
+      console.error('Points Claim error', error);
+      setStatus('error');
+    } finally {
+      setLoading(false);
+    }
+  }, [curItem, onClaim]);
+
+  const handleEarlyStake = useCallback(async () => {
+    await stake({
+      poolType: PoolType.POINTS,
+      onSuccess: () => {
+        setModalVisible(false);
+      },
+    });
+  }, [stake]);
 
   useEffect(() => {
     currentList && run();
@@ -103,10 +198,8 @@ export default function usePointsPoolService() {
   });
 
   useWebLoginEvent(WebLoginEvents.LOGINED, async () => {
-    if (currentList === ListTypeEnum.All) {
-      await sleep(500);
-      run();
-    }
+    await sleep(500);
+    run();
   });
 
   return {
@@ -116,5 +209,18 @@ export default function usePointsPoolService() {
     setCurrentList,
     fetchData: run,
     onClaim,
+    curItem,
+    modalVisible,
+    setModalVisible,
+    transactionId,
+    resetState,
+    handleConfirm,
+    handleEarlyStake,
+    isLG,
+    handleSegmentChange,
+    segmentedOptions,
+    handleClaim,
+    handleGain,
+    status,
   };
 }

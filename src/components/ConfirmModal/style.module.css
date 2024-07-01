@@ -1,0 +1,15 @@
+.modal-no-title{
+  :global{
+    .earn-modal-title{
+      @apply hidden;
+    }
+  }
+}
+
+.modal-no-title.modal-mobile{
+  :global{
+    .earn-modal-header{
+      @apply !h-[44px];
+    }
+  }
+}

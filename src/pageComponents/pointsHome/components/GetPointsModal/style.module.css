@@ -1,7 +1,7 @@
 .pointsModal {
   :global{
     .earn-modal-header{
-      @apply !p-0 !border-none;
+      @apply !p-0 !border-none !h-0 lg:h-auto;
     }
     .earn-modal-body{
       @apply !pt-4 lg:!pt-8;

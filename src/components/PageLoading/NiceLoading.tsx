@@ -27,6 +27,7 @@ export function NiceLoading({ showClose = false, content, onClose }: ILoadingPro
 
   return (
     <Modal
+      zIndex={Number.MAX_SAFE_INTEGER}
       maskClosable={false}
       className={`${styles.loading} ${showClose && styles.loadingWithClose}`}
       open={modal.visible}
