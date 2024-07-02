@@ -171,7 +171,6 @@ function RemoveLiquidityModal({
             liquidityIds,
           };
           const { seed, signature, expirationTime } = (await liquidityRemoveSign(signParams)) || {};
-          closeLoading();
           if (!seed || !signature || !expirationTime) throw Error('sign error');
           const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
           let rawTransaction = null;
@@ -220,6 +219,7 @@ function RemoveLiquidityModal({
             if (resultTransactionId) {
               setTransactionId(TransactionId);
               setTradeStatus('success');
+              closeLoading();
             } else {
               throw Error('transaction error');
             }

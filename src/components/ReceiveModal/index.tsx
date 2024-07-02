@@ -3,7 +3,7 @@ import { Button } from 'aelf-design';
 import { Flex } from 'antd';
 import CommonModal from 'components/CommonModal';
 import TokenBalance from 'components/TokenBalance';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Reserves } from 'types';
 import { divDecimals } from 'utils/calculate';
 import { formatTokenPrice } from 'utils/format';
@@ -50,6 +50,7 @@ function ReceiveModal({
   handleReceive,
 }: IReceiveModalProps) {
   const modal = useModal();
+  const [loading, setLoading] = useState(false);
 
   const formatDepositedTokens = useMemo(() => {
     return depositedTokens?.map((item) => {
@@ -64,11 +65,17 @@ function ReceiveModal({
     return `${divDecimals(fee, 8)} ELF`;
   }, [fee]);
 
+  const handleClick = useCallback(async () => {
+    setLoading(true);
+    await handleReceive?.();
+    setLoading(false);
+  }, [handleReceive]);
+
   return (
     <CommonModal
       title="You will receive"
       footer={
-        <Button type="primary" className="!rounded-lg" onClick={handleReceive}>
+        <Button type="primary" className="!rounded-lg" onClick={handleClick} loading={loading}>
           {type === 'add' ? 'Confirm Stake' : 'Confirm Remove'}
         </Button>
       }

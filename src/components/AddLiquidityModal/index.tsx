@@ -279,7 +279,7 @@ function AddLiquidityModal({
           throw new Error('approve failed');
         }
         if (checked) {
-          const periodInSeconds = 15 * 60;
+          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
           try {
             showLoading();
             const tokenAMin = ZERO.plus(tokenA.balance)
@@ -383,30 +383,30 @@ function AddLiquidityModal({
       },
     });
   }, [
-    caContractAddress,
     checkStakeData,
+    stakeModal,
+    lpPoolLongestReleaseTime,
+    lp,
+    lpToken?.decimal,
+    customAmountModule,
+    rewardsContractAddress,
+    wallet,
+    curChain,
+    tokenB.symbol,
+    tokenB.decimal,
+    tokenB.balance,
+    showLoading,
+    tokenA.balance,
+    tolerance,
+    per1,
+    dappId,
     claimInfos,
     closeLoading,
     config,
-    curChain,
-    customAmountModule,
-    dappId,
     deadline,
-    lp,
-    lpPoolLongestReleaseTime,
-    lpToken?.decimal,
-    onSuccess,
-    per1,
-    rewardsContractAddress,
-    showLoading,
-    stakeModal,
-    tokenA.balance,
-    tokenB.balance,
-    tokenB.decimal,
-    tokenB.symbol,
-    tolerance,
-    wallet,
     walletType,
+    caContractAddress,
+    onSuccess,
   ]);
 
   return (
