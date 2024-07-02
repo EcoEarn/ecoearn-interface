@@ -1,7 +1,7 @@
 import { useModal } from '@ebay/nice-modal-react';
 import { singleMessage } from '@portkey/did-ui-react';
 import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
-import { useRequest } from 'ahooks';
+import { useInterval, useRequest } from 'ahooks';
 import { message } from 'antd';
 import {
   cancelSign,
@@ -206,26 +206,28 @@ export default function useLiquidityListService() {
     });
   }, [data, getAddBtnTip, getStakeBtnTip, isAddBtnDisabled, isStakeBtnDisabled]);
 
-  const fetchData = useCallback(async () => {
-    let list: Array<ILiquidityItem>;
-    if (!wallet.address) return;
-    try {
-      if (currentList === LiquidityListTypeEnum.My) {
-        showLoading();
-        list = await myLiquidity({ address: wallet.address });
-        closeLoading();
-      } else {
-        showLoading();
-        list = await liquidityMarket({ address: wallet.address });
-        closeLoading();
+  const fetchData = useCallback(
+    async (props?: { needLoading?: boolean }) => {
+      const { needLoading = true } = props || {};
+      let list: Array<ILiquidityItem>;
+      if (!wallet.address) return;
+      try {
+        needLoading && showLoading();
+        if (currentList === LiquidityListTypeEnum.My) {
+          list = await myLiquidity({ address: wallet.address });
+        } else {
+          list = await liquidityMarket({ address: wallet.address });
+        }
+        needLoading && closeLoading();
+        setData(list || []);
+      } catch (error) {
+        console.error('getLiquidityList error', error);
+      } finally {
+        needLoading && closeLoading();
       }
-      setData(list || []);
-    } catch (error) {
-      console.error('getLiquidityList error', error);
-    } finally {
-      closeLoading();
-    }
-  }, [closeLoading, currentList, showLoading, wallet.address]);
+    },
+    [closeLoading, currentList, showLoading, wallet.address],
+  );
 
   const lpPoolLongestReleaseTime = useMemo(() => {
     const { lpPoolAgg } = rewardsData || {};
@@ -655,6 +657,14 @@ export default function useLiquidityListService() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useInterval(
+    () => {
+      fetchData({ needLoading: false });
+    },
+    20000,
+    { immediate: false },
+  );
 
   const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
     { label: 'My Liquidity', value: LiquidityListTypeEnum.My },

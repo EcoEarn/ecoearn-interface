@@ -305,7 +305,11 @@ function ConfirmModal(props: IConfirmModalProps) {
             )}
           {BigNumber(content?.amountFromEarlyStake || 0).gt(ZERO) && (
             <div className="text-sm font-normal mt-4 text-neutralSecondary">
-              {`The unlocked amount is your staked ${content?.tokenSymbol} rewards,
+              {BigNumber(content?.amountFromWallet || 0).gt(ZERO)
+                ? `The unlocked amount includes the ${content?.tokenSymbol} rewards you staked early,
+               which will not be withdrawn to the wallet and will appear on the "Rewards" page after
+               unlocking.`
+                : `The unlocked amount is your staked ${content?.tokenSymbol} rewards,
                which will not be withdrawn to the wallet and will appear on the "Rewards" page after
                unlocking.`}
             </div>
