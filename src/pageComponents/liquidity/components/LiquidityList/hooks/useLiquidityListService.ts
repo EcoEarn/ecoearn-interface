@@ -552,8 +552,7 @@ export default function useLiquidityListService() {
         onStake: async (amount, period) => {
           try {
             showLoading();
-            // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-            const periodInSeconds = 15 * 60;
+            const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
             const claimInfos = rewardsData?.lpPoolAgg?.claimInfos || [];
             const longestReleaseTime =
               claimInfos && claimInfos?.length > 0
