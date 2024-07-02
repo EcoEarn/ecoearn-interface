@@ -34,9 +34,13 @@ export interface ICMSInfo {
   awakenLpTokenContractAddress03: string;
   awakenLpTokenContractAddress01: string;
   awakenLpTokenContractAddress005: string;
+  awakenLpTokenContractAddress3: string;
+  awakenLpTokenContractAddress5: string;
   awakenLpSwapContractAddress03: string;
   awakenLpSwapContractAddress01: string;
   awakenLpSwapContractAddress005: string;
+  awakenLpSwapContractAddress3: string;
+  awakenLpSwapContractAddress5: string;
   awakenSGRUrl: string;
   awakenUrl: string;
   stakeNotes: string[];

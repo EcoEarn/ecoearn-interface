@@ -11,6 +11,10 @@ export default function useGetAwakenContract() {
     awakenLpTokenContractAddress03,
     awakenLpSwapContractAddress005,
     awakenLpTokenContractAddress005,
+    awakenLpSwapContractAddress3,
+    awakenLpSwapContractAddress5,
+    awakenLpTokenContractAddress3,
+    awakenLpTokenContractAddress5,
   } = useGetCmsInfo() || {};
 
   const contractAddress = useMemo(() => {
@@ -27,14 +31,26 @@ export default function useGetAwakenContract() {
         swap: awakenLpSwapContractAddress005 || '',
         token: awakenLpTokenContractAddress005 || '',
       },
+      '0.05': {
+        swap: awakenLpSwapContractAddress5 || '',
+        token: awakenLpTokenContractAddress5 || '',
+      },
+      '0.03': {
+        swap: awakenLpSwapContractAddress3 || '',
+        token: awakenLpTokenContractAddress3 || '',
+      },
     };
   }, [
     awakenLpSwapContractAddress005,
     awakenLpSwapContractAddress01,
     awakenLpSwapContractAddress03,
+    awakenLpSwapContractAddress3,
+    awakenLpSwapContractAddress5,
     awakenLpTokenContractAddress005,
     awakenLpTokenContractAddress01,
     awakenLpTokenContractAddress03,
+    awakenLpTokenContractAddress3,
+    awakenLpTokenContractAddress5,
   ]);
 
   const getAddress = useCallback(
