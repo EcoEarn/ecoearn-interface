@@ -24,6 +24,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
     confirmModalTransactionId,
     confirmModalOnClose,
     confirmModalOnConfirm,
+    confirmModalErrorTip,
     pointsEarlyStakeDisabled,
     tokenEarlyStakeDisabled,
     lpEarlyStakeDisabled,
@@ -93,7 +94,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
                 className="md:!w-[100px] !rounded-md flex-1 md:flex-none"
                 disabled={pointsEarlyStakeDisabled}
               >
-                Stake
+                Stake early
               </Button>
             </ToolTip>
             <ToolTip title={pointsWithdrawTip}>
@@ -154,7 +155,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
                 className="md:!w-[100px] !rounded-md flex-1 md:flex-none"
                 disabled={tokenEarlyStakeDisabled}
               >
-                Stake
+                Stake early
               </Button>
             </ToolTip>
             <ToolTip title={tokenWithdrawTip}>
@@ -216,7 +217,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
                   className="md:!w-[100px] !rounded-md flex-1 md:flex-none"
                   disabled={lpEarlyStakeDisabled}
                 >
-                  Stake
+                  Stake early
                 </Button>
               </ToolTip>
               <ToolTip title={lpWithdrawTip}>
@@ -238,6 +239,7 @@ export default forwardRef(function PoolsAmount(props, ref) {
       <ConfirmModal
         type={confirmModalType}
         content={confirmModalContent}
+        errorTip={confirmModalErrorTip}
         status={confirmModalStatus}
         loading={confirmModalLoading}
         visible={confirmModalVisible}

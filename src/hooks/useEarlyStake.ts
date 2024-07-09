@@ -17,6 +17,7 @@ import { earlyStake as earlyStakeApi } from 'api/request';
 import { ISendResult } from 'types';
 import getBalanceTip from 'utils/stake';
 import { getTxResult } from 'utils/aelfUtils';
+import { matchErrorMsg } from 'utils/formatError';
 
 const noAmountErrorTip = 'No amount available for staking. Please try again later.';
 const amountNotEnoughErrorTip =
@@ -180,7 +181,7 @@ export default function useEarlyStake() {
                 period: periodInSeconds,
               };
               const { signature, seed, expirationTime } = await earlyStakeSign(signParams);
-              if (!signature || !seed || !expirationTime) throw Error('sign error');
+              if (!signature || !seed || !expirationTime) throw Error();
               try {
                 const rpcUrl = (config as Partial<ICMSInfo>)[
                   `rpcUrl${curChain?.toLocaleUpperCase()}`
@@ -219,14 +220,14 @@ export default function useEarlyStake() {
                   });
                 } catch (error) {
                   await cancelSign(signParams);
-                  throw Error('getRawTransaction error');
+                  throw Error();
                 }
                 console.log('rawTransaction', rawTransaction);
                 if (!rawTransaction) {
                   await cancelSign(signParams);
-                  throw Error('rawTransaction empty');
+                  throw Error();
                 }
-                const TransactionId = await earlyStakeApi({
+                const { data: TransactionId, message: errorMessage } = await earlyStakeApi({
                   chainId: curChain!,
                   rawTransaction: rawTransaction || '',
                 });
@@ -239,13 +240,18 @@ export default function useEarlyStake() {
                   if (resultTransactionId) {
                     return { TransactionId: resultTransactionId } as ISendResult;
                   } else {
-                    throw Error('transaction error');
+                    throw Error();
                   }
                 } else {
-                  throw Error('no TransactionId');
+                  const { showInModal, matchedErrorMsg } = matchErrorMsg(
+                    errorMessage,
+                    'EarlyStake',
+                  );
+                  if (!showInModal) message.error(matchedErrorMsg);
+                  throw Error(showInModal ? matchedErrorMsg : '');
                 }
               } catch (error) {
-                throw Error('earlyStake error');
+                throw Error((error as Error).message);
               }
             },
             onSuccess: () => {

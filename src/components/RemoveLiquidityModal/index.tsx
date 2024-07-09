@@ -4,7 +4,7 @@ import { ReactComponent as SettingIcon } from 'assets/img/setting.svg';
 import SettingModal from 'components/SettingModal';
 import PoolShare from 'components/AddLiquidityModal/components/PoolShare';
 import { Button } from 'aelf-design';
-import { Flex, message } from 'antd';
+import { Flex, message as AntdMessage } from 'antd';
 import CommonTooltip from 'components/CommonTooltip';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Reserves } from 'types';
@@ -22,6 +22,7 @@ import { getRawTransaction } from 'utils/getRawTransaction';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { getTxResult } from 'utils/aelfUtils';
 import styles from './style.module.css';
+import { matchErrorMsg } from 'utils/formatError';
 
 interface IRemoveLiquidityModalProps {
   tokenA: {
@@ -76,6 +77,7 @@ function RemoveLiquidityModal({
   const { showLoading, closeLoading } = useLoading();
   const [tradeStatus, setTradeStatus] = useState<'success' | 'error'>('success');
   const [transactionId, setTransactionId] = useState('');
+  const [errorTip, setErrorTip] = useState('');
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [tolerance, setTolerance] = useState('0.5');
   const [deadline, setDeadline] = useState('20');
@@ -171,7 +173,7 @@ function RemoveLiquidityModal({
             liquidityIds,
           };
           const { seed, signature, expirationTime } = (await liquidityRemoveSign(signParams)) || {};
-          if (!seed || !signature || !expirationTime) throw Error('sign error');
+          if (!seed || !signature || !expirationTime) throw Error();
           const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
           let rawTransaction = null;
           try {
@@ -199,14 +201,14 @@ function RemoveLiquidityModal({
             });
           } catch (error) {
             await cancelSign(signParams);
-            throw Error('getRawTransaction error');
+            throw Error();
           }
           console.log('rawTransaction', rawTransaction);
           if (!rawTransaction) {
             await cancelSign(signParams);
-            throw Error('rawTransaction empty');
+            throw Error();
           }
-          const TransactionId = await liquidityRemove({
+          const { data: TransactionId, message } = await liquidityRemove({
             chainId: curChain!,
             rawTransaction: rawTransaction || '',
           });
@@ -221,15 +223,19 @@ function RemoveLiquidityModal({
               setTradeStatus('success');
               closeLoading();
             } else {
-              throw Error('transaction error');
+              throw Error();
             }
           } else {
-            throw Error('no TransactionId');
+            const { showInModal, matchedErrorMsg } = matchErrorMsg(message, 'RemoveLiquidity');
+            if (!showInModal) AntdMessage.error(matchedErrorMsg);
+            throw Error(showInModal ? matchedErrorMsg : '');
           }
         } catch (error) {
-          console.error(error);
+          const errorTip = (error as Error).message;
+          console.error(errorTip);
           setTransactionId('');
           setTradeStatus('error');
+          setErrorTip(errorTip);
         } finally {
           closeLoading();
           setResultModalVisible(true);
@@ -302,6 +308,7 @@ function RemoveLiquidityModal({
         visible={resultModalVisible}
         status={tradeStatus}
         transactionId={transactionId}
+        errorTip={errorTip}
         onClose={() => {
           setResultModalVisible(false);
           if (tradeStatus === 'success') {

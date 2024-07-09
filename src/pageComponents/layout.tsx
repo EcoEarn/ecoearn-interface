@@ -121,7 +121,7 @@ const Layout = dynamic(async () => {
             <div className="flex-1">
               <AntdLayout.Content
                 className={clsx(
-                  'pb-4 w-full max-w-[1280px] mx-auto px-4 lg:px-10',
+                  'pb-[72px] w-full max-w-[1280px] mx-auto px-4 lg:px-10',
                   widthLayout && 'max-w-[1440px]',
                 )}
               >

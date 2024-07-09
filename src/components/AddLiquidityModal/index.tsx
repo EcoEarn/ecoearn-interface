@@ -34,6 +34,7 @@ import { ICMSInfo } from 'redux/types/reducerTypes';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import { ZERO } from 'constants/index';
 import styles from './index.module.css';
+import { matchErrorMsg } from 'utils/formatError';
 
 export interface IAddLiquidityModalProps {
   tokenA: {
@@ -250,6 +251,7 @@ function AddLiquidityModal({
     const typeIsAdd = !BigNumber(stakeData?.staked || 0).isZero();
     stakeModal.show({
       isStakeRewards: true,
+      isAddLiquidityAndStake: true,
       type: typeIsAdd ? StakeType.ADD : StakeType.STAKE,
       stakeData: {
         ...stakeData,
@@ -276,10 +278,11 @@ function AddLiquidityModal({
             amount: divDecimals(tokenB.balance, tokenB.decimal).toString(),
           });
         } catch (error) {
-          throw new Error('approve failed');
+          throw new Error();
         }
         if (checked) {
-          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 5 * 60;
           try {
             showLoading();
             const tokenAMin = ZERO.plus(tokenA.balance)
@@ -303,7 +306,7 @@ function AddLiquidityModal({
             };
             const { seed, signature, expirationTime } = (await addLiquiditySign(signParams)) || {};
             closeLoading();
-            if (!seed || !signature || !expirationTime) throw Error('sign error');
+            if (!seed || !signature || !expirationTime) throw Error();
             const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
             const seconds = Math.ceil(new Date().getTime() / 1000) + Number(deadline || 20) * 60;
             const longestReleaseTime =
@@ -340,18 +343,18 @@ function AddLiquidityModal({
               });
             } catch (error) {
               await cancelSign(signParams);
-              throw Error('getRawTransaction error');
+              throw Error();
             }
             console.log('rawTransaction', rawTransaction);
             if (!rawTransaction) {
               await cancelSign(signParams);
-              throw Error('rawTransaction empty');
+              throw Error();
             }
             const stakeDataRes = await checkStakeData();
             if (!stakeDataRes) {
-              throw Error('checkStakeData error');
+              throw Error();
             }
-            const TransactionId = await addLiquidity({
+            const { data: TransactionId, message: errorMessage } = await addLiquidity({
               chainId: curChain!,
               rawTransaction: rawTransaction || '',
             });
@@ -364,10 +367,15 @@ function AddLiquidityModal({
               if (resultTransactionId) {
                 return { TransactionId: resultTransactionId } as ISendResult;
               } else {
-                throw Error('transaction error');
+                throw Error();
               }
             } else {
-              throw Error('no TransactionId');
+              const { showInModal, matchedErrorMsg } = matchErrorMsg(
+                errorMessage,
+                'AddLiquidityAndStake',
+              );
+              if (!showInModal) message.error(matchedErrorMsg);
+              throw Error(showInModal ? matchedErrorMsg : '');
             }
           } catch (error) {
             const errorMsg = (error as Error).message;

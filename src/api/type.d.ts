@@ -329,6 +329,7 @@ interface ILiquidityItem {
   ecoEarnTokenAAmount?: string;
   ecoEarnTokenBAmount?: string;
   lpAmount?: string;
+  stakingAmount?: string | number;
 }
 
 interface IAddLiquidityParams {
@@ -364,4 +365,10 @@ interface ILiquidityRemoveSignParams {
   tokenAMin: string | number;
   tokenBMin: string | number;
   liquidityIds: Array<any>;
+}
+
+interface ISendTransactionResult {
+  data: string;
+  code: number;
+  message: string;
 }

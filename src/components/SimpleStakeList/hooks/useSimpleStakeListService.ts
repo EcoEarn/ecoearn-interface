@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { formatTokenSymbol } from 'utils/format';
 import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import { ZERO } from 'constants/index';
+import { message } from 'antd';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -203,7 +204,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         (poolType === 'Lp' && !getLpTokenContractAddress(fee)) ||
         (poolType === 'Token' && !tokensContractAddress)
       ) {
-        throw new Error('missingParams');
+        throw new Error();
       }
     },
     [curChain, getLpTokenContractAddress, poolType, tokensContractAddress],
@@ -247,6 +248,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           ? `It is the amount of ${symbol} held in your wallet`
           : `It is the amount of LP you hold in AwakenSwap`;
       stakeModal.show({
+        poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
         isFreezeAmount: type === StakeType.RENEW ? true : false,
         freezeAmount: type === StakeType.RENEW ? String(stakeData.staked) : undefined,
         type,
@@ -256,10 +258,17 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         onStake: async (amount, period) => {
           const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
           if (type === StakeType.RENEW) {
-            return await Renew({
-              poolId: stakeData?.poolId || '',
-              period: periodInSeconds,
-            });
+            try {
+              const renewRes = await Renew({
+                poolId: stakeData?.poolId || '',
+                period: periodInSeconds,
+              });
+              return renewRes;
+            } catch (error) {
+              const { showInModal, errorMessage } = error as any;
+              if (!showInModal) message.error(errorMessage.message);
+              throw Error(showInModal ? errorMessage.message : '');
+            }
           } else {
             await checkApproveParams(rate as TFeeType);
             let checked = false;
@@ -275,14 +284,21 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
                 contractAddress: getLpTokenContractAddress(rate as TFeeType),
               });
             } catch (error) {
-              throw new Error('approve failed');
+              throw new Error();
             }
             if (checked) {
-              return await tokenStake({
-                poolId: stakeData?.poolId || '',
-                amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
-                period: periodInSeconds,
-              });
+              try {
+                const stakeRes = await tokenStake({
+                  poolId: stakeData?.poolId || '',
+                  amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
+                  period: periodInSeconds,
+                });
+                return stakeRes;
+              } catch (error) {
+                const { showInModal, errorMessage } = error as any;
+                if (!showInModal) message.error(errorMessage.message);
+                throw Error(showInModal ? errorMessage.message : '');
+              }
             }
           }
         },

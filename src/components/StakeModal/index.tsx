@@ -15,7 +15,7 @@ import {
 import { RightOutlined } from '@ant-design/icons';
 import style from './style.module.css';
 import dayjs from 'dayjs';
-import { StakeType } from 'types/stake';
+import { PoolType, StakeType } from 'types/stake';
 import {
   formatNumberWithDecimalPlaces,
   formatTokenPrice,
@@ -49,10 +49,12 @@ interface IStakeModalProps {
   freezePeriod?: number | string;
   freezeAmount?: number | string;
   isStakeRewards?: boolean;
+  isAddLiquidityAndStake?: boolean;
   customAmountModule?: ReactNode;
   modalTitle?: string;
   earlyAmount?: number | string;
   isEarlyStake?: boolean;
+  poolType?: PoolType;
   balanceDec?: string;
   visible: boolean;
   balance?: string;
@@ -69,6 +71,8 @@ function StakeModal({
   isFreezeAmount = false,
   isFreezePeriod = false,
   isStakeRewards = false,
+  isAddLiquidityAndStake = false,
+  poolType = PoolType.TOKEN,
   freezeAmount,
   earlyAmount,
   isEarlyStake,
@@ -98,6 +102,7 @@ function StakeModal({
     earnedSymbol,
     usdRate,
     longestReleaseTime,
+    earlyStakedAmount,
   } = stakeData || {};
   const [form] = Form.useForm();
   const [amount, setAmount] = useState<string>('');
@@ -320,12 +325,16 @@ function StakeModal({
   const notesList = useMemo(() => {
     if (noteList) return noteList;
     if (typeIsStake) return stakeNotes;
-    if (typeIsAdd) return addStakeNotes.concat(extendStakeNotes);
+    if (typeIsAdd) {
+      if (isAddLiquidityAndStake) return addStakeNotes;
+      return addStakeNotes.slice(1);
+    }
     if (typeIsRenew) return renewStakeNotes;
     return extendStakeNotes;
   }, [
     addStakeNotes,
     extendStakeNotes,
+    isAddLiquidityAndStake,
     noteList,
     renewStakeNotes,
     stakeNotes,
@@ -338,6 +347,46 @@ function StakeModal({
     () => (typeIsStake || typeIsRenew ? MIN_STAKE_PERIOD : 0),
     [typeIsRenew, typeIsStake],
   );
+
+  const balanceTipText = useMemo(() => {
+    if (typeIsExtend || typeIsRenew) {
+      const stakeFromWallet = ZERO.plus(staked || 0).minus(earlyStakedAmount || 0);
+      const stakeEarlyBalanceText = formatTokenPrice(
+        divDecimals(earlyStakedAmount || 0, decimal || 8),
+      ).toString();
+      const walletBalanceText = formatTokenPrice(
+        divDecimals(stakeFromWallet, decimal || 8),
+      ).toString();
+      return stakeFromWallet.isZero() ? (
+        poolType === PoolType.TOKEN ? (
+          'This total amount is your rewards for early staking.'
+        ) : (
+          'This total amount is the liquidity added to your rewards and staked in advance.'
+        )
+      ) : !BigNumber(earlyStakedAmount || 0).isZero() ? (
+        poolType === PoolType.TOKEN ? (
+          <>
+            <p>This amount includes the rewards you staked early, of which:</p>
+            <p>{`Reward amount: ${stakeEarlyBalanceText}`}</p>
+            <p>{`From wallet: ${walletBalanceText}`}</p>
+          </>
+        ) : (
+          <>
+            <p>
+              This amount includes the liquidity added to your rewards and staked in advance, of
+              which:
+            </p>
+            <p>{`Liquidity added and staked amount: ${stakeEarlyBalanceText}`}</p>
+            <p>{`From AwakenSwap: ${walletBalanceText}`}</p>
+          </>
+        )
+      ) : (
+        ''
+      );
+    } else {
+      return balanceDec;
+    }
+  }, [balanceDec, decimal, earlyStakedAmount, poolType, staked, typeIsExtend, typeIsRenew]);
 
   const stakeLabel = useMemo(() => {
     const _balance = typeIsExtend
@@ -357,12 +406,11 @@ function StakeModal({
           )}
         >
           {!typeIsExtend && !isFreezeAmount ? 'Balance: ' : ''}
-          <ToolTip title={!typeIsExtend && !typeIsRenew ? balanceDec : ''} placement="topRight">
+          <ToolTip title={balanceTipText} placement="topRight">
             <span
               className={clsx(
                 'text-neutralPrimary font-semibold',
-                !typeIsExtend &&
-                  !typeIsRenew &&
+                balanceTipText &&
                   'decoration-dashed underline-offset-2 decoration-1 underline cursor-pointer',
               )}
             >
@@ -374,14 +422,13 @@ function StakeModal({
     );
   }, [
     balance,
-    balanceDec,
+    balanceTipText,
     customAmountModule,
     decimal,
     freezeAmount,
     isFreezeAmount,
     stakedAmount,
     typeIsExtend,
-    typeIsRenew,
   ]);
 
   const periodLabel = useMemo(() => {

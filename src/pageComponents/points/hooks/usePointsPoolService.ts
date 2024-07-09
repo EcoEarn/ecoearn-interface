@@ -1,6 +1,7 @@
 import { sleep } from '@portkey/utils';
 import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
 import { useRequest } from 'ahooks';
+import { message } from 'antd';
 import { getPointsPoolList, pointsClaim, stakingClaim } from 'api/request';
 import useEarlyStake from 'hooks/useEarlyStake';
 import useLoading from 'hooks/useLoading';
@@ -13,6 +14,7 @@ import { ISendResult } from 'types';
 import { PoolType } from 'types/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { timesDecimals } from 'utils/calculate';
+import { matchErrorMsg } from 'utils/formatError';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import { useResponsive } from 'utils/useResponsive';
 
@@ -35,6 +37,7 @@ export default function usePointsPoolService() {
   const [curItem, setCurItem] = useState<IPointsPoolItem>();
   const [status, setStatus] = useState<'normal' | 'success' | 'error'>('normal');
   const [transactionId, setTransactionId] = useState<string>();
+  const [errorTip, setErrorTip] = useState('');
   const { stake } = useEarlyStake();
 
   const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
@@ -105,7 +108,7 @@ export default function usePointsPoolService() {
           poolId: String(item.poolId),
           address: wallet.address,
         })) || {};
-      if (!signature || !seed || !expirationTime) throw Error('sign error');
+      if (!signature || !seed || !expirationTime) throw Error();
       try {
         const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
         let rawTransaction = null;
@@ -128,11 +131,11 @@ export default function usePointsPoolService() {
             chainId: curChain!,
           });
         } catch (error) {
-          throw Error('getRawTransaction error');
+          throw Error();
         }
         console.log('rawTransaction', rawTransaction);
-        if (!rawTransaction) throw Error('rawTransaction empty');
-        const TransactionId = await pointsClaim({
+        if (!rawTransaction) throw Error();
+        const { data: TransactionId, message: errorMessage } = await pointsClaim({
           chainId: curChain!,
           rawTransaction: rawTransaction || '',
         });
@@ -145,13 +148,15 @@ export default function usePointsPoolService() {
           if (resultTransactionId) {
             return resultTransactionId;
           } else {
-            throw Error('transaction error');
+            throw Error();
           }
         } else {
-          throw Error('no TransactionId');
+          const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'Claim');
+          if (!showInModal) message.error(matchedErrorMsg);
+          throw Error(showInModal ? matchedErrorMsg : '');
         }
       } catch (error) {
-        throw Error('claim error');
+        throw Error((error as Error).message);
       }
     },
     [caContractAddress, config, curChain, pointsContractAddress, wallet, walletType],
@@ -166,11 +171,13 @@ export default function usePointsPoolService() {
         setStatus('success');
         setTransactionId(transactionId);
       } else {
-        throw new Error('transactionId empty');
+        throw new Error();
       }
     } catch (error) {
-      console.error('Points Claim error', error);
+      const errorTip = (error as Error).message;
+      console.error('Points Claim error', errorTip);
       setStatus('error');
+      setErrorTip(errorTip);
     } finally {
       setLoading(false);
     }
@@ -213,6 +220,7 @@ export default function usePointsPoolService() {
     modalVisible,
     setModalVisible,
     transactionId,
+    errorTip,
     resetState,
     handleConfirm,
     handleEarlyStake,
