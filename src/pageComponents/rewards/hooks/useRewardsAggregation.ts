@@ -296,7 +296,8 @@ export default function useRewardsAggregation() {
             longestReleaseTime: getLongestReleaseTime(type) || 0,
           },
           onStake: async (amount, period = 0, poolId) => {
-            const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+            // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+            const periodInSeconds = 15 * 60;
             const stakeAmount = getEarlyStakeAmount(type);
             const signParams = {
               amount: Number(stakeAmount),
