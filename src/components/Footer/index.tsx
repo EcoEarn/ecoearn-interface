@@ -1,7 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { icons } from 'antd/es/image/PreviewGroup';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 
 interface ILinkItem {
@@ -13,17 +11,15 @@ interface ILinkItem {
 }
 
 export default function Footer() {
-  const router = useRouter();
-
   const linkList: Array<ILinkItem> = useMemo(() => {
     return [
       {
         label: 'Terms of Service',
-        path: '/termsService',
+        path: '/terms-service',
       },
       {
         label: 'Privacy Policy',
-        path: '/privacyPolicy',
+        path: '/privacy-policy',
       },
       {
         label: 'Docs',

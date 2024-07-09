@@ -65,7 +65,7 @@ export default function LiquidityList() {
             )}
           </Flex>
         ),
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -83,7 +83,7 @@ export default function LiquidityList() {
             <CommonTooltip title="Your LP amount in staking." />
           </Flex>
         ),
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -103,7 +103,7 @@ export default function LiquidityList() {
             )}
           </Flex>
         ),
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -115,7 +115,7 @@ export default function LiquidityList() {
       {
         key: 'amountOne',
         dataIndex: 'tokenAAmount',
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         title: (
           <Flex align="center" gap={8}>
             <span>Amount</span>
@@ -133,7 +133,7 @@ export default function LiquidityList() {
       {
         key: 'amountTwo',
         dataIndex: 'tokenBAmount',
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         title: (
           <Flex align="center" gap={8}>
             <span>Amount</span>
