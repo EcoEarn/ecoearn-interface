@@ -56,7 +56,11 @@ export default function Footer() {
           return (
             <div key={index} className="flex items-center">
               {item.path ? (
-                <Link className="text-neutralTertiary hover:text-neutralTertiary" href={item.path}>
+                <Link
+                  target="_blank"
+                  className="text-neutralTertiary hover:text-neutralTertiary"
+                  href={item.path}
+                >
                   {item.label}
                 </Link>
               ) : (
