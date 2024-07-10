@@ -11,6 +11,8 @@ export const TransactionFeeNotEnough =
 
 export const LoginFailed = 'Login failed!';
 
+export const defaultErrorTip = 'Unknown error, please refresh the page or try again later.';
+
 enum SourceErrorType {
   Error1 = 'Operation canceled',
   Error2 = 'You closed the prompt without any action',
@@ -62,12 +64,10 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
       TargetErrorType.Error7,
     ];
 
-    let resMessage: string = message;
+    let resMessage: string = defaultErrorTip;
     let showInModal = false;
 
-    if (message.includes('Invalid') || message.includes('Pool not start.')) {
-      resMessage = 'Unknown error, please refresh the page or try again later.';
-    } else if (message.includes('Signature expired.')) {
+    if (message.includes('Signature expired.')) {
       resMessage = 'Signature expired, please initiate the transaction again.';
       showInModal = true;
     } else if (message.includes('Signature used.')) {
@@ -123,7 +123,7 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
       resMessage = 'Staking period is less than the reward release time, unable to stake early.';
       showInModal = true;
     } else {
-      resMessage = message;
+      resMessage = defaultErrorTip;
     }
 
     // for (let index = 0; index < sourceErrors.length; index++) {
