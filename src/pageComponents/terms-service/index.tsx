@@ -444,7 +444,7 @@ export default function TermsSerive() {
             The Site may provide you with opportunities to upload, display, or transmit data or
             other content (together, “User Content”). As part of these Terms and Conditions and
             subject to our{' '}
-            <a href="/privacy-policy" target="_blank">
+            <a href="https://docs.aelf.com/legal/privacy-policy/" target="_blank" rel="noreferrer">
               Privacy Policy
             </a>
             , you grant us a perpetual, irrevocable, worldwide, fully paid, non-exclusive, and
