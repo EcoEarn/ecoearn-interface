@@ -308,7 +308,7 @@ export default function useRewardsAggregation() {
               poolId: earlyStakeData?.poolId || '',
               claimInfos,
             };
-            const { signature, seed, expirationTime } = await earlyStakeSign(signParams);
+            const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
             if (!signature || !seed || !expirationTime) throw Error();
             try {
               const rpcUrl = (config as Partial<ICMSInfo>)[
@@ -481,7 +481,7 @@ export default function useRewardsAggregation() {
           claimInfos: claimParams?.withdrawClaimInfos || [],
           dappId: data?.dappId || '',
         };
-        const { signature, seed, expirationTime } = await withdrawSign(signParams);
+        const { signature, seed, expirationTime } = (await withdrawSign(signParams)) || {};
         if (!signature || !seed || !expirationTime) throw Error();
         const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
         let rawTransaction = null;

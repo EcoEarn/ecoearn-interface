@@ -1,6 +1,6 @@
 import styles from './style.module.css';
 
-export default function TermsSerive() {
+export default function TermsService() {
   return (
     <div className={styles.content}>
       <article>
@@ -808,6 +808,7 @@ export default function TermsSerive() {
               href="https://uncitral.un.org/en/texts/arbitration/contractualtexts/arbitration"
               target="_blank"
               rel="noreferrer"
+              className="break-all"
             >
               https://uncitral.un.org/en/texts/arbitration/contractualtexts/arbitration
             </a>

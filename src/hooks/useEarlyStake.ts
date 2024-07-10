@@ -180,7 +180,7 @@ export default function useEarlyStake() {
                 poolId: fixedEarlyStakeData?.poolId || '',
                 period: periodInSeconds,
               };
-              const { signature, seed, expirationTime } = await earlyStakeSign(signParams);
+              const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
               if (!signature || !seed || !expirationTime) throw Error();
               try {
                 const rpcUrl = (config as Partial<ICMSInfo>)[
