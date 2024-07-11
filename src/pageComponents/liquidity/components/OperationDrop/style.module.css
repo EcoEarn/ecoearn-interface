@@ -1,11 +1,11 @@
 .dropdown {
   @apply w-[152px];
   :global{
-    .earn-dropdown-menu {
-      @apply p-2;
+    .aelfd-dropdown-menu {
+      @apply px-[10px] py-2 flex flex-col gap-y-1;
     }
-    .earn-dropdown-menu-item {
-      @apply !py-2 !px-3;
+    .aelfd-dropdown-menu-item {
+      @apply !py-2 !px-3 !rounded-[2px];
     }
   }
 }
