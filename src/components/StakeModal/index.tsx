@@ -361,7 +361,7 @@ function StakeModal({
         poolType === PoolType.TOKEN ? (
           'This total amount is your rewards for early staking.'
         ) : (
-          'This total amount is the liquidity added to your rewards and staked in advance.'
+          'This total amount is the liquidity added to your rewards and staked early.'
         )
       ) : !BigNumber(earlyStakedAmount || 0).isZero() ? (
         poolType === PoolType.TOKEN ? (
@@ -373,8 +373,7 @@ function StakeModal({
         ) : (
           <>
             <p>
-              This amount includes the liquidity added to your rewards and staked in advance, of
-              which:
+              This amount includes the liquidity added to your rewards and staked early, of which:
             </p>
             <p>{`Liquidity added and staked amount: ${stakeEarlyBalanceText}`}</p>
             <p>{`From AwakenSwap: ${walletBalanceText}`}</p>

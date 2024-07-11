@@ -6,12 +6,13 @@ import styles from './style.module.css';
 import CommonTable from 'components/CommonTable';
 import { useMemo } from 'react';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
-import { Button, ToolTip } from 'aelf-design';
+import { AELFDProvider, Button, ToolTip } from 'aelf-design';
 import { formatTokenPrice, formatUSDPrice } from 'utils/format';
 import CommonTooltip from 'components/CommonTooltip';
 import LiquidityMobile from './LiquidityMobile';
-import { divDecimals } from 'utils/calculate';
 import OperationDrop from '../OperationDrop';
+import { theme } from './config';
+import { AELFDProviderTheme } from 'provider/config';
 
 export default function LiquidityList() {
   const {
@@ -184,6 +185,7 @@ export default function LiquidityList() {
                                 '!text-neutralDisable !cursor-not-allowed',
                             )}
                             onClick={() => {
+                              if (isStakeBtnDisabled({ index })) return;
                               onStake(item);
                             }}
                           >
@@ -203,6 +205,7 @@ export default function LiquidityList() {
                                 '!text-neutralDisable !cursor-not-allowed',
                             )}
                             onClick={() => {
+                              if (isRemoveBtnDisabled({ index })) return;
                               onRemove(item);
                             }}
                           >
@@ -236,7 +239,12 @@ export default function LiquidityList() {
   ]);
 
   return (
-    <>
+    <AELFDProvider
+      theme={{
+        ...AELFDProviderTheme,
+        components: { ...AELFDProviderTheme.components, ...theme.components },
+      }}
+    >
       <Segmented
         className={clsx('mt-6 lg:mt-12', styles.segmented)}
         size="large"
@@ -252,7 +260,7 @@ export default function LiquidityList() {
             columns={columns}
             dataSource={data}
             scroll={{ x: 'max-content' }}
-            className="mt-6"
+            className={clsx('mt-6', styles.table)}
             rowKey={(item) => item.symbol}
           />
         ) : (
@@ -273,6 +281,6 @@ export default function LiquidityList() {
           emptyText="You have no available liquidity."
         />
       )}
-    </>
+    </AELFDProvider>
   );
 }

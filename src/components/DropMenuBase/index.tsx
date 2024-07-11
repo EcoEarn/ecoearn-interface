@@ -21,6 +21,15 @@ interface IDropMenu {
   arrow?: boolean;
   trigger?: 'hover' | 'click';
   className?: string;
+  placement?:
+    | 'top'
+    | 'bottom'
+    | 'bottomLeft'
+    | 'topLeft'
+    | 'topCenter'
+    | 'topRight'
+    | 'bottomCenter'
+    | 'bottomRight';
 }
 const DropMenuBase = ({
   isMobile,
@@ -32,6 +41,7 @@ const DropMenuBase = ({
   titleTxt,
   arrow = false,
   trigger = 'hover',
+  placement = 'bottomLeft',
   className,
 }: IDropMenu) => {
   return isMobile ? (
@@ -65,6 +75,7 @@ const DropMenuBase = ({
       menu={{ items, selectable: false }}
       arrow={arrow}
       trigger={[trigger || 'hover']}
+      placement={placement}
     >
       {targetNode}
     </Dropdown>

@@ -454,6 +454,9 @@ function AddLiquidityModal({
       onCancel={() => {
         modal.hide();
       }}
+      afterClose={() => {
+        modal.remove();
+      }}
       className={styles['add-modal']}
     >
       <div className="flex flex-col gap-2 relative">

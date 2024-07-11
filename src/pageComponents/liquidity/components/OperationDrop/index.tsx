@@ -38,6 +38,7 @@ export default function OperationDrop({
       targetNode={targetNode}
       titleTxt="Operation"
       className={styles.dropdown}
+      placement="bottom"
     ></DropMenuBase>
   );
 }

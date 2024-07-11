@@ -284,6 +284,10 @@ export default function useLiquidityListService() {
       ecoEarnBanlance,
       ecoEarnTokenAAmount,
       ecoEarnTokenBAmount,
+      ecoEarnTokenAUnStakingAmount,
+      ecoEarnTokenBUnStakingAmount,
+      tokenAUnStakingAmount,
+      tokenBUnStakingAmount,
     }: ILiquidityItem) => {
       const pair = lpSymbol?.split(' ')?.[1];
       const defaultTokens = [
@@ -291,11 +295,15 @@ export default function useLiquidityListService() {
           symbol: tokenASymbol,
           balance: tokenAAmount,
           ecoBalance: ecoEarnTokenAAmount || 0,
+          marketUnStakingAmount: ecoEarnTokenAUnStakingAmount,
+          unStakingAmount: tokenAUnStakingAmount,
         },
         {
           symbol: tokenBSymbol,
           balance: tokenBAmount,
           ecoBalance: ecoEarnTokenBAmount || 0,
+          marketUnStakingAmount: ecoEarnTokenBUnStakingAmount,
+          unStakingAmount: tokenBUnStakingAmount,
         },
       ];
       const tokens = tokenASymbol === rewardsSymbol ? defaultTokens : defaultTokens.reverse();
@@ -342,10 +350,11 @@ export default function useLiquidityListService() {
             usdPrice: tokenAPrice || '0',
             icon: icons?.[0] || '',
             symbol: tokens[0].symbol,
-            position:
+            position: String(
               currentList === LiquidityListTypeEnum.Market
-                ? String(tokens[0].ecoBalance)
-                : String(tokens[0].balance),
+                ? tokens[0].marketUnStakingAmount
+                : tokens[0].unStakingAmount || '0',
+            ),
           },
           tokenB: {
             resource: 'wallet',
@@ -354,10 +363,11 @@ export default function useLiquidityListService() {
             usdPrice: tokenBPrice || '0',
             icon: icons?.[1] || '',
             symbol: tokens[1].symbol,
-            position:
+            position: String(
               currentList === LiquidityListTypeEnum.Market
-                ? String(tokens[1].ecoBalance)
-                : String(tokens[1].balance),
+                ? tokens[1].marketUnStakingAmount
+                : tokens[1].unStakingAmount || '0',
+            ),
           },
           lpToken: {
             icons,
