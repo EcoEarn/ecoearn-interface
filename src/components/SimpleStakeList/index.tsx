@@ -34,9 +34,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
           {title}
         </div>
         <div className="flex flex-col md:flex-row justify-between md:items-center">
-          <span className="text-neutralSecondary text-base font-medium cursor-pointer">
-            {description}
-          </span>
+          <span className="text-neutralSecondary text-base font-medium">{description}</span>
           {poolType === 'Lp' && (
             <span
               className="text-sm font-medium text-brandDefault cursor-pointer"
