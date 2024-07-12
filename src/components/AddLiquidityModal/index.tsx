@@ -70,7 +70,7 @@ export interface IAddLiquidityModalProps {
   onSuccess?: () => void;
   dappId: string;
   claimInfos: Array<{ claimId: string; releaseTime: string | number }>;
-  lpPoolLongestReleaseTime: string | number;
+  longestReleaseTime: string | number;
 }
 
 function AddLiquidityModal({
@@ -84,7 +84,7 @@ function AddLiquidityModal({
   onSuccess,
   dappId,
   claimInfos,
-  lpPoolLongestReleaseTime,
+  longestReleaseTime,
 }: IAddLiquidityModalProps) {
   const modal = useModal();
   const settingModal = useModal(SettingModal);
@@ -256,7 +256,7 @@ function AddLiquidityModal({
       stakeData: {
         ...stakeData,
         stakeInfos: stakeData?.subStakeInfos || [],
-        longestReleaseTime: lpPoolLongestReleaseTime || 0,
+        longestReleaseTime: longestReleaseTime || 0,
       },
       modalTitle: 'Receive LP & Stake',
       balanceDec: 'It is the amount of LP you hold in EcoEarn',
@@ -308,10 +308,6 @@ function AddLiquidityModal({
             if (!seed || !signature || !expirationTime) throw Error();
             const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
             const seconds = Math.ceil(new Date().getTime() / 1000) + Number(deadline || 20) * 60;
-            const longestReleaseTime =
-              claimInfos && claimInfos?.length > 0
-                ? claimInfos?.[claimInfos?.length - 1]?.releaseTime
-                : 0;
             let rawTransaction = null;
             try {
               rawTransaction = await getRawTransaction({
@@ -392,7 +388,7 @@ function AddLiquidityModal({
   }, [
     checkStakeData,
     stakeModal,
-    lpPoolLongestReleaseTime,
+    longestReleaseTime,
     lp,
     lpToken?.decimal,
     customAmountModule,
