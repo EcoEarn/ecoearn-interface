@@ -113,7 +113,6 @@ export default function PoolsTable({
     >
       <CommonTable
         columns={columns}
-        //FIXME:
         // rowKey={(record) => `${record.claimId}-${record.date}`}
         scroll={{ x: 'max-content' }}
         dataSource={dataList}

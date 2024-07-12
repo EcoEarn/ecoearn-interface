@@ -216,6 +216,7 @@ export default function PointsStakingList() {
     modalVisible,
     setModalVisible,
     transactionId,
+    errorTip,
     resetState,
     handleConfirm,
     handleEarlyStake,
@@ -231,6 +232,7 @@ export default function PointsStakingList() {
     <>
       <ConfirmModal
         type={ConfirmModalTypeEnum.Claim}
+        errorTip={errorTip}
         content={{
           amount: curItem?.realEarned || 0,
           tokenSymbol: curItem?.rewardsTokenName,

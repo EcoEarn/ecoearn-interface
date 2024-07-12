@@ -11,6 +11,8 @@ export const TransactionFeeNotEnough =
 
 export const LoginFailed = 'Login failed!';
 
+export const defaultErrorTip = 'Unknown error, please refresh the page or try again later.';
+
 enum SourceErrorType {
   Error1 = 'Operation canceled',
   Error2 = 'You closed the prompt without any action',
@@ -34,7 +36,7 @@ export enum TargetErrorType {
   Error7 = 'Request rejected. Ecoearn needs your permission to continue',
 }
 
-const stringifyMsg = (message: any) => {
+const stringifyMsg = (message: string | object) => {
   if (typeof message === 'object') {
     return JSON.stringify(message);
   }
@@ -42,7 +44,6 @@ const stringifyMsg = (message: any) => {
 };
 
 export const matchErrorMsg = <T>(message: T, method?: string) => {
-  // console.log('errorMsg', message);
   if (typeof message === 'string') {
     const sourceErrors = [
       SourceErrorType.Error1,
@@ -63,17 +64,83 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
       TargetErrorType.Error7,
     ];
 
-    let resMessage: string = message;
+    let resMessage: string = defaultErrorTip;
+    let showInModal = false;
 
-    for (let index = 0; index < sourceErrors.length; index++) {
-      if (message.includes(sourceErrors[index])) {
-        resMessage = message.replace(sourceErrors[index], targetErrors[index]);
+    if (message.includes('Signature expired.')) {
+      resMessage = 'Signature expired, please initiate the transaction again.';
+      showInModal = true;
+    } else if (message.includes('Signature used.')) {
+      resMessage = 'Signature already used, please initiate the transaction again.';
+      showInModal = true;
+    } else if (message.includes('Cannot claim yet.')) {
+      resMessage = 'You can claim once per day, please do not claim repeatedly.';
+      showInModal = true;
+    } else if (message.includes('Not staked before.')) {
+      resMessage = 'No current staked amount, no rewards available for claim.';
+      showInModal = true;
+    } else if (message.includes('Not in unlock window.')) {
+      switch (method) {
+        case 'Claim':
+          resMessage =
+            'Unlock period not reached, unable to claim. Please refresh the page and try again.';
+          break;
+        case 'Renew':
+          resMessage = 'Unlock period not reached, unable to renew.';
+          break;
+        case 'Unlock':
+          resMessage = 'Unlock period not reached, unable to unlock.';
+          break;
+        default:
+          resMessage = message;
+          break;
       }
+      showInModal = true;
+    } else if (message.includes('Already claimed during this window.')) {
+      resMessage =
+        'You can claim once during the unlock period; remaining rewards will be claimed upon unlocking.';
+      showInModal = true;
+    } else if (message.includes('Cannot stake during unlock window.')) {
+      resMessage = 'Unlock period reached, unable to add staking or extend.';
+      showInModal = true;
+    } else if (message.includes('Position exceed maximum.')) {
+      resMessage = 'Maximum staking attempts reached, unable to add staking.';
+      showInModal = true;
+    } else if (message.includes('Already unlocked.')) {
+      switch (method) {
+        case 'Renew':
+          resMessage = 'Position unlocked, unable to renew.';
+          break;
+        case 'Unlock':
+          resMessage = 'Already unlocked, please do not unlock repeatedly.';
+          break;
+        default:
+          resMessage = message;
+          break;
+      }
+      showInModal = true;
+    } else if (message.includes('Period not enough.')) {
+      resMessage = 'Staking period is less than the reward release time, unable to stake early.';
+      showInModal = true;
+    } else {
+      resMessage = defaultErrorTip;
     }
 
-    return resMessage.replace('AElf.Sdk.CSharp.AssertionException: ', '');
+    // for (let index = 0; index < sourceErrors.length; index++) {
+    //   if (message.includes(sourceErrors[index])) {
+    //     resMessage = message.replace(sourceErrors[index], targetErrors[index]);
+    //   }
+    // }
+
+    return {
+      matchedErrorMsg: resMessage.replace('AElf.Sdk.CSharp.AssertionException: ', ''),
+      showInModal,
+    };
   } else {
-    return DEFAULT_ERROR;
+    return {
+      matchedErrorMsg: '',
+      showInModal: false,
+    };
   }
 };
 
@@ -121,10 +188,13 @@ export const formatErrorMsg = (result: IContractError, method?: string) => {
 
   const errorMessage = resError.errorMessage?.message;
 
+  const { matchedErrorMsg, showInModal } = matchErrorMsg(errorMessage, method);
+
   return {
     ...resError,
     errorMessage: {
-      message: matchErrorMsg(errorMessage, method),
+      message: matchedErrorMsg,
     },
+    showInModal,
   };
 };

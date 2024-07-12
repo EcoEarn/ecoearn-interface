@@ -38,6 +38,7 @@ import {
   getTargetUnlockTimeStamp,
   timesDecimals,
 } from 'utils/calculate';
+import { matchErrorMsg } from 'utils/formatError';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import useResponsive from 'utils/useResponsive';
 
@@ -160,11 +161,19 @@ export default function useLiquidityListService() {
   const isStakeBtnDisabled = useCallback(
     ({ index }: { index: number }) => {
       return (
-        !BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
-        dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs())
+        BigNumber(data?.[index]?.banlance || 0).isZero() ||
+        (!BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
+          dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs()))
       );
     },
-    [earlyStakeInfos],
+    [data, earlyStakeInfos],
+  );
+
+  const isRemoveBtnDisabled = useCallback(
+    ({ index }: { index: number }) => {
+      return BigNumber(data?.[index]?.banlance || 0).isZero();
+    },
+    [data],
   );
 
   const getAddBtnTip = useCallback(
@@ -184,12 +193,24 @@ export default function useLiquidityListService() {
 
   const getStakeBtnTip = useCallback(
     ({ index }: { index: number }) => {
+      if (BigNumber(data?.[index]?.banlance || 0).isZero()) {
+        return 'No LP amount available for staking.';
+      }
       return !BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
         dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs())
         ? 'Your staking has expired and cannot be added. Please proceed to "Farms(LP Staking)" for renewal.'
         : '';
     },
-    [earlyStakeInfos],
+    [data, earlyStakeInfos],
+  );
+
+  const getRemoveBtnTip = useCallback(
+    ({ index }: { index: number }) => {
+      return BigNumber(data?.[index]?.banlance || 0).isZero()
+        ? 'No LP amount available for removal.'
+        : '';
+    },
+    [data],
   );
 
   console.log('totalEarlyStakeAmount', totalEarlyStakeAmount);
@@ -200,11 +221,21 @@ export default function useLiquidityListService() {
         ...item,
         addBtnDisabled: isAddBtnDisabled({ index }),
         stakeBtnDisabled: isStakeBtnDisabled({ index }),
+        removeBtnDisabled: isRemoveBtnDisabled({ index }),
         addBtnTip: getAddBtnTip({ index }),
         stakeBtnTip: getStakeBtnTip({ index }),
+        removeBtnTip: getRemoveBtnTip({ index }),
       };
     });
-  }, [data, getAddBtnTip, getStakeBtnTip, isAddBtnDisabled, isStakeBtnDisabled]);
+  }, [
+    data,
+    getAddBtnTip,
+    getRemoveBtnTip,
+    getStakeBtnTip,
+    isAddBtnDisabled,
+    isRemoveBtnDisabled,
+    isStakeBtnDisabled,
+  ]);
 
   const fetchData = useCallback(
     async (props?: { needLoading?: boolean }) => {
@@ -253,6 +284,10 @@ export default function useLiquidityListService() {
       ecoEarnBanlance,
       ecoEarnTokenAAmount,
       ecoEarnTokenBAmount,
+      ecoEarnTokenAUnStakingAmount,
+      ecoEarnTokenBUnStakingAmount,
+      tokenAUnStakingAmount,
+      tokenBUnStakingAmount,
     }: ILiquidityItem) => {
       const pair = lpSymbol?.split(' ')?.[1];
       const defaultTokens = [
@@ -260,11 +295,15 @@ export default function useLiquidityListService() {
           symbol: tokenASymbol,
           balance: tokenAAmount,
           ecoBalance: ecoEarnTokenAAmount || 0,
+          marketUnStakingAmount: ecoEarnTokenAUnStakingAmount,
+          unStakingAmount: tokenAUnStakingAmount,
         },
         {
           symbol: tokenBSymbol,
           balance: tokenBAmount,
           ecoBalance: ecoEarnTokenBAmount || 0,
+          marketUnStakingAmount: ecoEarnTokenBUnStakingAmount,
+          unStakingAmount: tokenBUnStakingAmount,
         },
       ];
       const tokens = tokenASymbol === rewardsSymbol ? defaultTokens : defaultTokens.reverse();
@@ -311,10 +350,11 @@ export default function useLiquidityListService() {
             usdPrice: tokenAPrice || '0',
             icon: icons?.[0] || '',
             symbol: tokens[0].symbol,
-            position:
+            position: String(
               currentList === LiquidityListTypeEnum.Market
-                ? String(tokens[0].ecoBalance)
-                : String(tokens[0].balance),
+                ? tokens[0].marketUnStakingAmount
+                : tokens[0].unStakingAmount || '0',
+            ),
           },
           tokenB: {
             resource: 'wallet',
@@ -323,10 +363,11 @@ export default function useLiquidityListService() {
             usdPrice: tokenBPrice || '0',
             icon: icons?.[1] || '',
             symbol: tokens[1].symbol,
-            position:
+            position: String(
               currentList === LiquidityListTypeEnum.Market
-                ? String(tokens[1].ecoBalance)
-                : String(tokens[1].balance),
+                ? tokens[1].marketUnStakingAmount
+                : tokens[1].unStakingAmount || '0',
+            ),
           },
           lpToken: {
             icons,
@@ -570,7 +611,7 @@ export default function useLiquidityListService() {
             const { seed, signature, expirationTime } =
               (await liquidityStakeSign(signParams)) || {};
             closeLoading();
-            if (!seed || !signature || !expirationTime) throw Error('sign error');
+            if (!seed || !signature || !expirationTime) throw Error();
             const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
             let rawTransaction = null;
             try {
@@ -598,14 +639,14 @@ export default function useLiquidityListService() {
               });
             } catch (error) {
               await cancelSign(signParams);
-              throw Error('getRawTransaction error');
+              throw Error();
             }
             console.log('rawTransaction', rawTransaction);
             if (!rawTransaction) {
               await cancelSign(signParams);
-              throw Error('rawTransaction empty');
+              throw Error();
             }
-            const TransactionId = await liquidityStake({
+            const { data: TransactionId, message: errorMessage } = await liquidityStake({
               chainId: curChain!,
               rawTransaction: rawTransaction || '',
             });
@@ -618,10 +659,15 @@ export default function useLiquidityListService() {
               if (resultTransactionId) {
                 return { TransactionId: resultTransactionId } as ISendResult;
               } else {
-                throw Error('transaction error');
+                throw Error();
               }
             } else {
-              throw Error('no TransactionId');
+              const { showInModal, matchedErrorMsg } = matchErrorMsg(
+                errorMessage,
+                'StakeLiquidity',
+              );
+              if (!showInModal) message.error(matchedErrorMsg);
+              throw Error(showInModal ? matchedErrorMsg : '');
             }
           } catch (error) {
             const errorMsg = (error as Error).message;
@@ -695,8 +741,10 @@ export default function useLiquidityListService() {
     onStake,
     getAddBtnTip,
     getStakeBtnTip,
+    getRemoveBtnTip,
     isAddBtnDisabled,
     isStakeBtnDisabled,
+    isRemoveBtnDisabled,
     totalEarlyStakeAmount,
     mobileDataList,
   };

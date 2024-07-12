@@ -41,6 +41,19 @@ class Request {
         if (response.config.url?.includes('api.etherscan.io')) {
           return res;
         }
+        if (
+          response?.config?.url &&
+          [
+            '/app/points/staking/claim',
+            '/app/rewards/early/stake',
+            '/app/rewards/withdraw',
+            '/app/rewards/add/liquidity',
+            '/app/rewards/liquidity/stake',
+            '/app/rewards/remove/liquidity',
+          ].includes(response?.config?.url)
+        ) {
+          return res;
+        }
         if (config.baseURL?.includes('cms')) {
           return data;
         }

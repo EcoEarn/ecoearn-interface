@@ -87,10 +87,6 @@ const Layout = dynamic(async () => {
 
     useWalletInit();
 
-    const isHiddenHeader = useMemo(() => {
-      return ['/privacy-policy'].includes(pathname);
-    }, [pathname]);
-
     const isHiddenLayout = useMemo(() => {
       return ['/assets'].includes(pathname);
     }, [pathname]);
@@ -117,11 +113,11 @@ const Layout = dynamic(async () => {
             id="pageContainer"
             className={clsx('h-full flex flex-col overflow-scroll min-w-[360px] bg-brandBg')}
           >
-            {!isHiddenHeader && <Header />}
+            <Header />
             <div className="flex-1">
               <AntdLayout.Content
                 className={clsx(
-                  'pb-4 w-full max-w-[1280px] mx-auto px-4 lg:px-10',
+                  'pb-[72px] w-full max-w-[1280px] mx-auto px-4 lg:px-10',
                   widthLayout && 'max-w-[1440px]',
                 )}
               >

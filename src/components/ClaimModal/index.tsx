@@ -6,6 +6,7 @@ import { ISendResult } from 'types';
 import { tokenClaim } from 'contract/tokenStaking';
 import { divDecimals } from 'utils/calculate';
 import { useRouter } from 'next/navigation';
+import { message } from 'antd';
 
 interface IClaimModalProps {
   amount: string | number;
@@ -31,6 +32,7 @@ function ClaimModal({
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
   const [loading, setLoading] = useState(false);
   const [transactionId, setTransactionId] = useState('');
+  const [errorTip, setErrorTip] = useState('');
   const router = useRouter();
 
   const onConfirm = useCallback(async () => {
@@ -40,8 +42,12 @@ function ClaimModal({
       setTransactionId(TransactionId);
       setStatus('success');
     } catch (error) {
-      console.log('===claim error', error);
+      const { showInModal, errorMessage } = error as any;
+      const errorTip = errorMessage?.message;
+      console.log('===claim error', errorTip);
+      if (!showInModal) message.error(errorTip);
       setStatus('error');
+      errorTip && setErrorTip(errorTip);
     } finally {
       setLoading(false);
     }
@@ -59,6 +65,7 @@ function ClaimModal({
       visible={modal.visible}
       status={status}
       loading={loading}
+      errorTip={errorTip}
       content={{ amount: divDecimals(amount, decimal).toFixed(2), tokenSymbol, releasePeriod }}
       onClose={onClose}
       afterClose={() => {
