@@ -4,7 +4,7 @@ import { storages } from 'storages';
 import { needCheckTokenUrl } from 'constants/token';
 
 export const isCurrentPageNeedToken = (): boolean => {
-  if (['/term-service', '/privacy-policy'].includes(window.location.pathname)) {
+  if (['/terms-service', '/privacy-policy'].includes(window.location.pathname)) {
     return false;
   }
   return true;

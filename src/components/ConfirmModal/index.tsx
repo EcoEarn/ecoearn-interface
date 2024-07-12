@@ -80,6 +80,7 @@ export interface IConfirmModalProps {
   onClose?: () => void;
   afterClose?: () => void;
   transactionId?: string;
+  errorTip?: string;
   visible: boolean;
   onEarlyStake?: () => void;
   onGoRewards?: () => void;
@@ -95,6 +96,7 @@ function ConfirmModal(props: IConfirmModalProps) {
     onClose,
     afterClose,
     transactionId,
+    errorTip,
     visible,
     onEarlyStake,
     onGoRewards,
@@ -146,14 +148,21 @@ function ConfirmModal(props: IConfirmModalProps) {
             ? 'Transaction sent, waiting for on-chain confirmation'
             : 'Transaction confirmation failed.'}
         </div>
-        {status === 'success' && (
-          <div className="text-base font-normal lg:text-lg lg:font-medium text-neutralSecondary">
-            On-chain transaction is being packaged. There may be delays in data updates.
+        {(status === 'success' || (status === 'error' && errorTip)) && (
+          <div
+            className={clsx(
+              'text-base font-normal lg:text-lg lg:font-medium text-neutralSecondary',
+              status === 'error' && 'mt-4',
+            )}
+          >
+            {status === 'error'
+              ? errorTip
+              : 'On-chain transaction is being packaged. There may be delays in data updates.'}
           </div>
         )}
       </Flex>
     );
-  }, [status]);
+  }, [errorTip, status]);
 
   const afterClaimAction = useMemo(() => {
     return (

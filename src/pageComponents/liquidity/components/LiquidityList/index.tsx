@@ -6,11 +6,13 @@ import styles from './style.module.css';
 import CommonTable from 'components/CommonTable';
 import { useMemo } from 'react';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
-import { Button, ToolTip } from 'aelf-design';
+import { AELFDProvider, Button, ToolTip } from 'aelf-design';
 import { formatTokenPrice, formatUSDPrice } from 'utils/format';
 import CommonTooltip from 'components/CommonTooltip';
 import LiquidityMobile from './LiquidityMobile';
-import { divDecimals } from 'utils/calculate';
+import OperationDrop from '../OperationDrop';
+import { theme } from './config';
+import { AELFDProviderTheme } from 'provider/config';
 
 export default function LiquidityList() {
   const {
@@ -27,11 +29,13 @@ export default function LiquidityList() {
     getStakeBtnTip,
     isAddBtnDisabled,
     isStakeBtnDisabled,
+    getRemoveBtnTip,
+    isRemoveBtnDisabled,
     onStake,
   } = useLiquidityListService();
 
   const columns: TableColumnsType<ILiquidityItem> = useMemo(() => {
-    return [
+    const allColumns: TableColumnsType<ILiquidityItem> = [
       {
         key: 'lpSymbol',
         dataIndex: 'lpSymbol',
@@ -54,8 +58,33 @@ export default function LiquidityList() {
       {
         key: 'banlance',
         dataIndex: 'banlance',
-        title: 'Banlance',
-        width: 150,
+        title: (
+          <Flex align="center" gap={8}>
+            <span>Balance</span>
+            {currentList === LiquidityListTypeEnum.My && (
+              <CommonTooltip title="The amount of LP you hold, excluding the LP in staking." />
+            )}
+          </Flex>
+        ),
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
+        render: (text, item) => {
+          return (
+            <span className="text-base font-semibold text-neutralTitle">
+              {formatTokenPrice(text).toString()}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'stakingAmount',
+        dataIndex: 'stakingAmount',
+        title: (
+          <Flex align="center" gap={8}>
+            <span>Staking</span>
+            <CommonTooltip title="Your LP amount in staking." />
+          </Flex>
+        ),
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -67,8 +96,15 @@ export default function LiquidityList() {
       {
         key: 'value',
         dataIndex: 'value',
-        title: 'Value',
-        width: 150,
+        title: (
+          <Flex align="center" gap={8}>
+            <span>Value</span>
+            {currentList === LiquidityListTypeEnum.My && (
+              <CommonTooltip title="The total value of LP obtained by adding liquidity, including the balance and staking amount." />
+            )}
+          </Flex>
+        ),
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -80,7 +116,7 @@ export default function LiquidityList() {
       {
         key: 'amountOne',
         dataIndex: 'tokenAAmount',
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         title: (
           <Flex align="center" gap={8}>
             <span>Amount</span>
@@ -98,7 +134,7 @@ export default function LiquidityList() {
       {
         key: 'amountTwo',
         dataIndex: 'tokenBAmount',
-        width: 150,
+        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
         title: (
           <Flex align="center" gap={8}>
             <span>Amount</span>
@@ -135,46 +171,67 @@ export default function LiquidityList() {
                   Add & Stake
                 </Button>
               </ToolTip>
-
               {currentList === LiquidityListTypeEnum.My && (
-                <>
-                  <ToolTip title={getStakeBtnTip({ index })}>
-                    <Button
-                      type="primary"
-                      ghost
-                      size="small"
-                      className="!rounded-sm"
-                      disabled={isStakeBtnDisabled({ index })}
-                      onClick={() => {
-                        onStake(item);
-                      }}
-                    >
-                      Stake
-                    </Button>
-                  </ToolTip>
-                  <Button
-                    type="primary"
-                    ghost
-                    size="small"
-                    className="!rounded-sm"
-                    onClick={() => {
-                      onRemove(item);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </>
+                <OperationDrop
+                  items={[
+                    {
+                      key: 'stake',
+                      label: (
+                        <ToolTip title={getStakeBtnTip({ index })}>
+                          <div
+                            className={clsx(
+                              'text-base font-medium text-neutralTitle w-full',
+                              isStakeBtnDisabled({ index }) &&
+                                '!text-neutralDisable !cursor-not-allowed',
+                            )}
+                            onClick={() => {
+                              if (isStakeBtnDisabled({ index })) return;
+                              onStake(item);
+                            }}
+                          >
+                            Stake
+                          </div>
+                        </ToolTip>
+                      ),
+                    },
+                    {
+                      key: 'remove',
+                      label: (
+                        <ToolTip title={getRemoveBtnTip({ index })}>
+                          <div
+                            className={clsx(
+                              'text-base font-medium text-neutralTitle w-full',
+                              isRemoveBtnDisabled({ index }) &&
+                                '!text-neutralDisable !cursor-not-allowed',
+                            )}
+                            onClick={() => {
+                              if (isRemoveBtnDisabled({ index })) return;
+                              onRemove(item);
+                            }}
+                          >
+                            Remove
+                          </div>
+                        </ToolTip>
+                      ),
+                    },
+                  ]}
+                />
               )}
             </Flex>
           );
         },
       },
     ];
+    return currentList === LiquidityListTypeEnum.My
+      ? allColumns
+      : [...allColumns.slice(0, 2), ...allColumns.slice(3)];
   }, [
     currentList,
     getAddBtnTip,
+    getRemoveBtnTip,
     getStakeBtnTip,
     isAddBtnDisabled,
+    isRemoveBtnDisabled,
     isStakeBtnDisabled,
     onAddAndStake,
     onRemove,
@@ -182,7 +239,12 @@ export default function LiquidityList() {
   ]);
 
   return (
-    <>
+    <AELFDProvider
+      theme={{
+        ...AELFDProviderTheme,
+        components: { ...AELFDProviderTheme.components, ...theme.components },
+      }}
+    >
       <Segmented
         className={clsx('mt-6 lg:mt-12', styles.segmented)}
         size="large"
@@ -198,7 +260,7 @@ export default function LiquidityList() {
             columns={columns}
             dataSource={data}
             scroll={{ x: 'max-content' }}
-            className="mt-6"
+            className={clsx('mt-6', styles.table)}
             rowKey={(item) => item.symbol}
           />
         ) : (
@@ -219,6 +281,6 @@ export default function LiquidityList() {
           emptyText="You have no available liquidity."
         />
       )}
-    </>
+    </AELFDProvider>
   );
 }

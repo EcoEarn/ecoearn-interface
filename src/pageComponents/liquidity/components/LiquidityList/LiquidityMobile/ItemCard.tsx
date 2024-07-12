@@ -18,8 +18,10 @@ export default function ItemCard({
   data: ILiquidityItem & {
     addBtnDisabled: boolean;
     stakeBtnDisabled: boolean;
+    removeBtnDisabled: boolean;
     addBtnTip: string;
     stakeBtnTip: string;
+    removeBtnTip: string;
   };
   onRemove: (data: ILiquidityItem) => void;
   onAdd: (data: ILiquidityItem) => void;
@@ -37,15 +39,22 @@ export default function ItemCard({
     icons,
     rate,
     decimal,
+    stakingAmount,
     addBtnDisabled,
     stakeBtnDisabled,
     addBtnTip,
     stakeBtnTip,
+    removeBtnDisabled,
+    removeBtnTip,
   } = data || {};
 
   const balanceText = useMemo(() => {
     return formatTokenPrice(banlance).toString();
   }, [banlance]);
+
+  const stakingText = useMemo(() => {
+    return formatTokenPrice(stakingAmount || 0).toString();
+  }, [stakingAmount]);
 
   const valueText = useMemo(() => {
     return formatUSDPrice(value).toString();
@@ -77,11 +86,30 @@ export default function ItemCard({
       </Flex>
 
       <Flex justify="space-between" className="text-balance font-medium" align="center">
-        <span className="text-neutralTertiary">Balance</span>
+        <Flex gap={8} align="center">
+          <span className="text-neutralTertiary">Balance</span>
+          {currentList === LiquidityListTypeEnum.My && (
+            <CommonTooltip title="The amount of LP you hold, excluding the LP in staking." />
+          )}
+        </Flex>
         <span className="text-neutralTitle">{balanceText}</span>
       </Flex>
+      {currentList === LiquidityListTypeEnum.My && (
+        <Flex justify="space-between" className="text-balance font-medium" align="center">
+          <Flex gap={8} align="center">
+            <span className="text-neutralTertiary">Staking</span>
+            <CommonTooltip title="Your LP amount in staking." />
+          </Flex>
+          <span className="text-neutralTitle">{stakingText}</span>
+        </Flex>
+      )}
       <Flex justify="space-between" className="text-balance font-medium" align="center">
-        <span className="text-neutralTertiary">Value</span>
+        <Flex gap={8} align="center">
+          <span className="text-neutralTertiary">Value</span>
+          {currentList === LiquidityListTypeEnum.My && (
+            <CommonTooltip title="The total value of LP obtained by adding liquidity, including the balance and staking amount." />
+          )}
+        </Flex>
         <span className="text-neutralTitle">{valueText}</span>
       </Flex>
       <Flex justify="space-between" className="text-balance font-medium" align="center">
@@ -115,14 +143,14 @@ export default function ItemCard({
         </ToolTip>
 
         {currentList === LiquidityListTypeEnum.My && (
-          <>
+          <div className="flex gap-4">
             <ToolTip title={stakeBtnTip}>
               <Button
                 type="primary"
                 ghost
                 block
                 size="medium"
-                className="!rounded-md"
+                className="!rounded-md !flex-1"
                 disabled={stakeBtnDisabled}
                 onClick={() => {
                   onStake(data);
@@ -131,19 +159,22 @@ export default function ItemCard({
                 Stake
               </Button>
             </ToolTip>
-            <Button
-              type="primary"
-              ghost
-              block
-              size="medium"
-              className="!rounded-md"
-              onClick={() => {
-                onRemove(data);
-              }}
-            >
-              Remove
-            </Button>
-          </>
+            <ToolTip title={removeBtnTip}>
+              <Button
+                type="primary"
+                ghost
+                block
+                size="medium"
+                disabled={removeBtnDisabled}
+                className="!rounded-md !flex-1"
+                onClick={() => {
+                  onRemove(data);
+                }}
+              >
+                Remove
+              </Button>
+            </ToolTip>
+          </div>
         )}
       </Flex>
     </section>

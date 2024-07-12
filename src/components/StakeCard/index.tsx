@@ -53,7 +53,7 @@ export default function StakeCard({
     earned = '0',
     earnedInUsd,
     staked,
-    stakedInUsD,
+    stakedInUsd,
     stakeApr,
     icons,
     decimal = 8,
@@ -214,7 +214,7 @@ export default function StakeCard({
                   <span>{formatTokenSymbol(stakeSymbol || '')}</span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
-                  {formatUSDPrice(divDecimals(stakedInUsD || 0, decimal))}
+                  {formatUSDPrice(divDecimals(stakedInUsd || 0, decimal))}
                 </div>
               </div>
             </div>

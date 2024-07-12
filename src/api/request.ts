@@ -1,7 +1,6 @@
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import request, { awakenRequest, cmsRequest, tokenRequest } from './axios';
 import qs from 'qs';
-import { PoolType } from 'types/stake';
 
 export const fetchToken = async (data: ITokenParams) => {
   return tokenRequest.post<
@@ -45,7 +44,7 @@ export const stakingClaim = async (
 export const pointsClaim = async (data: {
   rawTransaction: string;
   chainId: Chain;
-}): Promise<string> => {
+}): Promise<ISendTransactionResult> => {
   return request.post('/app/points/staking/claim', data);
 };
 
@@ -98,7 +97,7 @@ export const earlyStakeSign = async (data: IEarlyStakeSignParams): Promise<IEarl
   return request.post('/app/rewards/early/stake/signature', data);
 };
 
-export const earlyStake = async (data: IEarlyStakeParams): Promise<string> => {
+export const earlyStake = async (data: IEarlyStakeParams): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/early/stake', data);
 };
 
@@ -106,7 +105,7 @@ export const withdrawSign = async (data: IWithdrawSignParams): Promise<IEarlySta
   return request.post('/app/rewards/withdraw/signature', data);
 };
 
-export const withdraw = async (data: IEarlyStakeParams): Promise<string> => {
+export const withdraw = async (data: IEarlyStakeParams): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/withdraw', data);
 };
 
@@ -126,7 +125,7 @@ export const addLiquiditySign = async (
   return request.post('/app/rewards/add/liquidity/signature', data);
 };
 
-export const addLiquidity = async (data: IAddLiquidityParams): Promise<string> => {
+export const addLiquidity = async (data: IAddLiquidityParams): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/add/liquidity', data);
 };
 
@@ -140,7 +139,9 @@ export const liquidityStakeSign = async (
   return request.post('/app/rewards/liquidity/stake/signature', data);
 };
 
-export const liquidityStake = async (data: IAddLiquidityParams): Promise<string> => {
+export const liquidityStake = async (
+  data: IAddLiquidityParams,
+): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/liquidity/stake', data);
 };
 
@@ -150,6 +151,8 @@ export const liquidityRemoveSign = async (
   return request.post('/app/rewards/remove/liquidity/signature', data);
 };
 
-export const liquidityRemove = async (data: IAddLiquidityParams): Promise<string> => {
+export const liquidityRemove = async (
+  data: IAddLiquidityParams,
+): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/remove/liquidity', data);
 };

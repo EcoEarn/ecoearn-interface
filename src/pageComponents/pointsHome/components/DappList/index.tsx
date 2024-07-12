@@ -182,7 +182,7 @@ export default function DappList({
       dataSource={items}
       loading={loading}
       scroll={{ x: 'max-content' }}
-      className={clsx('mt-[80px]', styles.table)}
+      className={clsx('mt-[60px]', styles.table)}
     />
   );
 }

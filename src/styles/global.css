@@ -55,5 +55,7 @@ code {
 	margin-bottom: 0 !important;
 }
 
-
+.earn-message {
+  @apply z-[100100];
+}
 

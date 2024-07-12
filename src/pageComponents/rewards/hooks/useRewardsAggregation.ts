@@ -28,6 +28,8 @@ import { earlyStake as earlyStakeApi } from 'api/request';
 import { ISendResult } from 'types';
 import getBalanceTip from 'utils/stake';
 import { getTxResult } from 'utils/aelfUtils';
+import { matchErrorMsg } from 'utils/formatError';
+import { message } from 'antd';
 
 const stakeEarlyErrorTip =
   'Stake has expired, cannot be added stake. Please renew the staking first.';
@@ -47,6 +49,7 @@ export default function useRewardsAggregation() {
     'normal',
   );
   const [confirmModalTransactionId, setConfirmModalTransactionId] = useState<string>('');
+  const [confirmModalErrorTip, setConfirmModalErrorTip] = useState('');
   const [confirmModalType, setConfirmModalType] = useState<ConfirmModalTypeEnum>();
   const [curTrigger, setCurTrigger] = useState<'pointsWithdraw' | 'tokenWithdraw' | 'LPWithdraw'>();
   const { isLogin } = useGetLoginStatus();
@@ -73,8 +76,8 @@ export default function useRewardsAggregation() {
   }, [data?.pointsPoolAgg]);
 
   const pointsEarlyStakeDisabled = useMemo(() => {
-    return pointsEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
-  }, [earlyStakedPoolIsUnLock, pointsEarlyStakeNotEnough]);
+    return !earlyStakeData || pointsEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
+  }, [earlyStakeData, earlyStakedPoolIsUnLock, pointsEarlyStakeNotEnough]);
 
   const tokenEarlyStakeNotEnough = useMemo(() => {
     const { frozen, withdrawable } = data?.tokenPoolAgg || {};
@@ -85,8 +88,8 @@ export default function useRewardsAggregation() {
   }, [data?.tokenPoolAgg]);
 
   const tokenEarlyStakeDisabled = useMemo(() => {
-    return tokenEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
-  }, [earlyStakedPoolIsUnLock, tokenEarlyStakeNotEnough]);
+    return !earlyStakeData || tokenEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
+  }, [earlyStakeData, earlyStakedPoolIsUnLock, tokenEarlyStakeNotEnough]);
 
   const lpEarlyStakeNotEnough = useMemo(() => {
     const { frozen, withdrawable } = data?.lpPoolAgg || {};
@@ -96,8 +99,8 @@ export default function useRewardsAggregation() {
   }, [data?.lpPoolAgg]);
 
   const lpEarlyStakeDisabled = useMemo(() => {
-    return lpEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
-  }, [earlyStakedPoolIsUnLock, lpEarlyStakeNotEnough]);
+    return !earlyStakeData || lpEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
+  }, [earlyStakeData, earlyStakedPoolIsUnLock, lpEarlyStakeNotEnough]);
 
   const fetchData = useCallback(
     async (props?: { needLoading?: boolean }) => {
@@ -304,8 +307,8 @@ export default function useRewardsAggregation() {
               poolId: earlyStakeData?.poolId || '',
               claimInfos,
             };
-            const { signature, seed, expirationTime } = await earlyStakeSign(signParams);
-            if (!signature || !seed || !expirationTime) throw Error('sign error');
+            const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
+            if (!signature || !seed || !expirationTime) throw Error();
             try {
               const rpcUrl = (config as Partial<ICMSInfo>)[
                 `rpcUrl${curChain?.toLocaleUpperCase()}`
@@ -341,14 +344,14 @@ export default function useRewardsAggregation() {
                 });
               } catch (error) {
                 await cancelSign(signParams);
-                throw Error('getRawTransaction error');
+                throw Error();
               }
               console.log('rawTransaction', rawTransaction);
               if (!rawTransaction) {
                 await cancelSign(signParams);
-                throw Error('rawTransaction empty');
+                throw Error();
               }
-              const TransactionId = await earlyStakeApi({
+              const { data: TransactionId, message: errorMessage } = await earlyStakeApi({
                 chainId: curChain!,
                 rawTransaction: rawTransaction || '',
               });
@@ -362,13 +365,15 @@ export default function useRewardsAggregation() {
                 if (resultTransactionId) {
                   return { TransactionId: resultTransactionId } as ISendResult;
                 } else {
-                  throw Error('transaction error');
+                  throw Error();
                 }
               } else {
-                throw Error('no TransactionId');
+                const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'EarlyStake');
+                if (!showInModal) message.error(matchedErrorMsg);
+                throw Error(showInModal ? matchedErrorMsg : '');
               }
             } catch (error) {
-              throw Error('earlyStake error');
+              throw Error((error as Error).message);
             }
           },
           onSuccess: () => {
@@ -475,8 +480,8 @@ export default function useRewardsAggregation() {
           claimInfos: claimParams?.withdrawClaimInfos || [],
           dappId: data?.dappId || '',
         };
-        const { signature, seed, expirationTime } = await withdrawSign(signParams);
-        if (!signature || !seed || !expirationTime) throw Error('sign error');
+        const { signature, seed, expirationTime } = (await withdrawSign(signParams)) || {};
+        if (!signature || !seed || !expirationTime) throw Error();
         const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
         let rawTransaction = null;
         try {
@@ -500,14 +505,14 @@ export default function useRewardsAggregation() {
           });
         } catch (error) {
           await cancelSign(signParams);
-          throw Error('getRawTransaction error');
+          throw Error();
         }
         console.log('rawTransaction', rawTransaction);
         if (!rawTransaction) {
           await cancelSign(signParams);
-          throw Error('rawTransaction empty');
+          throw Error();
         }
-        const TransactionId = await withdraw({
+        const { data: TransactionId, message: errorMessage } = await withdraw({
           chainId: curChain!,
           rawTransaction: rawTransaction || '',
         });
@@ -522,14 +527,18 @@ export default function useRewardsAggregation() {
             setConfirmModalTransactionId(resultTransactionId);
             setConfirmModalStatus('success');
           } else {
-            throw Error('transaction error');
+            throw Error();
           }
         } else {
-          throw Error('no TransactionId');
+          const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'Withdraw');
+          if (!showInModal) message.error(matchedErrorMsg);
+          throw Error(showInModal ? matchedErrorMsg : '');
         }
       } catch (error) {
-        console.error('WithDraw error', error);
+        const errorTip = (error as Error).message;
+        console.error('WithDraw error', errorTip);
         setConfirmModalTransactionId('');
+        errorTip && setConfirmModalErrorTip(errorTip);
         setConfirmModalStatus('error');
       } finally {
         closeLoading();
@@ -750,6 +759,7 @@ export default function useRewardsAggregation() {
     tokenPoolsAmount,
     lpPoolsAmount,
     confirmModalContent,
+    confirmModalErrorTip,
     confirmModalLoading,
     confirmModalOnClose,
     confirmModalOnConfirm,

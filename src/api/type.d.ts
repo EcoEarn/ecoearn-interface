@@ -15,7 +15,6 @@ interface IStakeInfoItem {
   earned?: string | number;
   earnedInUsd?: string | number;
   staked?: string;
-  stakedInUsD?: string;
   unlockTime?: number | string;
   stakeApr?: string | number;
   stakedAmount?: string;
@@ -46,13 +45,12 @@ interface IStakePoolData {
   stakedTime?: number;
   period?: number;
   yearlyRewards?: number;
-  stakedInUsD?: string | number;
   unlockTime?: number | string;
   stakeApr?: string | number;
   stakedAmount?: string;
   earlyStakedAmount?: string;
   staked?: string;
-  stakedInUsD?: string;
+  stakedInUsd?: string;
   decimal?: number;
   rate?: number | string;
   fixedBoostFactor?: number | string;
@@ -329,6 +327,11 @@ interface ILiquidityItem {
   ecoEarnTokenAAmount?: string;
   ecoEarnTokenBAmount?: string;
   lpAmount?: string;
+  stakingAmount?: string | number;
+  tokenAUnStakingAmount?: string | number;
+  tokenBUnStakingAmount?: string | number;
+  ecoEarnTokenAUnStakingAmount?: string | number;
+  ecoEarnTokenBUnStakingAmount?: string | number;
 }
 
 interface IAddLiquidityParams {
@@ -364,4 +367,10 @@ interface ILiquidityRemoveSignParams {
   tokenAMin: string | number;
   tokenBMin: string | number;
   liquidityIds: Array<any>;
+}
+
+interface ISendTransactionResult {
+  data: string;
+  code: number;
+  message: string;
 }
