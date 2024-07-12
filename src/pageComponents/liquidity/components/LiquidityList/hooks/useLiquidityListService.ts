@@ -596,10 +596,10 @@ export default function useLiquidityListService() {
             // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
             const periodInSeconds = 5 * 60;
             const claimInfos = rewardsData?.lpPoolAgg?.claimInfos || [];
-            const longestReleaseTime =
-              claimInfos && claimInfos?.length > 0
-                ? claimInfos?.[claimInfos?.length - 1]?.releaseTime
-                : 0;
+            // const longestReleaseTime =
+            //   claimInfos && claimInfos?.length > 0
+            //     ? claimInfos?.[claimInfos?.length - 1]?.releaseTime
+            //     : 0;
             const dappId = rewardsData?.dappId || '';
             const signParams: ILiquidityStakeSignParams = {
               lpAmount: String(lpAmount || ''),
@@ -632,7 +632,6 @@ export default function useLiquidityListService() {
                   },
                   poolId: signParams.poolId,
                   period: signParams.period,
-                  longestReleaseTime: BigNumber(longestReleaseTime).div(1000).dp(0).toNumber(),
                   signature,
                 },
                 rpcUrl,
