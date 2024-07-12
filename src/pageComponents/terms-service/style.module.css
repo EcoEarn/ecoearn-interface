@@ -1,0 +1,65 @@
+/* stylelint-disable no-descending-specificity */
+.content {
+  @apply px-5 md:max-w-[893px] mx-auto pb-10;
+
+  p, li {
+    @apply text-base;
+  }
+
+  a {
+    @apply break-all;
+  }
+
+  article{
+    @apply pt-5;
+  }
+
+  hgroup {
+    @apply mb-[40px];
+
+    h1 {
+      @apply text-4xl mb-3;
+    }
+
+    p{
+      @apply font-semibold;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply mt-4 mb-4 font-bold;
+  }
+
+  h2 {
+    @apply text-2xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
+  ul, ol {
+    @apply ml-4 my-4;
+  }
+
+  li {
+    list-style: circle;
+    @apply mb-2;
+  }
+
+  ol.lower-alpha {
+    li {
+      list-style: lower-alpha;
+    }
+  }
+  ol.lower-roman {
+    li {
+      list-style: lower-roman;
+    }
+  }
+}

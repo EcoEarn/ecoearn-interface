@@ -24,11 +24,13 @@ interface IStakeModalProps {
   customAmountModule?: ReactNode;
   isFreezePeriod?: boolean;
   isStakeRewards?: boolean;
+  isAddLiquidityAndStake?: boolean;
   freezePeriod?: number | string;
   earlyAmount?: number | string;
   isEarlyStake?: boolean;
   balanceDec?: string;
   balance?: string;
+  poolType?: PoolType;
   modalTitle?: string;
   stakeData: IStakePoolData;
   onStake: (
@@ -49,11 +51,13 @@ function StakeModalWithConfirm({
   customAmountModule,
   isFreezePeriod,
   isStakeRewards,
+  isAddLiquidityAndStake,
   freezePeriod,
   earlyAmount,
   isEarlyStake,
   balanceDec,
   modalTitle,
+  poolType,
   onStake,
   onSuccess,
   balance,
@@ -61,6 +65,7 @@ function StakeModalWithConfirm({
   const modal = useModal();
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
+  const [errorTip, setErrorTip] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmType, setConfirmType] = useState<ConfirmModalTypeEnum>(ConfirmModalTypeEnum.Stake);
   const [content, setContent] = useState<TStakeExtendContent>({
@@ -157,10 +162,12 @@ function StakeModalWithConfirm({
           setStatus('success');
           setTransactionId(res?.TransactionId);
         } else {
-          throw Error('no TransactionId');
+          throw Error();
         }
       } catch (error) {
-        console.error('===stake error', error);
+        const errorTip = (error as Error).message;
+        console.error('===stake error', errorTip);
+        errorTip && setErrorTip(errorTip);
         setStatus('error');
       } finally {
         setLoading(false);
@@ -187,7 +194,9 @@ function StakeModalWithConfirm({
         freezePeriod={freezePeriod}
         freezeAmount={freezeAmount}
         isStakeRewards={isStakeRewards}
+        isAddLiquidityAndStake={isAddLiquidityAndStake}
         customAmountModule={customAmountModule}
+        poolType={poolType}
         modalTitle={modalTitle}
         earlyAmount={earlyAmount}
         isEarlyStake={isEarlyStake}
@@ -204,6 +213,7 @@ function StakeModalWithConfirm({
         status={status}
         loading={loading}
         content={content}
+        errorTip={errorTip}
         transactionId={transactionId}
         onClose={onConfirmClose}
         onConfirm={onConfirm}

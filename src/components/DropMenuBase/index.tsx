@@ -3,6 +3,7 @@ import { MenuProps, Drawer } from 'antd';
 import { ReactNode } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import styles from './style.module.css';
+import clsx from 'clsx';
 
 export interface IMenuItem {
   label: string | ReactNode;
@@ -17,6 +18,18 @@ interface IDropMenu {
   targetNode: ReactNode;
   onCloseHandler: () => void;
   titleTxt: string;
+  arrow?: boolean;
+  trigger?: 'hover' | 'click';
+  className?: string;
+  placement?:
+    | 'top'
+    | 'bottom'
+    | 'bottomLeft'
+    | 'topLeft'
+    | 'topCenter'
+    | 'topRight'
+    | 'bottomCenter'
+    | 'bottomRight';
 }
 const DropMenuBase = ({
   isMobile,
@@ -26,6 +39,10 @@ const DropMenuBase = ({
   targetNode,
   onCloseHandler,
   titleTxt,
+  arrow = false,
+  trigger = 'hover',
+  placement = 'bottomLeft',
+  className,
 }: IDropMenu) => {
   return isMobile ? (
     <>
@@ -53,7 +70,13 @@ const DropMenuBase = ({
       </Drawer>
     </>
   ) : (
-    <Dropdown overlayClassName={styles.dropdownCustom} menu={{ items, selectable: false }}>
+    <Dropdown
+      overlayClassName={clsx(styles.dropdownCustom, className)}
+      menu={{ items, selectable: false }}
+      arrow={arrow}
+      trigger={[trigger || 'hover']}
+      placement={placement}
+    >
       {targetNode}
     </Dropdown>
   );

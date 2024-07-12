@@ -7,6 +7,7 @@ import { singleMessage } from '@portkey/did-ui-react';
 import { IEarlyStakeProps } from 'hooks/useEarlyStake';
 import { useRouter } from 'next/navigation';
 import { formatTokenSymbol } from 'utils/format';
+import { message } from 'antd';
 
 interface IUnlockModalProps {
   amount: string;
@@ -35,6 +36,7 @@ function UnlockModal({
 }: IUnlockModalProps) {
   const modal = useModal();
   const [status, setStatus] = useState<TConfirmModalStatus>('normal');
+  const [errorTip, setErrorTip] = useState('');
   const [loading, setLoading] = useState(false);
   const [TransactionId, setTransactionId] = useState('');
   const router = useRouter();
@@ -51,11 +53,15 @@ function UnlockModal({
         setTransactionId(TransactionId);
         setStatus('success');
       } else {
-        throw new Error('TransactionId empty');
+        throw new Error();
       }
     } catch (error) {
-      console.log('tokenUnlock error', error);
+      const { showInModal, errorMessage } = error as any;
+      const errorTip = errorMessage?.message;
+      console.log('tokenUnlock error', errorTip);
+      if (!showInModal) message.error(errorTip);
       setStatus('error');
+      errorTip && setErrorTip(errorTip);
     } finally {
       setLoading(false);
     }
@@ -73,6 +79,7 @@ function UnlockModal({
       visible={modal.visible}
       status={status}
       loading={loading}
+      errorTip={errorTip}
       content={{
         amount,
         amountFromEarlyStake,

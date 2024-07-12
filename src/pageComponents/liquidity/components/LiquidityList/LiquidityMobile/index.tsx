@@ -12,8 +12,10 @@ export default function LiquidityMobile({
     ILiquidityItem & {
       addBtnDisabled: boolean;
       stakeBtnDisabled: boolean;
+      removeBtnDisabled: boolean;
       addBtnTip: string;
       stakeBtnTip: string;
+      removeBtnTip: string;
     }
   >;
   onRemove: (data: ILiquidityItem) => void;
