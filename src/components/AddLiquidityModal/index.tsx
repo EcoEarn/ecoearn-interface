@@ -281,7 +281,8 @@ function AddLiquidityModal({
           throw new Error();
         }
         if (checked) {
-          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 15 * 60;
           try {
             showLoading();
             const tokenAMin = ZERO.plus(tokenA.balance)
