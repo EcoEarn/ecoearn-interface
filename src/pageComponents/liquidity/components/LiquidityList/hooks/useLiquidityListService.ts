@@ -593,12 +593,10 @@ export default function useLiquidityListService() {
       }
       const typeIsAdd = !BigNumber(stakeData?.staked || 0).isZero();
       stakeModal.show({
-        isStakeRewards: true,
         type: typeIsAdd ? StakeType.ADD : StakeType.STAKE,
         stakeData: {
           ...stakeData,
           stakeInfos: stakeData?.subStakeInfos || [],
-          longestReleaseTime: longestReleaseTime || 0,
         },
         balanceDec: 'It is the amount of LP you hold in EcoEarn',
         balance: String(banlance),
@@ -699,7 +697,6 @@ export default function useLiquidityListService() {
       config,
       curChain,
       fetchData,
-      longestReleaseTime,
       rewardsContractAddress,
       rewardsData?.dappId,
       showLoading,
