@@ -112,44 +112,49 @@ export function formatNumber(
   const abs = numberBig.abs();
   if (abs.gt(TUnit) && abs.gte(formatMin)) {
     return (
-      formatTokenPrice(BigNumber(numberBig.div(TUnit).toFixed(decimalPlaces, roundingMode)), {
+      formatTokenPrice(numberBig.div(TUnit), {
         decimalPlaces,
         minValue: 0.01,
+        roundingMode,
       }) +
       // .replace(regexp, '$1'),
       'T'
     );
   } else if (abs.gte(BUnit) && abs.gte(formatMin)) {
     return (
-      formatTokenPrice(BigNumber(numberBig.div(BUnit).toFixed(decimalPlaces, roundingMode)), {
+      formatTokenPrice(numberBig.div(BUnit), {
         decimalPlaces,
         minValue: 0.01,
+        roundingMode,
       }) +
       // .replace(regexp, '$1')
       'B'
     );
   } else if (abs.gte(MUnit) && abs.gte(formatMin)) {
     return (
-      formatTokenPrice(BigNumber(numberBig.div(MUnit).toFixed(decimalPlaces, roundingMode)), {
+      formatTokenPrice(numberBig.div(MUnit), {
         decimalPlaces,
         minValue: 0.01,
+        roundingMode,
       }) +
       // .replace(regexp, '$1')
       'M'
     );
   } else if (abs.gte(KUnit) && abs.gte(formatMin)) {
     return (
-      formatTokenPrice(BigNumber(numberBig.div(KUnit).toFixed(decimalPlaces, roundingMode)), {
+      formatTokenPrice(numberBig.div(KUnit), {
         decimalPlaces,
         minValue: 0.01,
+        roundingMode,
       }) +
       // .replace(regexp, '$1')
       'K'
     );
   } else {
-    return formatTokenPrice(BigNumber(numberBig.toFixed(decimalPlaces, roundingMode)), {
+    return formatTokenPrice(numberBig, {
       decimalPlaces,
       minValue: 0.01,
+      roundingMode,
     });
   }
 }
@@ -236,4 +241,37 @@ export function getTargetClaimTime(time: string | number) {
 export function getTokenSymbolFromLp(symbol: string) {
   if (!symbol) return [];
   return symbol.split(' ')?.[1]?.split('-');
+}
+
+const tokenWeights: { [key: string]: number } = {
+  USDT: 100,
+  USDC: 90,
+  DAI: 80,
+  ELF: 60,
+  ETH: 50,
+  BNB: 30,
+};
+
+export function getTokenWeights(symbol?: string): number {
+  if (!symbol) {
+    return 0;
+  }
+
+  return tokenWeights[symbol] || 1;
+}
+
+export function orderPairTokens(
+  tokenA: {
+    symbol: string;
+    [key: string]: any;
+  },
+  tokenB: {
+    symbol: string;
+    [key: string]: any;
+  },
+) {
+  const defaultRes = [tokenA, tokenB];
+  const tokenAWeight = getTokenWeights(tokenA.symbol);
+  const tokenBWeight = getTokenWeights(tokenB.symbol);
+  return tokenAWeight >= tokenBWeight ? defaultRes : defaultRes.reverse();
 }

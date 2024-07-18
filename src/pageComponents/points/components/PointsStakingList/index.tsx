@@ -19,6 +19,7 @@ import { ZERO } from 'constants/index';
 import CommonTooltip from 'components/CommonTooltip';
 import { PoolType } from 'types/stake';
 import { useRouter } from 'next/navigation';
+import TextEllipsis from 'components/TextEllipsis';
 
 const formatMin = 1000000;
 
@@ -39,8 +40,8 @@ export function PointsStakeItem({
   }, [item, onClaim]);
 
   const dailyRewards = useMemo(() => {
-    return formatTokenPrice(item.dailyRewards, { decimalPlaces: 2 });
-  }, [item.dailyRewards]);
+    return formatNumber(item?.dailyRewards || 0).toString();
+  }, [item?.dailyRewards]);
 
   const poolDailyRewards = useMemo(() => {
     return formatTokenPrice(item.poolDailyRewards, { decimalPlaces: 2 });
@@ -73,8 +74,8 @@ export function PointsStakeItem({
   }, [isLogin, item.rewardsTokenName]);
 
   const earned = useMemo(() => {
-    return isLogin && item.realEarned ? formatNumberOverMillion(item.realEarned) : '--';
-  }, [formatNumberOverMillion, isLogin, item.realEarned]);
+    return isLogin && item.realEarned ? formatNumber(item.realEarned) : '--';
+  }, [isLogin, item.realEarned]);
 
   const claimDisabled = useMemo(() => {
     return BigNumber(item.realEarned).lte(ZERO);
@@ -115,10 +116,11 @@ export function PointsStakeItem({
           justify={isMD ? 'space-between' : 'start'}
         >
           <span className="text-sm font-medium text-brandDefault">
-            Rewards for 1w Points / Month:{' '}
+            Rewards for 10k Points / Month:{' '}
           </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
-            {dailyRewards} {item.rewardsTokenName}
+            <span className="mr-1">{dailyRewards}</span>{' '}
+            <TextEllipsis text={item.rewardsTokenName} />
             <CommonTooltip
               title="It indicates monthly rewards obtained by staking 10,000 points."
               className="ml-1 fill-brandDefault"
@@ -184,7 +186,9 @@ export function PointsStakeItem({
             <Flex gap={8} align="center">
               <span className="font-semibold text-lg text-neutralTitle">{earned}</span>
               {earnSymbol && (
-                <span className="text-base font-normal text-neutralPrimary">{earnSymbol}</span>
+                <span className="text-base font-normal text-neutralPrimary">
+                  <TextEllipsis text={earnSymbol} />
+                </span>
               )}
             </Flex>
           </Flex>

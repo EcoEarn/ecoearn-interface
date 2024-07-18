@@ -4,6 +4,7 @@ import Description from 'components/StakeCardDescription';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { ZERO } from 'constants/index';
 import {
+  formatNumber,
   formatNumberWithDecimalPlaces,
   formatTokenAmount,
   formatTokenSymbol,
@@ -16,6 +17,7 @@ import { divDecimals } from 'utils/calculate';
 import { MAX_STAKE_PERIOD } from 'constants/stake';
 import Renewal from 'components/Renewal';
 import useUnlockCount from './hooks/useUnlockCount';
+import TextEllipsis from 'components/TextEllipsis';
 
 interface IStakeCardProps {
   type: PoolTypeEnum;
@@ -114,7 +116,7 @@ export default function StakeCard({
 
   const stakedStr = useMemo(() => {
     const stakeAmount = divDecimals(staked, decimal);
-    return formatNumberWithDecimalPlaces(stakeAmount);
+    return formatNumber(stakeAmount);
   }, [decimal, staked]);
 
   const disabledExtendBtn = useMemo(() => {
@@ -122,6 +124,10 @@ export default function StakeCard({
     const canNotExtends = ZERO.plus(remainingDays || 0).gt(MAX_STAKE_PERIOD - 1);
     return isUnLocked || canNotExtends;
   }, [isUnLocked, targetUnlockTimeStamp]);
+
+  const earnAmountText = useMemo(() => {
+    return formatNumber(divDecimals(earned, decimal));
+  }, [decimal, earned]);
 
   return (
     <div className="stake-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
@@ -133,6 +139,7 @@ export default function StakeCard({
           rate={rate}
           tokenName={stakeSymbol}
           projectName={projectOwner || '--'}
+          symbolDigs={12}
         />
         <Description
           className="w-full lg:w-[274px]"
@@ -176,11 +183,13 @@ export default function StakeCard({
             <div className="flex justify-between md:flex-col md:justify-start md:gap-2">
               <div className="text-base text-neutralSecondary font-medium">
                 <span>Earned</span>
-                <span className="ml-2 text-sm">{earnedSymbol}</span>
               </div>
               <div className="flex flex-col gap-1 items-end md:items-start">
-                <div className="text-base font-semibold text-neutralTitle">
-                  {formatTokenAmount(divDecimals(earned, decimal).toFixed())}
+                <div className="text-base font-semibold text-neutralTitle flex items-center gap-1">
+                  <span>{earnAmountText}</span>
+                  <span>
+                    <TextEllipsis text={earnedSymbol || ''} digits={10} />
+                  </span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
                   {formatUSDPrice(divDecimals(earnedInUsd || 0, decimal))}
@@ -211,7 +220,9 @@ export default function StakeCard({
                   <ToolTip title="The number of rewards included">
                     <span>{stakedStr}</span>
                   </ToolTip>
-                  <span>{formatTokenSymbol(stakeSymbol || '')}</span>
+                  <span>
+                    <TextEllipsis text={formatTokenSymbol(stakeSymbol || '') || ''} digits={10} />
+                  </span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
                   {formatUSDPrice(divDecimals(stakedInUsd || 0, decimal))}
