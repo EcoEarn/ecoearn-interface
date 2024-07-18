@@ -25,6 +25,7 @@ import useLoading from 'hooks/useLoading';
 import usePair from 'hooks/usePair';
 import useToken from 'hooks/useToken';
 import { useWalletService } from 'hooks/useWallet';
+import { max } from 'lodash-es';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
@@ -260,13 +261,28 @@ export default function useLiquidityListService() {
     [closeLoading, currentList, showLoading, wallet.address],
   );
 
-  const lpPoolLongestReleaseTime = useMemo(() => {
-    const { lpPoolAgg } = rewardsData || {};
-    const { claimInfos } = lpPoolAgg || {};
-    if (claimInfos && claimInfos?.length > 0) {
-      return claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0;
+  const longestReleaseTime = useMemo(() => {
+    const { pointsPoolAgg, tokenPoolAgg, lpPoolAgg } = rewardsData || {};
+    let pointsLongestReleaseTime = 0;
+    let tokenLongestReleaseTime = 0;
+    let lpLongestReleaseTime = 0;
+    const { claimInfos: pointsClaimInfos } = pointsPoolAgg || {};
+    const { claimInfos: tokenClaimInfos } = tokenPoolAgg || {};
+    const { claimInfos: lpClaimInfos } = lpPoolAgg || {};
+    if (pointsClaimInfos && pointsClaimInfos?.length > 0) {
+      pointsLongestReleaseTime = pointsClaimInfos?.[pointsClaimInfos?.length - 1]?.releaseTime || 0;
     }
-    return 0;
+    if (tokenClaimInfos && tokenClaimInfos?.length > 0) {
+      tokenLongestReleaseTime = tokenClaimInfos?.[tokenClaimInfos?.length - 1]?.releaseTime || 0;
+    }
+    if (lpClaimInfos && lpClaimInfos?.length > 0) {
+      lpLongestReleaseTime = lpClaimInfos?.[lpClaimInfos?.length - 1]?.releaseTime || 0;
+    }
+    return max([
+      pointsLongestReleaseTime || 0,
+      tokenLongestReleaseTime || 0,
+      lpLongestReleaseTime || 0,
+    ]);
   }, [rewardsData]);
 
   const onAddAndStake = useCallback(
@@ -390,7 +406,7 @@ export default function useLiquidityListService() {
             ...(rewardsData?.tokenPoolAgg?.claimInfos || []),
             ...(rewardsData?.lpPoolAgg?.claimInfos || []),
           ],
-          lpPoolLongestReleaseTime,
+          longestReleaseTime,
           onSuccess: () => {
             addModal?.remove();
             fetchData();
@@ -411,7 +427,7 @@ export default function useLiquidityListService() {
       getBalance,
       getPairInfo,
       getPrice,
-      lpPoolLongestReleaseTime,
+      longestReleaseTime,
       rewardsData?.dappId,
       rewardsData?.lpPoolAgg?.claimInfos,
       rewardsData?.pointsPoolAgg?.claimInfos,
@@ -577,12 +593,10 @@ export default function useLiquidityListService() {
       }
       const typeIsAdd = !BigNumber(stakeData?.staked || 0).isZero();
       stakeModal.show({
-        isStakeRewards: true,
         type: typeIsAdd ? StakeType.ADD : StakeType.STAKE,
         stakeData: {
           ...stakeData,
           stakeInfos: stakeData?.subStakeInfos || [],
-          longestReleaseTime: lpPoolLongestReleaseTime || 0,
         },
         balanceDec: 'It is the amount of LP you hold in EcoEarn',
         balance: String(banlance),
@@ -594,11 +608,6 @@ export default function useLiquidityListService() {
           try {
             showLoading();
             const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-            const claimInfos = rewardsData?.lpPoolAgg?.claimInfos || [];
-            const longestReleaseTime =
-              claimInfos && claimInfos?.length > 0
-                ? claimInfos?.[claimInfos?.length - 1]?.releaseTime
-                : 0;
             const dappId = rewardsData?.dappId || '';
             const signParams: ILiquidityStakeSignParams = {
               lpAmount: String(lpAmount || ''),
@@ -631,7 +640,6 @@ export default function useLiquidityListService() {
                   },
                   poolId: signParams.poolId,
                   period: signParams.period,
-                  longestReleaseTime: BigNumber(longestReleaseTime).div(1000).dp(0).toNumber(),
                   signature,
                 },
                 rpcUrl,
@@ -688,10 +696,8 @@ export default function useLiquidityListService() {
       config,
       curChain,
       fetchData,
-      lpPoolLongestReleaseTime,
       rewardsContractAddress,
       rewardsData?.dappId,
-      rewardsData?.lpPoolAgg?.claimInfos,
       showLoading,
       stakeModal,
       wallet,

@@ -1,12 +1,11 @@
 import { Flex } from 'antd';
 import CommonTooltip from 'components/CommonTooltip';
 import { useMemo } from 'react';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatNumber, formatTokenPrice, formatUSDPrice } from 'utils/format';
 import { LiquidityListTypeEnum } from '../hooks/useLiquidityListService';
 import { Button, ToolTip } from 'aelf-design';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import RateTag from 'components/RateTag';
-import { divDecimals } from 'utils/calculate';
 
 export default function ItemCard({
   data,
@@ -49,7 +48,7 @@ export default function ItemCard({
   } = data || {};
 
   const balanceText = useMemo(() => {
-    return formatTokenPrice(banlance).toString();
+    return formatTokenPrice(banlance || 0).toString();
   }, [banlance]);
 
   const stakingText = useMemo(() => {
@@ -61,12 +60,12 @@ export default function ItemCard({
   }, [value]);
 
   const amountOneText = useMemo(() => {
-    return `${formatTokenPrice(tokenAAmount).toString()} ${tokenASymbol}`;
-  }, [tokenAAmount, tokenASymbol]);
+    return `${formatNumber(tokenAAmount).toString()}`;
+  }, [tokenAAmount]);
 
   const amountTwoText = useMemo(() => {
-    return `${formatTokenPrice(tokenBAmount).toString()} ${tokenBSymbol}`;
-  }, [tokenBAmount, tokenBSymbol]);
+    return `${formatNumber(tokenBAmount).toString()}`;
+  }, [tokenBAmount]);
 
   return (
     <section className="flex gap-8 flex-col bg-neutralWhiteBg border-[1px] px-4 py-6 border-neutralBorder rounded-[12px] border-solid text-base">
@@ -75,9 +74,10 @@ export default function ItemCard({
           icons={icons}
           tokenName={lpSymbol}
           type={PoolTypeEnum.Lp}
-          className="lg:!items-center"
+          className="lg:!items-center max-w-[200px]"
           tokenSymbolClassName="!text-base"
           size="middle"
+          symbolDigs={12}
         />
         <RateTag
           value={Number(rate) * 100}
@@ -117,14 +117,24 @@ export default function ItemCard({
           <span className="text-neutralTertiary">Amount</span>
           <CommonTooltip title='"Amount" includes the added liquidity as well as the reward you earned through the Swap.' />
         </Flex>
-        <span className="text-neutralTitle">{amountOneText}</span>
+        <span className="text-neutralTitle flex gap-1 items-center truncate max-w-[118px]">
+          <span>{amountOneText}</span>
+          <ToolTip title={tokenASymbol?.length > 6 ? tokenASymbol : ''}>
+            <span className="truncate">{tokenASymbol}</span>
+          </ToolTip>
+        </span>
       </Flex>
       <Flex justify="space-between" className="text-balance font-medium" align="center">
         <Flex gap={8} align="center">
           <span className="text-neutralTertiary">Amount</span>
           <CommonTooltip title='"Amount" includes the added liquidity as well as the reward you earned through the Swap.' />
         </Flex>
-        <span className="text-neutralTitle">{amountTwoText}</span>
+        <span className="text-neutralTitle flex gap-1 items-center truncate max-w-[118px]">
+          <span>{amountTwoText}</span>
+          <ToolTip title={tokenBSymbol?.length > 6 ? tokenBSymbol : ''}>
+            <span className="truncate">{tokenBSymbol}</span>
+          </ToolTip>
+        </span>
       </Flex>
       <Flex gap={16} vertical>
         <ToolTip title={addBtnTip}>
