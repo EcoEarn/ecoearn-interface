@@ -28,7 +28,7 @@
     "@sentry/nextjs": "^7.19.0",
     "aelf-design": "^0.1.73-alpha.0",
     "aelf-sdk": "^3.2.40",
-    "aelf-web-login": "2.0.1-beta.8",
+    "aelf-web-login": "2.0.1-beta.15",
     "ahooks": "^3.7.11",
     "antd": "^5.x",
     "antd-style": "^3.6.1",

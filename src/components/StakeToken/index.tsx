@@ -7,6 +7,7 @@ import TokenTextIcon from 'components/TokenTextIcon';
 import { formatTokenSymbol } from 'utils/format';
 import BigNumber from 'bignumber.js';
 import useResponsive from 'utils/useResponsive';
+import { ToolTip } from 'aelf-design';
 
 export enum PoolTypeEnum {
   Points = 0,
@@ -24,6 +25,7 @@ export interface IStakeTokenProps {
   size?: 'small' | 'middle' | 'large';
   tokenSymbolClassName?: string;
   tagClassName?: string;
+  symbolDigs?: number;
 }
 
 const StakeToken = memo(
@@ -37,6 +39,7 @@ const StakeToken = memo(
     size = 'large',
     tokenSymbolClassName,
     tagClassName,
+    symbolDigs,
   }: IStakeTokenProps) => {
     const { isLG } = useResponsive();
     const symbolTextList = useMemo(
@@ -56,6 +59,15 @@ const StakeToken = memo(
       }
       return icons?.length <= 0 ? symbolTextList : icons;
     }, [icons, symbolTextList, type]);
+
+    const tokenNameText = useMemo(() => {
+      return tokenName ? formatTokenSymbol(tokenName) || '' : '--';
+    }, [tokenName]);
+
+    const showSymbolTip = useMemo(() => {
+      if (!symbolDigs) return false;
+      return tokenNameText.length > symbolDigs;
+    }, [symbolDigs, tokenNameText.length]);
 
     return (
       <div
@@ -104,14 +116,16 @@ const StakeToken = memo(
             })}
           </Flex>
         )}
-        <div className="flex flex-col">
+        <div className="flex flex-col w-fit min-w-0">
           <div
             className={clsx(
               'flex items-center lg:justify-start gap-4 text-xl font-semibold text-neutralTitle',
               tokenSymbolClassName,
             )}
           >
-            <span className="break-all">{tokenName ? formatTokenSymbol(tokenName) : '--'}</span>
+            <ToolTip title={showSymbolTip ? formatTokenSymbol(tokenName || '') || '' : ''}>
+              <span className="truncate min-w-0 break-all">{tokenNameText}</span>
+            </ToolTip>
             {!!rate && <RateTag value={Number(rate) * 100} className={tagClassName} />}
           </div>
           {projectName && (

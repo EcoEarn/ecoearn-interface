@@ -7,12 +7,13 @@ import CommonTable from 'components/CommonTable';
 import { useMemo } from 'react';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { AELFDProvider, Button, ToolTip } from 'aelf-design';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatNumber, formatTokenPrice, formatUSDPrice } from 'utils/format';
 import CommonTooltip from 'components/CommonTooltip';
 import LiquidityMobile from './LiquidityMobile';
 import OperationDrop from '../OperationDrop';
 import { theme } from './config';
 import { AELFDProviderTheme } from 'provider/config';
+import TextEllipsis from 'components/TextEllipsis';
 
 export default function LiquidityList() {
   const {
@@ -39,7 +40,7 @@ export default function LiquidityList() {
       {
         key: 'lpSymbol',
         dataIndex: 'lpSymbol',
-        width: 280,
+        width: 302,
         render: (text, item) => {
           return (
             <StakeToken
@@ -48,7 +49,8 @@ export default function LiquidityList() {
               tokenName={text}
               rate={item.rate}
               type={PoolTypeEnum.Lp}
-              className="lg:!items-center"
+              symbolDigs={12}
+              className="lg:!items-center !w-[270px]"
               tokenSymbolClassName="!text-base"
               tagClassName="!text-base lg:!text-base !font-medium !px-2 !py-1 !leading-4"
             />
@@ -66,7 +68,7 @@ export default function LiquidityList() {
             )}
           </Flex>
         ),
-        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
+        width: currentList === LiquidityListTypeEnum.My ? 134 : 152,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -84,7 +86,7 @@ export default function LiquidityList() {
             <CommonTooltip title="Your LP amount in staking." />
           </Flex>
         ),
-        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
+        width: currentList === LiquidityListTypeEnum.My ? 138 : 156,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -104,7 +106,7 @@ export default function LiquidityList() {
             )}
           </Flex>
         ),
-        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
+        width: currentList === LiquidityListTypeEnum.My ? 138 : 156,
         render: (text, item) => {
           return (
             <span className="text-base font-semibold text-neutralTitle">
@@ -116,7 +118,7 @@ export default function LiquidityList() {
       {
         key: 'amountOne',
         dataIndex: 'tokenAAmount',
-        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
+        width: currentList === LiquidityListTypeEnum.My ? 150 : 168,
         title: (
           <Flex align="center" gap={8}>
             <span>Amount</span>
@@ -125,16 +127,24 @@ export default function LiquidityList() {
         ),
         render: (text, item) => {
           return (
-            <span className="text-base font-semibold text-neutralTitle">
-              {`${formatTokenPrice(text).toString()} ${item.tokenASymbol}`}
-            </span>
+            <div
+              className={clsx(
+                'text-base font-semibold text-neutralTitle flex items-center gap-1',
+                currentList === LiquidityListTypeEnum.My ? 'w-[118px]' : 'w-[136px]',
+              )}
+            >
+              {`${formatNumber(text).toString()}`}
+              <ToolTip title={item?.tokenASymbol?.length > 6 ? item.tokenASymbol : ''}>
+                <span className="flex-1 truncate">{item.tokenASymbol}</span>
+              </ToolTip>
+            </div>
           );
         },
       },
       {
         key: 'amountTwo',
         dataIndex: 'tokenBAmount',
-        width: currentList === LiquidityListTypeEnum.My ? 142 : 150,
+        width: currentList === LiquidityListTypeEnum.My ? 150 : 168,
         title: (
           <Flex align="center" gap={8}>
             <span>Amount</span>
@@ -143,9 +153,17 @@ export default function LiquidityList() {
         ),
         render: (text, item) => {
           return (
-            <span className="text-base font-semibold text-neutralTitle">
-              {`${formatTokenPrice(text).toString()} ${item.tokenBSymbol}`}
-            </span>
+            <div
+              className={clsx(
+                'text-base font-semibold text-neutralTitle flex items-center gap-1',
+                currentList === LiquidityListTypeEnum.My ? 'w-[118px]' : 'w-[136px]',
+              )}
+            >
+              {`${formatNumber(text).toString()}`}
+              <ToolTip title={item?.tokenBSymbol?.length > 6 ? item.tokenBSymbol : ''}>
+                <span className="flex-1 truncate">{item.tokenBSymbol}</span>
+              </ToolTip>
+            </div>
           );
         },
       },
@@ -154,7 +172,7 @@ export default function LiquidityList() {
         dataIndex: 'Operation',
         title: 'Operation',
         align: 'right',
-        width: 200,
+        width: currentList === LiquidityListTypeEnum.My ? 180 : 120,
         render: (text, item, index) => {
           return (
             <Flex gap={16} justify="end">
