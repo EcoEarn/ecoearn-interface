@@ -47,6 +47,7 @@ export interface ICMSInfo {
   addStakeNotes: string[];
   extendStakeNotes: string[];
   renewStakeNotes: string[];
+  telegramBotId?: string;
   [key: string]: any;
 }
 
