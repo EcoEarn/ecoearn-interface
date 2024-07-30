@@ -129,6 +129,10 @@ export default function StakeCard({
     return formatNumber(divDecimals(earned, decimal));
   }, [decimal, earned]);
 
+  const displayEarnSymbol = useMemo(() => {
+    return formatTokenSymbol(earnedSymbol || '');
+  }, [earnedSymbol]);
+
   return (
     <div className="stake-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -147,7 +151,11 @@ export default function StakeCard({
           value={aprRange}
           tip="It indicates APR range obtained based on the different staking cycles. A longer cycle will bring a higher APR."
         />
-        <Description label="Earn" value={earnedSymbol || '--'} className="w-full lg:w-[140px]" />
+        <Description
+          label="Earn"
+          value={displayEarnSymbol || '--'}
+          className="w-full lg:w-[140px]"
+        />
         <Description
           className="w-full lg:w-[300px] items-start lg:items-end"
           label="Total Staked"
@@ -188,7 +196,7 @@ export default function StakeCard({
                 <div className="text-base font-semibold text-neutralTitle flex items-center gap-1">
                   <span>{earnAmountText}</span>
                   <span>
-                    <TextEllipsis text={earnedSymbol || ''} digits={10} />
+                    <TextEllipsis text={displayEarnSymbol || ''} digits={10} />
                   </span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">
@@ -221,7 +229,7 @@ export default function StakeCard({
                     <span>{stakedStr}</span>
                   </ToolTip>
                   <span>
-                    <TextEllipsis text={formatTokenSymbol(stakeSymbol || '') || ''} digits={10} />
+                    <TextEllipsis text={formatTokenSymbol(stakeSymbol || '')} digits={10} />
                   </span>
                 </div>
                 <div className="text-sm font-medium text-neutralTitle">

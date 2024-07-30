@@ -3,7 +3,7 @@ import { Flex } from 'antd';
 import CommonModal from 'components/CommonModal';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { formatTokenPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 import { ReactComponent as SuccessIcon } from 'assets/img/result-success-icon.svg';
 import { ReactComponent as ErrorIcon } from 'assets/img/result-error-icon.svg';
@@ -198,7 +198,9 @@ function ConfirmModal(props: IConfirmModalProps) {
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">You will claim </div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {`${formatTokenPrice(content?.amount || 0)} ${content?.tokenSymbol}`}
+            {`${formatTokenPrice(content?.amount || 0)} ${formatTokenSymbol(
+              content?.tokenSymbol || '',
+            )}`}
           </div>
           <div className="text-sm font-normal text-neutralSecondary mt-4">
             <span>{`The rewards you claim have a `}</span>
@@ -214,7 +216,9 @@ function ConfirmModal(props: IConfirmModalProps) {
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">You will withdraw</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {`${formatTokenPrice(content?.amount || 0)} ${content?.tokenSymbol}`}
+            {`${formatTokenPrice(content?.amount || 0)} ${formatTokenSymbol(
+              content?.tokenSymbol || '',
+            )}`}
           </div>
         </Flex>
       );
@@ -225,7 +229,9 @@ function ConfirmModal(props: IConfirmModalProps) {
             BigNumber(content?.oldAmount || 0).gt(ZERO) ? 'add staking for' : 'stake'
           }`}</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {`${formatTokenPrice(content?.amount || 0)} ${content?.tokenSymbol}`}
+            {`${formatTokenPrice(content?.amount || 0)} ${formatTokenSymbol(
+              content?.tokenSymbol || '',
+            )}`}
           </div>
           <Flex
             vertical
@@ -299,26 +305,31 @@ function ConfirmModal(props: IConfirmModalProps) {
         <Flex className="text-center" gap={16} vertical>
           <div className="text-xl font-medium text-neutralTitle">You will unlock</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
-            {formatTokenPrice(BigNumber(content?.amount || 0))} {content?.tokenSymbol}
+            {formatTokenPrice(BigNumber(content?.amount || 0))}{' '}
+            {formatTokenSymbol(content?.tokenSymbol || '')}
           </div>
           {BigNumber(content?.amountFromWallet || 0).gt(ZERO) &&
             BigNumber(content?.amountFromEarlyStake || 0).gt(ZERO) && (
               <>
                 <div className="text-sm font-normal text-neutralPrimary">
                   Unlock principal {formatTokenPrice(content?.amountFromWallet || 0)}{' '}
-                  {content?.tokenSymbol || ''} and reward{' '}
+                  {formatTokenSymbol(content?.tokenSymbol || '')} and reward{' '}
                   {formatTokenPrice(content?.amountFromEarlyStake || 0)}{' '}
-                  {content?.rewardsSymbol || ''}
+                  {formatTokenSymbol(content?.rewardsSymbol || '')}
                 </div>
               </>
             )}
           {BigNumber(content?.amountFromEarlyStake || 0).gt(ZERO) && (
             <div className="text-sm font-normal mt-4 text-neutralSecondary">
               {BigNumber(content?.amountFromWallet || 0).gt(ZERO)
-                ? `The unlocked amount includes the ${content?.tokenSymbol} rewards you staked early,
+                ? `The unlocked amount includes the ${formatTokenSymbol(
+                    content?.tokenSymbol || '',
+                  )} rewards you staked early,
                which will not be withdrawn to the wallet and will appear on the "Rewards" page after
                unlocking.`
-                : `The unlocked amount is your staked ${content?.tokenSymbol} rewards,
+                : `The unlocked amount is your staked ${formatTokenSymbol(
+                    content?.tokenSymbol || '',
+                  )} rewards,
                which will not be withdrawn to the wallet and will appear on the "Rewards" page after
                unlocking.`}
             </div>
@@ -385,7 +396,8 @@ function ConfirmModal(props: IConfirmModalProps) {
               <span>
                 <span> When unstaking, </span>
                 <span className="font-medium text-neutralTitle">
-                  {formatTokenPrice(content?.autoClaimAmount || 0)} {content?.rewardsSymbol}
+                  {formatTokenPrice(content?.autoClaimAmount || 0)}{' '}
+                  {formatTokenSymbol(content?.rewardsSymbol || '')}
                 </span>
                 <span> staking rewards will be automatically claimed.</span>
               </span>

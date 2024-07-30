@@ -1,7 +1,7 @@
 import { Flex } from 'antd';
 import CommonTooltip from 'components/CommonTooltip';
 import { useMemo } from 'react';
-import { formatNumber, formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatNumber, formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import { LiquidityListTypeEnum } from '../hooks/useLiquidityListService';
 import { Button, ToolTip } from 'aelf-design';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
@@ -67,6 +67,14 @@ export default function ItemCard({
     return `${formatNumber(tokenBAmount).toString()}`;
   }, [tokenBAmount]);
 
+  const formatTokenASymbol = useMemo(() => {
+    return formatTokenSymbol(tokenASymbol);
+  }, [tokenASymbol]);
+
+  const formatTokenBSymbol = useMemo(() => {
+    return formatTokenSymbol(tokenBSymbol);
+  }, [tokenBSymbol]);
+
   return (
     <section className="flex gap-8 flex-col bg-neutralWhiteBg border-[1px] px-4 py-6 border-neutralBorder rounded-[12px] border-solid text-base">
       <Flex justify="space-between" align="center">
@@ -119,8 +127,8 @@ export default function ItemCard({
         </Flex>
         <span className="text-neutralTitle flex gap-1 items-center truncate max-w-[118px]">
           <span>{amountOneText}</span>
-          <ToolTip title={tokenASymbol?.length > 6 ? tokenASymbol : ''}>
-            <span className="truncate">{tokenASymbol}</span>
+          <ToolTip title={formatTokenASymbol?.length > 6 ? formatTokenASymbol : ''}>
+            <span className="truncate">{formatTokenASymbol}</span>
           </ToolTip>
         </span>
       </Flex>
@@ -131,8 +139,8 @@ export default function ItemCard({
         </Flex>
         <span className="text-neutralTitle flex gap-1 items-center truncate max-w-[118px]">
           <span>{amountTwoText}</span>
-          <ToolTip title={tokenBSymbol?.length > 6 ? tokenBSymbol : ''}>
-            <span className="truncate">{tokenBSymbol}</span>
+          <ToolTip title={formatTokenBSymbol?.length > 6 ? formatTokenBSymbol : ''}>
+            <span className="truncate">{formatTokenBSymbol}</span>
           </ToolTip>
         </span>
       </Flex>

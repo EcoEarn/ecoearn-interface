@@ -41,9 +41,10 @@ export default function useEarlyStake() {
 
   const checkRewardsAmount = useCallback(
     async (poolType: PoolType) => {
-      const { pointsPoolAgg, tokenPoolAgg, lpPoolAgg, dappId } = await getPoolRewards({
-        address: wallet.address,
-      });
+      const { pointsPoolAgg, tokenPoolAgg, lpPoolAgg, dappId } =
+        (await getPoolRewards({
+          address: wallet.address,
+        })) || {};
 
       if (poolType === PoolType.POINTS) {
         const { frozen, withdrawable, decimal, claimInfos } = pointsPoolAgg || {};
@@ -53,9 +54,11 @@ export default function useEarlyStake() {
         );
         if (stakeTotal.gte(10)) {
           return {
-            amount: ZERO.plus(frozen).plus(withdrawable).toString(),
-            tokenName: pointsPoolAgg?.rewardsTokenName,
-            dappId,
+            amount: ZERO.plus(frozen || 0)
+              .plus(withdrawable || 0)
+              .toString(),
+            tokenName: pointsPoolAgg?.rewardsTokenName || '',
+            dappId: dappId || '',
             claimInfos: pointsPoolAgg?.claimInfos || [],
             claimIds: (pointsPoolAgg?.claimInfos || []).map((item) => {
               return item.claimId;
@@ -76,9 +79,11 @@ export default function useEarlyStake() {
         );
         if (stakeTotal.gte(10)) {
           return {
-            amount: ZERO.plus(frozen).plus(withdrawable).toString(),
-            tokenName: tokenPoolAgg?.rewardsTokenName,
-            dappId,
+            amount: ZERO.plus(frozen || 0)
+              .plus(withdrawable || 0)
+              .toString(),
+            tokenName: tokenPoolAgg?.rewardsTokenName || '',
+            dappId: dappId || '',
             claimInfos: tokenPoolAgg?.claimInfos || [],
             claimIds: (tokenPoolAgg?.claimInfos || []).map((item) => {
               return item.claimId;
@@ -99,9 +104,11 @@ export default function useEarlyStake() {
         );
         if (stakeTotal.gte(10)) {
           return {
-            amount: ZERO.plus(frozen).plus(withdrawable).toString(),
-            tokenName: lpPoolAgg.rewardsTokenName,
-            dappId,
+            amount: ZERO.plus(frozen || 0)
+              .plus(withdrawable || 0)
+              .toString(),
+            tokenName: lpPoolAgg?.rewardsTokenName || '',
+            dappId: dappId || '',
             claimInfos: lpPoolAgg?.claimInfos || [],
             claimIds: (lpPoolAgg?.claimInfos || []).map((item) => {
               return item.claimId;

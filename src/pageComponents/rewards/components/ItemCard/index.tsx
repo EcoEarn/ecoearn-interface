@@ -45,13 +45,6 @@ export default function ItemCard({
       <div>{renderSymbol}</div>
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
-          <span className="font-medium text-neutralSecondary">Stake Period</span>
-          <CommonTooltip title="Claimed rewards" className="ml-2" />
-        </Flex>
-        <span className="text-neutralTitle text-base font-semibold">30 Days</span>
-      </Flex>
-      <Flex className="text-base" justify="space-between" align="start">
-        <Flex align="center">
           <span className="font-medium text-neutralSecondary">Rewards</span>
           <CommonTooltip title="Claimed rewards" className="ml-2" />
         </Flex>
@@ -59,7 +52,7 @@ export default function ItemCard({
           <span className="text-neutralPrimary font-semibold">{`${formatTokenPrice(
             divDecimals(item.rewards, item.rewardsTokenDecimal || 8),
             { decimalPlaces: 2 },
-          )} ${item.rewardsToken}`}</span>
+          )} ${formatTokenSymbol(item.rewardsToken)}`}</span>
           <span className="text-neutralSecondary mt-1 font-medium">
             {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
               decimalPlaces: 2,

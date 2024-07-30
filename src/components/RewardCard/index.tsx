@@ -6,7 +6,7 @@ import { ZERO } from 'constants/index';
 import { useMemo } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { divDecimals } from 'utils/calculate';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 
 export interface IRewardCardProps {
@@ -45,15 +45,19 @@ export default function RewardCard({
   const { isLG, isSM } = useResponsive();
   const { isLogin } = useGetLoginStatus();
 
+  const formatRewardsSymbol = useMemo(() => {
+    return formatTokenSymbol(rewardsTokenSymbol);
+  }, [rewardsTokenSymbol]);
+
   const totalText = useMemo(() => {
     return !isLogin
       ? '--'
       : totalAmount
       ? `${formatTokenPrice(
           divDecimals(totalAmount, decimal || 8),
-        ).toString()} ${rewardsTokenSymbol}`
+        ).toString()} ${formatRewardsSymbol}`
       : '0.00';
-  }, [decimal, isLogin, rewardsTokenSymbol, totalAmount]);
+  }, [decimal, isLogin, formatRewardsSymbol, totalAmount]);
 
   const totalUsdText = useMemo(() => {
     return !isLogin
@@ -67,9 +71,9 @@ export default function RewardCard({
       : frozenAmount
       ? `${formatTokenPrice(
           divDecimals(frozenAmount, decimal || 8),
-        ).toString()} ${rewardsTokenSymbol}`
+        ).toString()} ${formatRewardsSymbol}`
       : '0.00';
-  }, [decimal, frozenAmount, isLogin, rewardsTokenSymbol]);
+  }, [decimal, frozenAmount, isLogin, formatRewardsSymbol]);
 
   const frozenUsdText = useMemo(() => {
     return !isLogin
@@ -83,9 +87,9 @@ export default function RewardCard({
       : claimableAmount
       ? `${formatTokenPrice(
           divDecimals(claimableAmount, decimal || 8),
-        ).toString()} ${rewardsTokenSymbol}`
+        ).toString()} ${formatRewardsSymbol}`
       : '0.00';
-  }, [claimableAmount, decimal, isLogin, rewardsTokenSymbol]);
+  }, [claimableAmount, decimal, isLogin, formatRewardsSymbol]);
 
   const claimableUsdText = useMemo(() => {
     return !isLogin
@@ -99,9 +103,9 @@ export default function RewardCard({
       : withdrawnAmount
       ? `${formatTokenPrice(
           divDecimals(withdrawnAmount, decimal || 8),
-        ).toString()} ${rewardsTokenSymbol}`
+        ).toString()} ${formatRewardsSymbol}`
       : '0.00';
-  }, [decimal, isLogin, rewardsTokenSymbol, withdrawnAmount]);
+  }, [decimal, isLogin, formatRewardsSymbol, withdrawnAmount]);
 
   const withdrawnUsdText = useMemo(() => {
     return !isLogin
@@ -132,14 +136,14 @@ export default function RewardCard({
       : stakeEarlyAmountNotEnough
       ? ZERO.plus(stakeEarlyTotal || 0).isZero()
         ? ''
-        : `Min staking 10 ${rewardsTokenSymbol}`
+        : `Min staking 10 ${formatRewardsSymbol}`
       : earlyStakedPoolIsUnLock
       ? 'Stake has expired, cannot be added stake.'
       : '';
   }, [
     earlyStakedPoolIsUnLock,
     isLogin,
-    rewardsTokenSymbol,
+    formatRewardsSymbol,
     stakeEarlyAmountNotEnough,
     stakeEarlyTotal,
   ]);
@@ -147,8 +151,8 @@ export default function RewardCard({
   const stakeEarlyAmount = useMemo(() => {
     return `${formatTokenPrice(
       BigNumber(divDecimals(earlyStakedAmount || 0, decimal || 8)),
-    ).toString()} ${rewardsTokenSymbol}`;
-  }, [decimal, earlyStakedAmount, rewardsTokenSymbol]);
+    ).toString()} ${formatRewardsSymbol}`;
+  }, [decimal, earlyStakedAmount, formatRewardsSymbol]);
 
   const stakeEarlyUsdAmount = useMemo(() => {
     return formatUSDPrice(

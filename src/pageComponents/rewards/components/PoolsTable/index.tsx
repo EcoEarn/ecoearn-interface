@@ -2,7 +2,7 @@ import { Pagination } from 'aelf-design';
 import { Flex, TableColumnsType } from 'antd';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { divDecimals } from 'utils/calculate';
 import { AELFDProvider } from 'aelf-design';
@@ -73,7 +73,7 @@ export default function PoolsTable({
               <span className="text-base text-neutralPrimary font-semibold">{`${formatTokenPrice(
                 divDecimals(text, item.rewardsTokenDecimal || 8),
                 { decimalPlaces: 2 },
-              )} ${item.rewardsToken}`}</span>
+              )} ${formatTokenSymbol(item.rewardsToken)}`}</span>
               <span className="text-sm text-neutralSecondary mt-2 font-medium">
                 {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
                   decimalPlaces: 2,

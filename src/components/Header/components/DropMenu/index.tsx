@@ -13,6 +13,7 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { OmittedType, addPrefixSuffix, getOmittedStr } from 'utils/addressFormatting';
 import { Flex } from 'antd';
 import CommonCopy from 'components/CommonCopy';
+import useTelegram from 'hooks/useTelegram';
 
 export enum DropMenuTypeEnum {
   My = 'my',
@@ -31,6 +32,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
   const { logout, wallet } = useWalletService();
   const { isLogin } = useGetLoginStatus();
   const { explorerUrl, curChain } = useGetCmsInfo() || {};
+  const { isInTelegram } = useTelegram();
 
   const fullAddress = useMemo(() => {
     return addPrefixSuffix(wallet.address, curChain);
@@ -110,8 +112,12 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
     label: string | ReactNode;
     href?: string;
   }> = useMemo(() => {
-    return type === DropMenuTypeEnum.My ? menuItemsMy : menuItems;
-  }, [menuItems, menuItemsMy, type]);
+    return type === DropMenuTypeEnum.My
+      ? isInTelegram()
+        ? menuItemsMy.slice(0, 2)
+        : menuItemsMy
+      : menuItems;
+  }, [isInTelegram, menuItems, menuItemsMy, type]);
 
   const onClickHandler = useCallback(
     (ele: IMenuItem) => {

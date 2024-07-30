@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { divDecimals } from 'utils/calculate';
-import { formatTokenPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol } from 'utils/format';
 
 export interface IRewardsModalProps {
   symbol: string;
@@ -67,7 +67,7 @@ export default NiceModal.create(function MiningRewardsModal({
       ? '--'
       : `${formatTokenPrice(
           divDecimals(nextReleaseAmount, decimal || 8),
-        ).toString()} ${rewardsSymbol}`;
+        ).toString()} ${formatTokenSymbol(rewardsSymbol)}`;
   }, [decimal, isLogin, nextReleaseAmount, rewardsSymbol]);
 
   const releaseTime = useMemo(() => {

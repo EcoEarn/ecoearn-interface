@@ -4,7 +4,12 @@ import { Flex } from 'antd';
 import clsx from 'clsx';
 import RateTag from 'components/RateTag';
 import TokenTextIcon from 'components/TokenTextIcon';
-import { formatTokenSymbol } from 'utils/format';
+import {
+  formatTokenSymbol,
+  isTokenSymbolNeedReverse,
+  orderPairTokens,
+  splitTokensFromPairSymbol,
+} from 'utils/format';
 import BigNumber from 'bignumber.js';
 import useResponsive from 'utils/useResponsive';
 import { ToolTip } from 'aelf-design';
@@ -42,23 +47,31 @@ const StakeToken = memo(
     symbolDigs,
   }: IStakeTokenProps) => {
     const { isLG } = useResponsive();
-    const symbolTextList = useMemo(
-      () =>
-        type === PoolTypeEnum.Lp
-          ? tokenName
-              ?.split(' ')?.[1]
-              ?.split('-')
-              ?.filter((item) => !BigNumber(item).isFinite()) || [tokenName]
-          : [tokenName],
-      [tokenName, type],
-    );
+
+    const symbolTextList = useMemo(() => {
+      if (type === PoolTypeEnum.Lp) {
+        const splitSymbol = tokenName?.split(' ');
+        if (splitSymbol && splitSymbol?.length > 1 && splitSymbol?.[0] === 'ALP') {
+          const pair = splitSymbol[1];
+          const tokens = splitTokensFromPairSymbol(pair);
+          return orderPairTokens(tokens?.[0], tokens?.[1]);
+        } else {
+          return [formatTokenSymbol(tokenName || '')];
+        }
+      }
+      return [formatTokenSymbol(tokenName || '')];
+    }, [tokenName, type]);
+
+    const isSymbolNeedReverse = useMemo(() => {
+      return isTokenSymbolNeedReverse(tokenName || '');
+    }, [tokenName]);
 
     const tokenIconList = useMemo(() => {
       if (type === PoolTypeEnum.Points) {
         return [];
       }
-      return icons?.length <= 0 ? symbolTextList : icons;
-    }, [icons, symbolTextList, type]);
+      return icons?.length <= 0 ? symbolTextList : isSymbolNeedReverse ? icons?.reverse() : icons;
+    }, [icons, isSymbolNeedReverse, symbolTextList, type]);
 
     const tokenNameText = useMemo(() => {
       return tokenName ? formatTokenSymbol(tokenName) || '' : '--';
@@ -90,7 +103,7 @@ const StakeToken = memo(
             )}
           >
             {tokenIconList.map((item, index) => {
-              const tokenName = symbolTextList[index];
+              const tokenName = symbolTextList?.[index];
               return (
                 <SkeletonImage
                   key={index}

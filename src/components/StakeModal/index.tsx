@@ -980,7 +980,9 @@ function StakeModal({
   ]);
 
   const rewardsStr = useMemo(() => {
-    return rewards ? `${formatTokenPrice(rewards).toString()} ${earnedSymbol}` : '--';
+    return rewards
+      ? `${formatTokenPrice(rewards).toString()} ${formatTokenSymbol(earnedSymbol || '')}`
+      : '--';
   }, [earnedSymbol, rewards]);
 
   const rewardsUsdStr = useMemo(() => {

@@ -7,7 +7,7 @@ import CommonTable from 'components/CommonTable';
 import { useMemo } from 'react';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { AELFDProvider, Button, ToolTip } from 'aelf-design';
-import { formatNumber, formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatNumber, formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import CommonTooltip from 'components/CommonTooltip';
 import LiquidityMobile from './LiquidityMobile';
 import OperationDrop from '../OperationDrop';
@@ -126,6 +126,7 @@ export default function LiquidityList() {
           </Flex>
         ),
         render: (text, item) => {
+          const formatSymbol = formatTokenSymbol(item.tokenASymbol);
           return (
             <div
               className={clsx(
@@ -134,8 +135,8 @@ export default function LiquidityList() {
               )}
             >
               {`${formatNumber(text).toString()}`}
-              <ToolTip title={item?.tokenASymbol?.length > 6 ? item.tokenASymbol : ''}>
-                <span className="flex-1 truncate">{item.tokenASymbol}</span>
+              <ToolTip title={formatSymbol?.length > 6 ? formatSymbol : ''}>
+                <span className="flex-1 truncate">{formatSymbol}</span>
               </ToolTip>
             </div>
           );
@@ -152,6 +153,7 @@ export default function LiquidityList() {
           </Flex>
         ),
         render: (text, item) => {
+          const formatSymbol = formatTokenSymbol(item.tokenBSymbol);
           return (
             <div
               className={clsx(
@@ -160,8 +162,8 @@ export default function LiquidityList() {
               )}
             >
               {`${formatNumber(text).toString()}`}
-              <ToolTip title={item?.tokenBSymbol?.length > 6 ? item.tokenBSymbol : ''}>
-                <span className="flex-1 truncate">{item.tokenBSymbol}</span>
+              <ToolTip title={formatSymbol?.length > 6 ? formatSymbol : ''}>
+                <span className="flex-1 truncate">{formatSymbol}</span>
               </ToolTip>
             </div>
           );
