@@ -1,6 +1,7 @@
 import { Flex } from 'antd';
 import { useMemo } from 'react';
 import { unitConverter } from 'utils/calculate';
+import { formatTokenSymbol } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 
 interface IPoolShareProps {
@@ -23,13 +24,21 @@ export default function PoolShare(props: IPoolShareProps) {
     return unitConverter(per2, 6);
   }, [per2]);
 
+  const formatLeftToken = useMemo(() => {
+    return formatTokenSymbol(leftToken);
+  }, [leftToken]);
+
+  const formatRightToken = useMemo(() => {
+    return formatTokenSymbol(rightToken);
+  }, [rightToken]);
+
   const per1Text = useMemo(() => {
-    return `${rightToken} Per ${leftToken}`;
-  }, [leftToken, rightToken]);
+    return `${formatRightToken} Per ${formatLeftToken}`;
+  }, [formatLeftToken, formatRightToken]);
 
   const per2Text = useMemo(() => {
-    return `${leftToken} Per ${rightToken}`;
-  }, [leftToken, rightToken]);
+    return `${formatLeftToken} Per ${formatRightToken}`;
+  }, [formatLeftToken, formatRightToken]);
 
   return (
     <>

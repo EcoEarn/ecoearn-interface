@@ -16,6 +16,7 @@ import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import WalletAndTokenInfo from 'utils/walletAndTokenInfo';
 import { useGetToken } from 'hooks/useGetToken';
+import VConsole from 'vconsole';
 
 const Layout = dynamic(async () => {
   const { useWebLogin, useCallContract } = await import('aelf-web-login').then((module) => module);
@@ -44,6 +45,12 @@ const Layout = dynamic(async () => {
         chainId: SupportedELFChainId.TDVW_NET,
         rpcUrl: cmsInfo?.rpcUrlTDVW,
       });
+
+    useEffect(() => {
+      if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') {
+        new VConsole();
+      }
+    }, []);
 
     useEffect(() => {
       const resize = () => {

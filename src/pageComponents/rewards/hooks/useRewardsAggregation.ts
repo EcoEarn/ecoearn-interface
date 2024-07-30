@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import StakeModal from 'components/StakeModalWithConfirm';
 import { useModal } from '@ebay/nice-modal-react';
 import { PoolType, StakeType } from 'types/stake';
-import { formatTokenPrice, formatUSDPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import BigNumber from 'bignumber.js';
 import { ConfirmModalTypeEnum, IWithDrawContent } from 'components/ConfirmModal';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
@@ -416,7 +416,7 @@ export default function useRewardsAggregation() {
       setConfirmModalType(ConfirmModalTypeEnum.WithDraw);
       setConfirmModalContent({
         amount: amount || 0,
-        tokenSymbol: symbol,
+        tokenSymbol: formatTokenSymbol(symbol),
       });
       setConfirmModalVisible(true);
     },
@@ -670,7 +670,7 @@ export default function useRewardsAggregation() {
     return {
       totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
       totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
-      rewardsTokenName,
+      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
     };
   }, [data?.pointsPoolAgg]);
 
@@ -679,7 +679,7 @@ export default function useRewardsAggregation() {
     return {
       totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
       totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
-      rewardsTokenName,
+      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
     };
   }, [data?.tokenPoolAgg]);
 
@@ -688,7 +688,7 @@ export default function useRewardsAggregation() {
     return {
       totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
       totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
-      rewardsTokenName,
+      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
     };
   }, [data?.lpPoolAgg]);
 
@@ -720,7 +720,7 @@ export default function useRewardsAggregation() {
     const { frozen, withdrawable, rewardsTokenName } = data?.pointsPoolAgg || {};
     return pointsEarlyStakeNotEnough
       ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking 10 ${rewardsTokenName}`
+        ? `Min staking 10 ${formatTokenSymbol(rewardsTokenName || '')}`
         : noStakeAmountTip
       : earlyStakedPoolIsUnLock
       ? stakeEarlyErrorTip
@@ -731,7 +731,7 @@ export default function useRewardsAggregation() {
     const { frozen, withdrawable, rewardsTokenName } = data?.tokenPoolAgg || {};
     return tokenEarlyStakeNotEnough
       ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking 10 ${rewardsTokenName}`
+        ? `Min staking 10 ${formatTokenSymbol(rewardsTokenName || '')}`
         : noStakeAmountTip
       : earlyStakedPoolIsUnLock
       ? stakeEarlyErrorTip
@@ -742,7 +742,7 @@ export default function useRewardsAggregation() {
     const { frozen, withdrawable, rewardsTokenName } = data?.lpPoolAgg || {};
     return lpEarlyStakeNotEnough
       ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking 10 ${rewardsTokenName}`
+        ? `Min staking 10 ${formatTokenSymbol(rewardsTokenName || '')}`
         : noStakeAmountTip
       : earlyStakedPoolIsUnLock
       ? stakeEarlyErrorTip

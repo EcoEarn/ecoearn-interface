@@ -89,6 +89,10 @@ export function PointsStakeItem({
     }
   }, [claimDisabled, isLogin, item.staked]);
 
+  const displayRewardsTokenName = useMemo(() => {
+    return formatTokenSymbol(item.rewardsTokenName);
+  }, [item.rewardsTokenName]);
+
   return (
     <div className="rounded-lg md:rounded-[24px] px-4 py-6 md:p-6 border-[1px] border-solid border-neutralBorder bg-white relative">
       <Flex
@@ -120,7 +124,7 @@ export function PointsStakeItem({
           </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
             <span className="mr-1">{dailyRewards}</span>{' '}
-            <TextEllipsis text={item.rewardsTokenName} />
+            <TextEllipsis text={displayRewardsTokenName} />
             <CommonTooltip
               title="It indicates monthly rewards obtained by staking 10,000 points."
               className="ml-1 fill-brandDefault"
@@ -141,7 +145,7 @@ export function PointsStakeItem({
         >
           Mining Pool Rewards / Day:
           <span className="text-neutralPrimary">
-            {poolDailyRewards} {item.rewardsTokenName}
+            {poolDailyRewards} {displayRewardsTokenName}
           </span>
         </Flex>
         <Flex

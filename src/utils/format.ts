@@ -213,12 +213,26 @@ export function durationFromNow(
 }
 
 export function formatTokenSymbol(symbol: string) {
-  if (!symbol) return;
+  if (!symbol || typeof symbol !== 'string') return symbol;
   const splitSymbol = symbol.split(' ');
   if (splitSymbol.length > 1 && splitSymbol[0] === 'ALP') {
-    return `${splitSymbol[1]} LP`;
+    const pair = splitSymbol[1];
+    const tokens = splitTokensFromPairSymbol(pair);
+    const orderedTokens = orderPairTokens(tokens?.[0], tokens?.[1]);
+    return orderedTokens ? `${orderedTokens[0]}-${orderedTokens[1]} LP` : `${pair} LP`;
   }
-  return symbol;
+  return formatSymbol(symbol);
+}
+
+export function isTokenSymbolNeedReverse(symbol: string) {
+  if (!symbol || typeof symbol !== 'string') return false;
+  const splitSymbol = symbol.split(' ');
+  if (splitSymbol.length > 1 && splitSymbol[0] === 'ALP') {
+    const pair = splitSymbol[1];
+    const tokens = splitTokensFromPairSymbol(pair);
+    return tokens.length > 1 ? getTokenWeights(tokens?.[0]) > getTokenWeights(tokens?.[1]) : false;
+  }
+  return false;
 }
 
 export function getTargetClaimTime(time: string | number) {
@@ -260,18 +274,31 @@ export function getTokenWeights(symbol?: string): number {
   return tokenWeights[symbol] || 1;
 }
 
-export function orderPairTokens(
-  tokenA: {
-    symbol: string;
-    [key: string]: any;
-  },
-  tokenB: {
-    symbol: string;
-    [key: string]: any;
-  },
-) {
-  const defaultRes = [tokenA, tokenB];
-  const tokenAWeight = getTokenWeights(tokenA.symbol);
-  const tokenBWeight = getTokenWeights(tokenB.symbol);
-  return tokenAWeight >= tokenBWeight ? defaultRes : defaultRes.reverse();
+export function orderPairTokens(tokenA: string, tokenB: string) {
+  if (!tokenA || !tokenB) return;
+  const defaultRes = [formatSymbol(tokenA), formatSymbol(tokenB)];
+  const tokenAWeight = getTokenWeights(tokenA);
+  const tokenBWeight = getTokenWeights(tokenB);
+  return tokenAWeight <= tokenBWeight ? defaultRes : defaultRes.reverse();
+}
+
+export const SYMBOL_FORMAT_MAP: Record<string, string> = {
+  'SGR-1': 'SGR',
+};
+
+export const formatSymbol = (symbol = '') => {
+  if (SYMBOL_FORMAT_MAP[symbol]) return SYMBOL_FORMAT_MAP[symbol];
+  return symbol;
+};
+
+export function splitTokensFromPairSymbol(str: string) {
+  if (!str || typeof str !== 'string') return [];
+  const pattern = /^([A-Za-z]+(?:-[0-9]+)?)-([A-Za-z]+(?:-[0-9]+)?)$/;
+  const match = str.match(pattern);
+
+  if (match) {
+    return [match[1], match[2]];
+  } else {
+    return [];
+  }
 }

@@ -2,7 +2,7 @@ import { Flex } from 'antd';
 import RateTag from 'components/RateTag';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { useMemo } from 'react';
-import { formatTokenPrice } from 'utils/format';
+import { formatTokenPrice, formatTokenSymbol } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 
 interface IPositionProps {
@@ -38,6 +38,14 @@ export default function Position(props: IPositionProps) {
     return formatTokenPrice(lpBalance || 0, { decimalPlaces: 6, minValue: 0.000001 }).toString();
   }, [lpBalance]);
 
+  const formatTokenAName = useMemo(() => {
+    return formatTokenSymbol(tokenAName);
+  }, [tokenAName]);
+
+  const formatTokenBName = useMemo(() => {
+    return formatTokenSymbol(tokenBName);
+  }, [tokenBName]);
+
   return (
     <>
       <Flex justify="space-between" vertical={isLG} gap={8}>
@@ -69,7 +77,7 @@ export default function Position(props: IPositionProps) {
           justify={isLG ? 'space-between' : 'start'}
         >
           <span className="text-lg font-medium text-neutralTitle">{tokenAValue}</span>
-          <span className="text-sm font-normal text-neutralTertiary">{tokenAName}</span>
+          <span className="text-sm font-normal text-neutralTertiary">{formatTokenAName}</span>
         </Flex>
         <Flex
           className="flex-row-reverse lg:flex-col"
@@ -78,7 +86,7 @@ export default function Position(props: IPositionProps) {
           justify={isLG ? 'space-between' : 'start'}
         >
           <span className="text-lg font-medium text-neutralTitle">{tokenBValue}</span>
-          <span className="text-sm font-normal text-neutralTertiary">{tokenBName}</span>
+          <span className="text-sm font-normal text-neutralTertiary">{formatTokenBName}</span>
         </Flex>
         <Flex
           className="flex-row-reverse lg:flex-col"
