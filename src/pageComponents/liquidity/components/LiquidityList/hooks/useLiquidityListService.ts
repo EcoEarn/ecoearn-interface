@@ -18,11 +18,11 @@ import AddLiquidityModal from 'components/AddLiquidityModal';
 import RemoveLiquidityModal from 'components/RemoveLiquidityModal';
 import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
 import { ZERO } from 'constants/index';
-import { StakeLiquidity } from 'contract/rewards';
 import dayjs from 'dayjs';
 import { TFeeType } from 'hooks/useGetAwakenContract';
 import useLoading from 'hooks/useLoading';
 import usePair from 'hooks/usePair';
+import useStakeConfig from 'hooks/useStakeConfig';
 import useToken from 'hooks/useToken';
 import { useWalletService } from 'hooks/useWallet';
 import { max } from 'lodash-es';
@@ -62,6 +62,7 @@ export default function useLiquidityListService() {
   const { wallet, walletType } = useWalletService();
   const stakeModal = useModal(StakeModalWithConfirm);
   const router = useRouter();
+  const { min } = useStakeConfig();
 
   const { data: rewardsData } = useRequest(
     async () => {
@@ -143,8 +144,8 @@ export default function useLiquidityListService() {
   }, [rewardsData?.pointsPoolAgg?.decimal, totalEarlyStakeAmount]);
 
   const totalStakeAmountNotEnough = useMemo(() => {
-    return BigNumber(totalStakeAmount).lt(10);
-  }, [totalStakeAmount]);
+    return BigNumber(totalStakeAmount).lt(min);
+  }, [min, totalStakeAmount]);
 
   console.log('=====totalStakeAmountNotEnough', totalStakeAmountNotEnough);
 
@@ -182,14 +183,14 @@ export default function useLiquidityListService() {
       const bigValue = BigNumber(totalStakeAmount || 0);
       return bigValue.isZero()
         ? 'You currently have no SGR rewards available for adding liquidity.'
-        : bigValue.lt(10)
-        ? 'The reward amount for adding liquidity can not be less than 10 SGR.'
+        : bigValue.lt(min)
+        ? `The reward amount for adding liquidity can not be less than ${min} SGR.`
         : !BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
           dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs())
         ? 'Your staking has expired and cannot be added. Please proceed to "Farms(LP Staking)" for renewal.'
         : '';
     },
-    [earlyStakeInfos, totalStakeAmount],
+    [earlyStakeInfos, min, totalStakeAmount],
   );
 
   const getStakeBtnTip = useCallback(
