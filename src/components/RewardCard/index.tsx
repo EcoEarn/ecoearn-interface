@@ -3,6 +3,7 @@ import { Flex } from 'antd';
 import BigNumber from 'bignumber.js';
 import CommonTooltip from 'components/CommonTooltip';
 import { ZERO } from 'constants/index';
+import useStakeConfig from 'hooks/useStakeConfig';
 import { useMemo } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { divDecimals } from 'utils/calculate';
@@ -44,6 +45,7 @@ export default function RewardCard({
 }: IRewardCardProps) {
   const { isLG, isSM } = useResponsive();
   const { isLogin } = useGetLoginStatus();
+  const { min } = useStakeConfig();
 
   const formatRewardsSymbol = useMemo(() => {
     return formatTokenSymbol(rewardsTokenSymbol);
@@ -123,8 +125,8 @@ export default function RewardCard({
   }, [claimableAmount, decimal, frozenAmount]);
 
   const stakeEarlyAmountNotEnough = useMemo(() => {
-    return ZERO.plus(stakeEarlyTotal).lte(10);
-  }, [stakeEarlyTotal]);
+    return ZERO.plus(stakeEarlyTotal).lte(min);
+  }, [min, stakeEarlyTotal]);
 
   const stakeEarlyDisabled = useMemo(() => {
     return !isLogin || stakeEarlyAmountNotEnough || earlyStakedPoolIsUnLock;
@@ -136,16 +138,17 @@ export default function RewardCard({
       : stakeEarlyAmountNotEnough
       ? ZERO.plus(stakeEarlyTotal || 0).isZero()
         ? ''
-        : `Min staking 10 ${formatRewardsSymbol}`
+        : `Min staking ${min} ${formatRewardsSymbol}`
       : earlyStakedPoolIsUnLock
       ? 'Stake has expired, cannot be added stake.'
       : '';
   }, [
-    earlyStakedPoolIsUnLock,
     isLogin,
-    formatRewardsSymbol,
     stakeEarlyAmountNotEnough,
     stakeEarlyTotal,
+    min,
+    formatRewardsSymbol,
+    earlyStakedPoolIsUnLock,
   ]);
 
   const stakeEarlyAmount = useMemo(() => {

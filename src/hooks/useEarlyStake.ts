@@ -1,5 +1,5 @@
 import { cancelSign, earlyStakeSign, getEarlyStakeInfo, getPoolRewards } from 'api/request';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { PoolType, StakeType } from 'types/stake';
 import { useWalletService } from './useWallet';
 import useLoading from './useLoading';
@@ -18,10 +18,9 @@ import { ISendResult } from 'types';
 import getBalanceTip from 'utils/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { matchErrorMsg } from 'utils/formatError';
+import useStakeConfig from './useStakeConfig';
 
 const noAmountErrorTip = 'No amount available for staking. Please try again later.';
-const amountNotEnoughErrorTip =
-  'Insufficient balance for early staking; a minimum of 10 SGR is required. Your current reward is being processed on the blockchain, please try again later.';
 const poolIsUnlockedError =
   'Your staking has expired and cannot be added. Please proceed to "Simple Staking" for renewal.';
 
@@ -38,6 +37,13 @@ export default function useEarlyStake() {
   const { curChain, caContractAddress, rewardsContractAddress } = useGetCmsInfo() || {};
   const config = useGetCmsInfo();
   const stakeModal = useModal(StakeModalWithConfirm);
+  const { min } = useStakeConfig();
+
+  const amountNotEnoughErrorTip = useMemo(
+    () =>
+      `Insufficient balance for early staking; a minimum of ${min} SGR is required. Your current reward is being processed on the blockchain, please try again later.`,
+    [min],
+  );
 
   const checkRewardsAmount = useCallback(
     async (poolType: PoolType) => {
@@ -52,7 +58,7 @@ export default function useEarlyStake() {
           ZERO.plus(frozen || 0).plus(withdrawable || 0),
           decimal || 8,
         );
-        if (stakeTotal.gte(10)) {
+        if (stakeTotal.gte(min)) {
           return {
             amount: ZERO.plus(frozen || 0)
               .plus(withdrawable || 0)
@@ -77,7 +83,7 @@ export default function useEarlyStake() {
           ZERO.plus(frozen || 0).plus(withdrawable || 0),
           decimal || 8,
         );
-        if (stakeTotal.gte(10)) {
+        if (stakeTotal.gte(min)) {
           return {
             amount: ZERO.plus(frozen || 0)
               .plus(withdrawable || 0)
@@ -102,7 +108,7 @@ export default function useEarlyStake() {
           ZERO.plus(frozen || 0).plus(withdrawable || 0),
           decimal || 8,
         );
-        if (stakeTotal.gte(10)) {
+        if (stakeTotal.gte(min)) {
           return {
             amount: ZERO.plus(frozen || 0)
               .plus(withdrawable || 0)
@@ -122,7 +128,7 @@ export default function useEarlyStake() {
         throw Error(stakeTotal.isZero() ? noAmountErrorTip : amountNotEnoughErrorTip);
       }
     },
-    [wallet.address],
+    [amountNotEnoughErrorTip, min, wallet.address],
   );
 
   const stake = useCallback(

@@ -48,6 +48,7 @@ export interface ICMSInfo {
   extendStakeNotes: string[];
   renewStakeNotes: string[];
   telegramBotId?: string;
+  minStakeAmount?: string | number;
   [key: string]: any;
 }
 

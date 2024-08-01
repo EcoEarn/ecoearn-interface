@@ -6,12 +6,7 @@ import DaysSelect from 'components/DaysSelect';
 import ViewItem from 'components/ViewItem';
 import { Form } from 'antd';
 import { ZERO, DEFAULT_DATE_FORMAT } from 'constants/index';
-import {
-  MIN_STAKE_AMOUNT,
-  MIN_STAKE_PERIOD,
-  MAX_STAKE_PERIOD,
-  ONE_DAY_IN_SECONDS,
-} from 'constants/stake';
+import { MIN_STAKE_PERIOD, MAX_STAKE_PERIOD, ONE_DAY_IN_SECONDS } from 'constants/stake';
 import { RightOutlined } from '@ant-design/icons';
 import style from './style.module.css';
 import dayjs from 'dayjs';
@@ -29,6 +24,7 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { getTotalStakedWithAdd, getOwnerAprK, divDecimals, timesDecimals } from 'utils/calculate';
 import RateTag from 'components/RateTag';
 import BigNumber from 'bignumber.js';
+import useStakeConfig from 'hooks/useStakeConfig';
 
 const FormItem = Form.Item;
 const { Title, Text } = Typography;
@@ -59,7 +55,6 @@ interface IStakeModalProps {
   visible: boolean;
   balance?: string;
   noteList?: Array<string>;
-  min?: number; // min balance
   stakeData: IStakePoolData;
   onConfirm?: (amount: string, period: string) => void;
   onClose?: () => void;
@@ -81,7 +76,6 @@ function StakeModal({
   customAmountModule,
   balance,
   noteList,
-  min = MIN_STAKE_AMOUNT,
   stakeData,
   onClose,
   onConfirm,
@@ -109,6 +103,7 @@ function StakeModal({
   const [period, setPeriod] = useState('');
   const [totalStaked, setTotalStaked] = useState<string>();
   const { getAprK, getAprKAve } = useAPRK();
+  const { min } = useStakeConfig();
 
   const typeIsExtend = useMemo(() => type === StakeType.EXTEND, [type]);
   const typeIsStake = useMemo(() => type === StakeType.STAKE, [type]);
