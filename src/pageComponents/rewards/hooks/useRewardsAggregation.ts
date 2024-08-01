@@ -30,6 +30,7 @@ import getBalanceTip from 'utils/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { matchErrorMsg } from 'utils/formatError';
 import { message } from 'antd';
+import useStakeConfig from 'hooks/useStakeConfig';
 
 const stakeEarlyErrorTip =
   'Stake has expired, cannot be added stake. Please renew the staking first.';
@@ -58,6 +59,7 @@ export default function useRewardsAggregation() {
   const { curChain, caContractAddress, rewardsContractAddress } = useGetCmsInfo() || {};
   const config = useGetCmsInfo();
   const rewardsDetailModal = useModal(MiningRewardsModal);
+  const { min } = useStakeConfig();
 
   const earlyStakedPoolIsUnLock = useMemo(() => {
     if (earlyStakeData?.staked && !BigNumber(earlyStakeData?.staked).isZero()) {
@@ -72,8 +74,8 @@ export default function useRewardsAggregation() {
     return divDecimals(
       ZERO.plus(frozen || 0).plus(withdrawable || 0),
       data?.pointsPoolAgg?.decimal,
-    ).lt(10);
-  }, [data?.pointsPoolAgg]);
+    ).lt(min);
+  }, [data?.pointsPoolAgg, min]);
 
   const pointsEarlyStakeDisabled = useMemo(() => {
     return !earlyStakeData || pointsEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
@@ -84,8 +86,8 @@ export default function useRewardsAggregation() {
     return divDecimals(
       ZERO.plus(frozen || 0).plus(withdrawable || 0),
       data?.tokenPoolAgg?.decimal,
-    ).lt(10);
-  }, [data?.tokenPoolAgg]);
+    ).lt(min);
+  }, [data?.tokenPoolAgg, min]);
 
   const tokenEarlyStakeDisabled = useMemo(() => {
     return !earlyStakeData || tokenEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
@@ -94,9 +96,9 @@ export default function useRewardsAggregation() {
   const lpEarlyStakeNotEnough = useMemo(() => {
     const { frozen, withdrawable } = data?.lpPoolAgg || {};
     return divDecimals(ZERO.plus(frozen || 0).plus(withdrawable || 0), data?.lpPoolAgg?.decimal).lt(
-      10,
+      min,
     );
-  }, [data?.lpPoolAgg]);
+  }, [data?.lpPoolAgg, min]);
 
   const lpEarlyStakeDisabled = useMemo(() => {
     return !earlyStakeData || lpEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
@@ -720,34 +722,34 @@ export default function useRewardsAggregation() {
     const { frozen, withdrawable, rewardsTokenName } = data?.pointsPoolAgg || {};
     return pointsEarlyStakeNotEnough
       ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking 10 ${formatTokenSymbol(rewardsTokenName || '')}`
+        ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
         : noStakeAmountTip
       : earlyStakedPoolIsUnLock
       ? stakeEarlyErrorTip
       : undefined;
-  }, [data?.pointsPoolAgg, earlyStakedPoolIsUnLock, pointsEarlyStakeNotEnough]);
+  }, [data?.pointsPoolAgg, earlyStakedPoolIsUnLock, min, pointsEarlyStakeNotEnough]);
 
   const tokenStakeDisabledTip = useMemo(() => {
     const { frozen, withdrawable, rewardsTokenName } = data?.tokenPoolAgg || {};
     return tokenEarlyStakeNotEnough
       ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking 10 ${formatTokenSymbol(rewardsTokenName || '')}`
+        ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
         : noStakeAmountTip
       : earlyStakedPoolIsUnLock
       ? stakeEarlyErrorTip
       : undefined;
-  }, [data?.tokenPoolAgg, earlyStakedPoolIsUnLock, tokenEarlyStakeNotEnough]);
+  }, [data?.tokenPoolAgg, earlyStakedPoolIsUnLock, min, tokenEarlyStakeNotEnough]);
 
   const lpStakeDisabledTip = useMemo(() => {
     const { frozen, withdrawable, rewardsTokenName } = data?.lpPoolAgg || {};
     return lpEarlyStakeNotEnough
       ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking 10 ${formatTokenSymbol(rewardsTokenName || '')}`
+        ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
         : noStakeAmountTip
       : earlyStakedPoolIsUnLock
       ? stakeEarlyErrorTip
       : undefined;
-  }, [data?.lpPoolAgg, earlyStakedPoolIsUnLock, lpEarlyStakeNotEnough]);
+  }, [data?.lpPoolAgg, earlyStakedPoolIsUnLock, lpEarlyStakeNotEnough, min]);
 
   return {
     data,
