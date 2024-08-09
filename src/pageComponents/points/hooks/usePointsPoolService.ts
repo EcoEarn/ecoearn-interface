@@ -91,6 +91,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     },
     {
       manual: true,
+      refreshDeps: [dappId],
     },
   );
 
