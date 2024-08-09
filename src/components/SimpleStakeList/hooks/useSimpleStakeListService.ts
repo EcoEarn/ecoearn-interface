@@ -105,17 +105,27 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
 
   const onClaim = useCallback(
     (stakeData: IStakePoolData) => {
-      const { earnedSymbol = '--', stakeId, earned, decimal, releasePeriod, poolId } = stakeData;
+      const {
+        earnedSymbol = '--',
+        stakeId,
+        earned,
+        decimal,
+        releasePeriod,
+        poolId,
+        supportEarlyStake,
+      } = stakeData;
       claimModal.show({
         amount: earned,
         tokenSymbol: earnedSymbol,
         decimal,
         poolId: String(poolId) || '',
         releasePeriod,
+        supportEarlyStake,
         onSuccess: () => getStakeData(),
         onEarlyStake: () => {
           earlyStake({
             poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
+            rewardsTokenName: earnedSymbol,
             onSuccess: () => {
               claimModal.remove();
             },
@@ -137,6 +147,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         poolId = '',
         decimal,
         releasePeriod,
+        supportEarlyStake,
       } = stakeData;
       if (!stakeId || !poolId) {
         singleMessage.error('missing params');
@@ -167,10 +178,12 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           rewardsSymbol: earnedSymbol,
           poolId,
           releasePeriod,
+          supportEarlyStake,
           onSuccess: () => getStakeData(),
           onEarlyStake: () => {
             earlyStake({
               poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
+              rewardsTokenName: earnedSymbol,
               onSuccess: () => {
                 unlockModal.remove();
               },

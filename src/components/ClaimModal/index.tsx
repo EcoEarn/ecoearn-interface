@@ -14,6 +14,7 @@ interface IClaimModalProps {
   tokenSymbol: string;
   decimal: number;
   poolId: string;
+  supportEarlyStake: boolean;
   onStake: (amount: number | string, period: number | string) => Promise<ISendResult>;
   onSuccess?: () => void;
   onEarlyStake?: () => void;
@@ -26,6 +27,7 @@ function ClaimModal({
   poolId,
   onSuccess,
   releasePeriod,
+  supportEarlyStake,
   onEarlyStake,
 }: IClaimModalProps) {
   const modal = useModal();
@@ -66,7 +68,12 @@ function ClaimModal({
       status={status}
       loading={loading}
       errorTip={errorTip}
-      content={{ amount: divDecimals(amount, decimal).toFixed(2), tokenSymbol, releasePeriod }}
+      content={{
+        amount: divDecimals(amount, decimal).toFixed(2),
+        tokenSymbol,
+        releasePeriod,
+        supportEarlyStake,
+      }}
       onClose={onClose}
       afterClose={() => {
         modal.remove();

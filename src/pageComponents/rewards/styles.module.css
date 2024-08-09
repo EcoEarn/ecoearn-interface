@@ -1,0 +1,39 @@
+.segmented {
+  background: none;
+  @apply border-neutralBorder rounded-lg p-1 border-[1px] border-solid;
+  :global{
+    .earn-segmented-group{
+      @apply gap-1;
+    }
+    .earn-segmented-item {
+      @apply min-w-[164px] rounded-md flex justify-center items-center font-medium text-base h-[40px];
+    }
+    .earn-segmented-item-selected {
+      @apply font-semibold;
+    }
+  }
+}
+
+.select {
+  @apply min-w-[164px] h-[48px];
+  :global{
+    .earn-select-selector{
+      @apply rounded-lg border-neutralDivider;
+    }
+    .earn-select-selection-item{
+      @apply text-base font-medium text-neutralTitle;
+    }
+  }
+}
+
+.selectOverlay {
+  @apply rounded-lg p-0 min-w-[164px] border-neutralDivider bg-neutralWhiteBg border-[1px] border-solid shadow-none;
+  :global{
+    .earn-select-item {
+      @apply py-3 px-4 text-base text-neutralPrimary font-medium;
+    }
+    .earn-select-item-option-selected {
+      @apply !bg-[#fafafa];
+    }
+  }
+}

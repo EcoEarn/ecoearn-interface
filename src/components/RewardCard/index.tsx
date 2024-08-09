@@ -24,6 +24,7 @@ export interface IRewardCardProps {
   earlyStakedAmountInUsd: string | number;
   earlyStakedPoolIsUnLock: boolean;
   decimal: number;
+  showEarlyStake: boolean;
   onEarlyStake: () => void;
 }
 
@@ -41,6 +42,7 @@ export default function RewardCard({
   earlyStakedAmountInUsd,
   earlyStakedPoolIsUnLock,
   decimal,
+  showEarlyStake: showEarlyStakeBtn,
   onEarlyStake,
 }: IRewardCardProps) {
   const { isLG, isSM } = useResponsive();
@@ -235,24 +237,26 @@ export default function RewardCard({
               </div>
             </Flex>
           </Flex>
-          <Flex align="center">
-            <ToolTip title={stakeEarlyTip}>
-              <Button
-                className="gap-2 !rounded-md"
-                block
-                type="primary"
-                size="medium"
-                disabled={stakeEarlyDisabled}
-                onClick={onEarlyStake}
-              >
-                <span>Stake early</span>
-                <CommonTooltip
-                  className="fill-white"
-                  title="Rewards earned from staking can be staked directly, without being withdrawn to the wallet, including frozen and withdrawable rewards."
-                />
-              </Button>
-            </ToolTip>
-          </Flex>
+          {showEarlyStakeBtn && (
+            <Flex align="center">
+              <ToolTip title={stakeEarlyTip}>
+                <Button
+                  className="gap-2 !rounded-md"
+                  block
+                  type="primary"
+                  size="medium"
+                  disabled={stakeEarlyDisabled}
+                  onClick={onEarlyStake}
+                >
+                  <span>Stake early</span>
+                  <CommonTooltip
+                    className="fill-white"
+                    title="Rewards earned from staking can be staked directly, without being withdrawn to the wallet, including frozen and withdrawable rewards."
+                  />
+                </Button>
+              </ToolTip>
+            </Flex>
+          )}
         </Flex>
         {showEarlyStake && (
           <Flex

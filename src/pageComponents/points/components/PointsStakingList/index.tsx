@@ -11,13 +11,11 @@ import ConfirmModal, { ConfirmModalTypeEnum } from '../../../../components/Confi
 import usePointsPoolService, {
   ListTypeEnum,
 } from 'pageComponents/points/hooks/usePointsPoolService';
-import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
 import Empty from 'components/Empty';
 import { ZERO } from 'constants/index';
 import CommonTooltip from 'components/CommonTooltip';
-import { PoolType } from 'types/stake';
 import { useRouter } from 'next/navigation';
 import TextEllipsis from 'components/TextEllipsis';
 
@@ -32,7 +30,7 @@ export function PointsStakeItem({
   onClaim: (item: IPointsPoolItem) => void;
   showHighYieldTag?: boolean;
 }) {
-  const { isLG, isXL, isMD, width } = useResponsive();
+  const { isMD, width } = useResponsive();
   const { isLogin } = useGetLoginStatus();
 
   const handleClaim = useCallback(() => {
@@ -213,7 +211,7 @@ export function PointsStakeItem({
   );
 }
 
-export default function PointsStakingList() {
+export default function PointsStakingList({ dappName }: { dappName: string }) {
   const {
     currentList,
     data,
@@ -233,7 +231,7 @@ export default function PointsStakingList() {
     segmentedOptions,
     handleClaim,
     handleGain,
-  } = usePointsPoolService();
+  } = usePointsPoolService({ dappName });
   const router = useRouter();
 
   return (
@@ -256,7 +254,9 @@ export default function PointsStakingList() {
         }}
         onConfirm={handleConfirm}
         transactionId={transactionId}
-        onEarlyStake={handleEarlyStake}
+        onEarlyStake={() => {
+          handleEarlyStake(curItem?.rewardsTokenName || '');
+        }}
         onGoRewards={() => {
           setModalVisible(false);
           router.push('/rewards');

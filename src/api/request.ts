@@ -1,6 +1,7 @@
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import request, { awakenRequest, cmsRequest, tokenRequest } from './axios';
 import qs from 'qs';
+import { PoolType } from 'types/stake';
 
 export const fetchToken = async (data: ITokenParams) => {
   return tokenRequest.post<
@@ -60,7 +61,10 @@ export const pointsStakingState = async (data: ICreateTradeParams): Promise<stri
   return request.post('/app/points/staking/stake', data);
 };
 
-export const getPoolRewards = async (data: { address: string }): Promise<IPoolRewardsData> => {
+export const getPoolRewards = async (data: {
+  address: string;
+  poolType: PoolType;
+}): Promise<Array<IPoolRewardsItem>> => {
   return request.post('/app/rewards/aggregation', data);
 };
 
@@ -70,7 +74,7 @@ export const getRewardsList = async (data: IRewardListParams): Promise<IRewardLi
 
 export const getEarlyStakeInfo = async (
   data: IGetEarlyStakeInfoParams,
-): Promise<IEarlyStakeInfo> => {
+): Promise<Array<IEarlyStakeInfo>> => {
   return request.post('/app/points/staking/early/stake/info', data);
 };
 
@@ -155,4 +159,8 @@ export const liquidityRemove = async (
   data: IAddLiquidityParams,
 ): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/remove/liquidity', data);
+};
+
+export const getRewardsType = async (): Promise<any> => {
+  return request.get('/app/rewards/filter/items');
 };

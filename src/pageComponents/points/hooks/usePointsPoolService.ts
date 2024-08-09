@@ -3,14 +3,13 @@ import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
 import { useRequest } from 'ahooks';
 import { message } from 'antd';
 import { getPointsPoolList, pointsClaim, stakingClaim } from 'api/request';
+import useDappList from 'hooks/useDappList';
 import useEarlyStake from 'hooks/useEarlyStake';
 import useLoading from 'hooks/useLoading';
-import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useWalletService } from 'hooks/useWallet';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { ICMSInfo } from 'redux/types/reducerTypes';
-import { ISendResult } from 'types';
 import { PoolType } from 'types/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { timesDecimals } from 'utils/calculate';
@@ -23,13 +22,11 @@ export enum ListTypeEnum {
   All = 'All',
 }
 
-export default function usePointsPoolService() {
+export default function usePointsPoolService({ dappName }: { dappName: string }) {
   const [currentList, setCurrentList] = useState<ListTypeEnum>(ListTypeEnum.All);
   const { showLoading, closeLoading } = useLoading();
   const { wallet, walletType } = useWalletService();
   const { pointsContractAddress, curChain, caContractAddress, ...config } = useGetCmsInfo() || {};
-  const { isLogin } = useGetLoginStatus();
-  const { checkLogin } = useCheckLoginAndToken();
   const { isLG } = useResponsive();
   const { schrodingerUrl } = useGetCmsInfo() || {};
   const [loading, setLoading] = useState(false);
@@ -39,11 +36,16 @@ export default function usePointsPoolService() {
   const [transactionId, setTransactionId] = useState<string>();
   const [errorTip, setErrorTip] = useState('');
   const { stake } = useEarlyStake();
+  const { dappList } = useDappList();
 
   const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
     { label: 'All', value: ListTypeEnum.All },
     { label: 'Staked', value: ListTypeEnum.Staked },
   ];
+
+  const dappId = useMemo(() => {
+    return dappList?.filter((item) => item?.dappName === dappName)?.[0]?.dappId || '';
+  }, [dappList, dappName]);
 
   const handleSegmentChange = useCallback(
     (value: string) => {
@@ -84,6 +86,7 @@ export default function usePointsPoolService() {
         skipCount: 0,
         maxResultCount: 20,
         address: wallet.address || '',
+        dappId: dappId || '',
       });
     },
     {
@@ -183,14 +186,18 @@ export default function usePointsPoolService() {
     }
   }, [curItem, onClaim]);
 
-  const handleEarlyStake = useCallback(async () => {
-    await stake({
-      poolType: PoolType.POINTS,
-      onSuccess: () => {
-        setModalVisible(false);
-      },
-    });
-  }, [stake]);
+  const handleEarlyStake = useCallback(
+    async (tokenName: string) => {
+      await stake({
+        poolType: PoolType.POINTS,
+        rewardsTokenName: tokenName,
+        onSuccess: () => {
+          setModalVisible(false);
+        },
+      });
+    },
+    [stake],
+  );
 
   useEffect(() => {
     currentList && run();

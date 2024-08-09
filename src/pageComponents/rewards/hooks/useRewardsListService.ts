@@ -4,7 +4,11 @@ import { useWalletService } from 'hooks/useWallet';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 
-export default function useRewardsListService() {
+export default function useRewardsListService({
+  rewardsTypeList,
+}: {
+  rewardsTypeList: Array<IRewardsTypeItem>;
+}) {
   const [dataList, setDataList] = useState<Array<IRewardListItem>>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -15,19 +19,21 @@ export default function useRewardsListService() {
   const { wallet } = useWalletService();
   const { showLoading, closeLoading } = useLoading();
   const [hasHistoryData, setHasHistoryData] = useState(false);
+  const [rewardsTypeId, setRewardsTypeId] = useState('');
 
-  const searchParams = useMemo(() => {
+  const searchParams: IRewardListParams = useMemo(() => {
     const params = {
       poolType,
       skipCount: page === 1 ? 0 : (page - 1) * pageSize,
       maxResultCount: pageSize,
       address: wallet.address || '',
+      id: rewardsTypeId || (poolType === 'All' ? 'all' : ''),
     };
     return params;
-  }, [page, pageSize, poolType, wallet.address]);
+  }, [page, pageSize, poolType, rewardsTypeId, wallet.address]);
 
   const fetchData = useCallback(async () => {
-    if (!isLogin || !wallet.address) return;
+    if (!wallet.address) return;
     try {
       setLoading(true);
       showLoading();
@@ -43,7 +49,7 @@ export default function useRewardsListService() {
       setLoading(false);
       closeLoading();
     }
-  }, [closeLoading, isLogin, page, poolType, searchParams, showLoading, wallet.address]);
+  }, [closeLoading, page, poolType, searchParams, showLoading, wallet.address]);
 
   useEffect(() => {
     fetchData();
@@ -59,11 +65,13 @@ export default function useRewardsListService() {
 
   const onChange = useCallback(
     (pagination: any, filters: Record<string, any>, sorter: any) => {
-      const filtered = filters?.['pools']?.[0];
-      setPoolType(filtered || 'All');
+      const filteredId = filters?.['pools']?.[0];
+      const rewardsType = rewardsTypeList.filter((item) => item?.id === filteredId)?.[0] || {};
+      setPoolType(rewardsType?.poolType || 'All');
+      setRewardsTypeId(rewardsType?.id || '');
       setPage(1);
     },
-    [setPoolType],
+    [rewardsTypeList],
   );
 
   return {

@@ -1,22 +1,22 @@
 .table {
   @apply border-[1px] border-solid border-neutralBorder rounded-[24px] overflow-hidden;
   :global{
-    .aelfd-table-thead .aelfd-table-cell{
+    .earn-table-thead .earn-table-cell{
       @apply px-6;
     }
-    .aelfd-table-tbody  .aelfd-table-cell {
+    .earn-table-tbody  .earn-table-cell {
       @apply py-[40px] px-6;
     }
-    .aelfd-table-row {
+    .earn-table-row {
       &:last-child td {
         @apply !border-b-0;
       }
     }
-    .aelfd-table-filter-column{
+    .earn-table-filter-column{
       @apply justify-start;
     }
 
-    .aelfd-table-filter-column .aelfd-table-column-title{
+    .earn-table-filter-column .earn-table-column-title{
       @apply flex-grow-0;
     }
   }

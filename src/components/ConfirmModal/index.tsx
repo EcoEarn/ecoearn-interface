@@ -30,6 +30,7 @@ export interface IClaimContent {
   tokenSymbol?: string;
   releasePeriod?: number | string;
   vestingPeriod?: number | string;
+  supportEarlyStake?: boolean;
 }
 
 export interface IWithDrawContent extends IClaimContent {
@@ -62,6 +63,7 @@ export interface IUnLockContent {
   rewardsSymbol?: string;
   releasePeriod?: number | string;
   vestingPeriod?: number | string;
+  supportEarlyStake?: boolean;
 }
 
 export type TConfirmModalContentType = IExtendedLockupContent &
@@ -175,18 +177,20 @@ function ConfirmModal(props: IConfirmModalProps) {
         >
           {`Go to "Rewards"`}
         </Button>
-        <Button
-          className="!rounded-lg !min-w-[200px]"
-          type="primary"
-          onClick={() => {
-            onEarlyStake?.();
-          }}
-        >
-          Stake to earn more
-        </Button>
+        {content?.supportEarlyStake && (
+          <Button
+            className="!rounded-lg !min-w-[200px]"
+            type="primary"
+            onClick={() => {
+              onEarlyStake?.();
+            }}
+          >
+            Stake to earn more
+          </Button>
+        )}
       </Flex>
     );
-  }, [isXS, onEarlyStake, onGoRewards]);
+  }, [content?.supportEarlyStake, isXS, onEarlyStake, onGoRewards]);
 
   const renderContent = useMemo(() => {
     if (status !== 'normal') {

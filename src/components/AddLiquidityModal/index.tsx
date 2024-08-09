@@ -35,6 +35,7 @@ import { getRawTransaction } from 'utils/getRawTransaction';
 import { ZERO } from 'constants/index';
 import styles from './index.module.css';
 import { matchErrorMsg } from 'utils/formatError';
+import { fixEarlyStakeData } from 'utils/stake';
 
 export interface IAddLiquidityModalProps {
   tokenA: {
@@ -202,7 +203,7 @@ function AddLiquidityModal({
   }, [lpToken.rate, lpToken.symbol, lpUnit, tolerance]);
 
   const checkStakeData = useCallback(async () => {
-    let stakeData: IEarlyStakeInfo;
+    let stakeData: Array<IEarlyStakeInfo>;
     try {
       showLoading();
       stakeData = await getEarlyStakeInfo({
@@ -213,26 +214,18 @@ function AddLiquidityModal({
         rate: lpToken.rate,
       });
       closeLoading();
-      if (stakeData) {
-        const fixedEarlyStakeData = {
-          ...stakeData,
-          unlockTime: getTargetUnlockTimeStamp(
-            stakeData?.stakingPeriod || 0,
-            stakeData?.lastOperationTime || 0,
-            stakeData?.unlockWindowDuration || 0,
-          ).unlockTime,
-        };
-        stakeData = fixedEarlyStakeData;
+      const fixedEarlyStakeData = (fixEarlyStakeData(stakeData) as Array<IEarlyStakeInfo>)?.[0];
+      if (fixedEarlyStakeData) {
         if (
-          !BigNumber(stakeData?.staked || 0).isZero() &&
-          dayjs(stakeData?.unlockTime || 0).isBefore(dayjs())
+          !BigNumber(fixedEarlyStakeData?.staked || 0).isZero() &&
+          dayjs(fixedEarlyStakeData?.unlockTime || 0).isBefore(dayjs())
         ) {
           message.error(
             'Stake has expired, cannot be added stake. Please renew the staking first.',
           );
           return;
         }
-        return stakeData;
+        return fixedEarlyStakeData;
       } else {
         message.error('no pool');
         return;
@@ -292,7 +285,7 @@ function AddLiquidityModal({
               .times(1 - Number(tolerance || '0.5') / 100)
               .dp(0)
               .toString();
-            const signParams = {
+            const signParams: IAddLiquiditySignParams = {
               amount: tokenA.balance,
               poolType: 'All',
               address: wallet.address,
@@ -302,6 +295,8 @@ function AddLiquidityModal({
               period: periodInSeconds,
               tokenAMin,
               tokenBMin,
+              operationDappIds: [dappId || ''],
+              operationPoolIds: [stakeData?.poolId || ''],
             };
             const { seed, signature, expirationTime } = (await addLiquiditySign(signParams)) || {};
             closeLoading();

@@ -13,7 +13,7 @@ import LiquidityMobile from './LiquidityMobile';
 import OperationDrop from '../OperationDrop';
 import { theme } from './config';
 import { AELFDProviderTheme } from 'provider/config';
-import TextEllipsis from 'components/TextEllipsis';
+import { APP_PREFIX } from 'constants/index';
 
 export default function LiquidityList() {
   const {
@@ -260,6 +260,7 @@ export default function LiquidityList() {
 
   return (
     <AELFDProvider
+      prefixCls={APP_PREFIX}
       theme={{
         ...AELFDProviderTheme,
         components: { ...AELFDProviderTheme.components, ...theme.components },

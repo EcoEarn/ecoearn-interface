@@ -16,6 +16,7 @@ import {
   formatTokenPrice,
   formatTokenSymbol,
   formatUSDPrice,
+  splitTokensFromPairSymbol,
 } from 'utils/format';
 import clsx from 'clsx';
 import { getPoolTotalStaked } from 'api/request';
@@ -580,26 +581,30 @@ function StakeModal({
     ],
   );
 
-  const displayGainToken = useMemo(() => {
-    //FIXME:
-    return true;
-    return stakeSymbol === 'ALP ELF-USDT' || stakeSymbol === 'SGR';
-  }, [stakeSymbol]);
-
-  const jumpUrl = useCallback(() => {
+  const jumpAwakenUrl = useMemo(() => {
     let awakenTradeUrl = '';
-    if (stakeSymbol === 'ALP ELF-USDT' && Number(rate) !== 0) {
-      awakenTradeUrl = `/trading/ELF_USDT_${Number(rate) * 100}`;
-    } else if (stakeSymbol === 'SGR') {
+    const symbolSplit = stakeSymbol?.split(' ');
+    if (symbolSplit?.[0] === 'ALP' && Number(rate) !== 0) {
+      const pairName = splitTokensFromPairSymbol(symbolSplit?.[1])?.join('_');
+      awakenTradeUrl = `/trading/${pairName}_${Number(rate) * 100}`;
+    } else if (stakeSymbol === 'SGR-1') {
       awakenTradeUrl = '/trading/SGR-1_ELF_3';
     } else {
-      //FIXME:
-      awakenTradeUrl = '/trading/SGR-1_ELF_3';
+      awakenTradeUrl = '';
     }
-    if (awakenTradeUrl) {
-      window.open(`${awakenSGRUrl}${awakenTradeUrl}`, '_blank');
+    return awakenTradeUrl;
+  }, [rate, stakeSymbol]);
+
+  const displayGainToken = useMemo(() => {
+    //FIXME:
+    return !!jumpAwakenUrl;
+  }, [jumpAwakenUrl]);
+
+  const jumpUrl = useCallback(() => {
+    if (jumpAwakenUrl) {
+      window.open(`${awakenSGRUrl}${jumpAwakenUrl}`, '_blank');
     }
-  }, [awakenSGRUrl, rate, stakeSymbol]);
+  }, [awakenSGRUrl, jumpAwakenUrl]);
 
   const getTotalStaked = useCallback(async () => {
     try {

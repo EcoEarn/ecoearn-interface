@@ -5,6 +5,7 @@ const useGetStoreInfo = () => {
   const info = useSelector(selectInfo);
   return {
     cmsInfo: info.cmsInfo,
+    dappList: info.dappList,
   };
 };
 

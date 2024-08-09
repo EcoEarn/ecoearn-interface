@@ -30,6 +30,7 @@ export interface IRewardsModalProps {
   isAllReleased?: boolean;
   allRewardsRelease: boolean;
   claimInfos: Array<any>;
+  showEarlyStake: boolean;
   onEarlyStake: () => void;
 }
 
@@ -54,6 +55,7 @@ export default NiceModal.create(function MiningRewardsModal({
   onEarlyStake,
   decimal,
   isAllReleased = false,
+  showEarlyStake,
 }: IRewardsModalProps) {
   const modal = useModal();
   const { isLogin } = useGetLoginStatus();
@@ -121,6 +123,7 @@ export default NiceModal.create(function MiningRewardsModal({
         earlyStakedAmountInUsd={earlyStakedAmountInUsd}
         earlyStakedPoolIsUnLock={earlyStakedPoolIsUnLock}
         decimal={decimal}
+        showEarlyStake={showEarlyStake}
       />
       {showLastReleaseModule && (
         <div className="mt-6 bg-brandBg rounded-lg p-5">

@@ -16,13 +16,13 @@
 
 .table{
   :global{
-    .aelfd-table-thead .aelfd-table-cell{
+    .earn-table-thead .earn-table-cell{
       @apply !px-4;
     }
-    .aelfd-table-tbody  .aelfd-table-cell {
+    .earn-table-tbody  .earn-table-cell {
       @apply !py-4 !px-4;
     }
-    .aelfd-table-row {
+    .earn-table-row {
       &:last-child td {
         @apply !border-b-0;
       }

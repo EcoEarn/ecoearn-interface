@@ -8,6 +8,7 @@ export type InfoStateType = {
     // some config
   };
   cmsInfo?: ICMSInfo;
+  dappList?: Array<IStakingItem>;
 };
 
 export interface ICMSInfo {

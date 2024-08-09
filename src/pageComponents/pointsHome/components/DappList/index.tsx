@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Button, Table } from 'aelf-design';
 import { TableColumnsType } from 'antd/lib';
 import Link from 'next/link';
@@ -6,9 +7,7 @@ import { RightOutlined } from '@ant-design/icons';
 import useResponsive from 'utils/useResponsive';
 import { useCallback, useMemo } from 'react';
 import clsx from 'clsx';
-import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useRouter } from 'next/navigation';
-import { useCheckLoginAndToken } from 'hooks/useWallet';
 import { useModal } from '@ebay/nice-modal-react';
 import GetPointsModal, { IPointsModalProps } from '../GetPointsModal';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
@@ -24,20 +23,12 @@ export default function DappList({
   loading: boolean;
 }) {
   const { isMD, isLG } = useResponsive();
-  const { isLogin } = useGetLoginStatus();
   const router = useRouter();
-  const { checkLogin } = useCheckLoginAndToken();
   const getPointsModal = useModal(GetPointsModal);
-  const { schrodingerGainPointsRule, schrodingerUrl } = useGetCmsInfo() || {};
 
-  const handleClick = useCallback(
-    (item: IStakingItem) => {
-      if (item.dappName === 'Schrödinger') {
-        window.open(schrodingerUrl || '');
-      }
-    },
-    [schrodingerUrl],
-  );
+  const handleClick = useCallback((item: IStakingItem) => {
+    window.open(item?.gainUrl || '');
+  }, []);
 
   const handleStake = useCallback(
     (item: IStakingItem) => {
@@ -53,16 +44,14 @@ export default function DappList({
         name: item.dappName,
         desc: item.projectOwner,
         icon: item.icon,
+        rulesContent: item.rulesText,
         handleConfirm: () => {
           handleClick(item);
         },
       };
-      if (item.dappName === 'Schrödinger') {
-        params.rulesContent = schrodingerGainPointsRule;
-      }
       getPointsModal.show(params);
     },
-    [getPointsModal, handleClick, schrodingerGainPointsRule],
+    [getPointsModal, handleClick],
   );
 
   const columns: TableColumnsType<IStakingItem> = useMemo(() => {

@@ -1,42 +1,79 @@
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import PoolsAmount from './components/PoolsAmount';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Empty from '../../components/Empty';
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useResponsive from 'utils/useResponsive';
 import RewardsListMobile from './components/RewardsListMobile';
 import RewardListPC from './components/RewardListPC';
 import clsx from 'clsx';
 import React from 'react';
+import { Segmented, Select } from 'antd';
+import styles from './styles.module.css';
+import { getRewardsList, getRewardsType } from 'api/request';
+import { useWalletService } from 'hooks/useWallet';
+import useLoading from 'hooks/useLoading';
+
+export enum RewardsTypeEnum {
+  'All' = 'all',
+  'Points' = 'points',
+  'Simple' = 'simple',
+  'Farms' = 'farms',
+}
 
 export default function Rewards() {
   const { isLogin } = useGetLoginStatus();
-  const router = useRouter();
-  const [hasHistoryData, setHasHistoryData] = useState(false);
-  const rewardDataRef = useRef<{ refresh: () => void }>();
+  const [initData, setInitData] = useState<Array<IRewardListItem>>();
+  const { isMD } = useResponsive();
+  const { wallet } = useWalletService();
+  const { showLoading, closeLoading } = useLoading();
+  const [currentType, setCurrentType] = useState<RewardsTypeEnum>(RewardsTypeEnum.All);
+  const [rewardsTypeList, setRewardsTypeList] = useState<Array<IRewardsTypeItem>>();
 
-  const updateHasHistoryDate = useCallback((value: boolean) => {
-    setHasHistoryData(value);
-  }, []);
+  const fetchInitData = useCallback(async () => {
+    if (!wallet.address) return;
+    try {
+      showLoading();
+      const [rewardsList, rewardsTypeList] = await Promise.all([
+        getRewardsList({
+          poolType: 'All',
+          id: 'all',
+          address: wallet.address,
+          skipCount: 0,
+          maxResultCount: 10,
+        }),
+        getRewardsType(),
+      ]);
+      closeLoading();
+      const { items } = rewardsList || {};
+      if (items && items?.length) {
+        setInitData(items);
+      }
+      if (rewardsTypeList && rewardsTypeList?.length) {
+        setRewardsTypeList(rewardsTypeList);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      closeLoading();
+    }
+  }, [closeLoading, showLoading, wallet.address]);
+
+  const hasHistoryData = useMemo(() => {
+    return initData && initData?.length > 0;
+  }, [initData]);
 
   useEffect(() => {
-    !isLogin && setHasHistoryData(false);
-  }, [isLogin]);
+    fetchInitData();
+  }, [fetchInitData]);
 
-  const { isMD } = useResponsive();
+  const options: Array<{ label: ReactNode; value: string }> = [
+    { label: 'All', value: RewardsTypeEnum.All },
+    { label: 'Points Staking', value: RewardsTypeEnum.Points },
+    { label: 'Simple Staking', value: RewardsTypeEnum.Simple },
+    { label: 'Farms', value: RewardsTypeEnum.Farms },
+  ];
 
-  const renderEmpty = (
-    <Empty
-      emptyBtnText="Stake"
-      emptyText="Participating in staking can earn rewards."
-      onClick={() => {
-        router.push('/simple');
-      }}
-    />
-  );
-
-  const onCountFinish = useCallback(() => {
-    rewardDataRef.current?.refresh();
+  const handleChange = useCallback((value: string) => {
+    setCurrentType(value as RewardsTypeEnum);
   }, []);
 
   return (
@@ -50,33 +87,42 @@ export default function Rewards() {
           after the release period expires.
         </p>
         <p>
-          After staking, you can restake your claimed SGR rewards early to the SGR pool, or stake
+          After staking, you can restake your claimed rewards early to the mining pool, or stake
           them early to the Farms through adding liquidity. Rewards that can be staked early include
           frozen and withdrawable amounts.
         </p>
       </div>
-      {isLogin && (
-        <div className={clsx(!hasHistoryData && 'invisible h-0')}>
-          <div className="mt-6 sm:mt-8 lg:mt-12">
-            <PoolsAmount ref={rewardDataRef} />
-          </div>
-          <div className="mt-6">
-            <div className="mb-4 text-base font-semibold text-neutralTitle">Claim Record</div>
-            {isMD ? (
-              <RewardsListMobile
-                updateHasHistoryDate={updateHasHistoryDate}
-                onCountDownFinish={onCountFinish}
-              />
-            ) : (
-              <RewardListPC
-                updateHasHistoryDate={updateHasHistoryDate}
-                onCountDownFinish={onCountFinish}
-              />
-            )}
-          </div>
+      {!isMD ? (
+        <Segmented
+          className={clsx('mt-8 lg:mt-12', styles.segmented)}
+          size="large"
+          value={currentType}
+          defaultValue={RewardsTypeEnum.All}
+          onChange={handleChange}
+          options={options}
+        />
+      ) : (
+        <Select
+          className={clsx(styles.select, 'mt-8')}
+          popupClassName={styles.selectOverlay}
+          value={currentType}
+          onChange={handleChange}
+          options={options}
+        />
+      )}
+      <div className="mt-6">
+        <PoolsAmount currentType={currentType} />
+      </div>
+      {isLogin && hasHistoryData && (
+        <div className="mt-6">
+          <div className="mb-4 text-base font-semibold text-neutralTitle">Claim Record</div>
+          {isMD ? (
+            <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
+          ) : (
+            <RewardListPC rewardsTypeList={rewardsTypeList || []} />
+          )}
         </div>
       )}
-      {!hasHistoryData && renderEmpty}
     </>
   );
 }
