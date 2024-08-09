@@ -2,7 +2,6 @@ import { getRewardsList } from 'api/request';
 import useLoading from 'hooks/useLoading';
 import { useWalletService } from 'hooks/useWallet';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 
 export default function useRewardsListService({
   rewardsTypeList,
@@ -15,7 +14,6 @@ export default function useRewardsListService({
   const [totalCount, setTotalCount] = useState(0);
   const [poolType, setPoolType] = useState<'Points' | 'Token' | 'Lp' | 'All'>('All');
   const [loading, setLoading] = useState(false);
-  const { isLogin } = useGetLoginStatus();
   const { wallet } = useWalletService();
   const { showLoading, closeLoading } = useLoading();
   const [hasHistoryData, setHasHistoryData] = useState(false);

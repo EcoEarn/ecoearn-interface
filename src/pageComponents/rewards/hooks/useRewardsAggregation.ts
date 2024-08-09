@@ -536,6 +536,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
   const handleDetail = useCallback(
     async (data: IRewardsListDataSource) => {
       await fetchData();
+      showLoading();
       const {
         totalRewards,
         totalRewardsInUsd,
@@ -561,6 +562,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
         (data) => data?.poolId === data?.poolId,
       )?.[0];
       const earlyStakePoolIsUnlock = isEarlyStakePoolIsUnlock(earlyStakePoolData);
+      closeLoading();
       rewardsDetailModal.show({
         symbol: data?.poolName,
         decimal: Number(decimal || 8),
@@ -587,7 +589,15 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
         },
       });
     },
-    [earlyStake, earlyStakeData, fetchData, isEarlyStakePoolIsUnlock, rewardsDetailModal],
+    [
+      closeLoading,
+      earlyStake,
+      earlyStakeData,
+      fetchData,
+      isEarlyStakePoolIsUnlock,
+      rewardsDetailModal,
+      showLoading,
+    ],
   );
 
   const confirmModalOnConfirm = useCallback(

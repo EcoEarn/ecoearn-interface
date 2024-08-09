@@ -105,7 +105,10 @@ export default NiceModal.create(function MiningRewardsModal({
       title={title}
       open={modal.visible}
       onCancel={() => {
-        modal.hide();
+        modal.remove();
+      }}
+      afterClose={() => {
+        modal.remove();
       }}
     >
       <RewardCard
