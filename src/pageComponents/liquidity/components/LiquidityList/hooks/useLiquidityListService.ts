@@ -546,7 +546,7 @@ export default function useLiquidityListService() {
 
   const onStake = useCallback(
     async ({ banlance, lpSymbol, rate, decimal, liquidityIds, lpAmount }: ILiquidityItem) => {
-      let stakeData;
+      let stakeData: any;
       try {
         showLoading();
         stakeData = await getEarlyStakeInfo({
