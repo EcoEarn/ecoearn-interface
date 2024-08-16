@@ -1,3 +1,6 @@
+import { NetworkType } from '@etransfer/ui-react';
+import { ILinkItem } from 'components/Footer';
+
 export type InfoStateType = {
   isMobile?: boolean;
   isSmallScreen?: boolean;
@@ -8,6 +11,7 @@ export type InfoStateType = {
     // some config
   };
   cmsInfo?: ICMSInfo;
+  dappList?: Array<IStakingItem>;
 };
 
 export interface ICMSInfo {
@@ -49,6 +53,15 @@ export interface ICMSInfo {
   renewStakeNotes: string[];
   telegramBotId?: string;
   minStakeAmount?: string | number;
+  etransferUrl: string;
+  etransferGitBookUrl: string;
+  etransferConfig: {
+    supportChainIds: string[];
+    networkType: NetworkType;
+    etransferUrl: string;
+    etransferAuthUrl: string;
+  };
+  socialList: Array<ILinkItem>;
   [key: string]: any;
 }
 

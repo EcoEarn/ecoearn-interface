@@ -1,13 +1,11 @@
 import { Button } from 'aelf-design';
 import { useMemo } from 'react';
-import useResponsive from 'utils/useResponsive';
 import clsx from 'clsx';
 import { RightOutlined } from '@ant-design/icons';
-import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import useDappList from 'hooks/useDappList';
 
 export default function Intro({ dappName }: { dappName: string }) {
-  const { isMD } = useResponsive();
-  const { sgrStakingPointsDesc, sgrStakingPointsTopDesc, schrodingerUrl } = useGetCmsInfo() || {};
+  const { dappList } = useDappList();
 
   const dappInfo: {
     name: string;
@@ -15,18 +13,14 @@ export default function Intro({ dappName }: { dappName: string }) {
     desc?: string;
     link?: string;
   } = useMemo(() => {
-    if (dappName === 'Schrödinger') {
-      return {
-        name: dappName,
-        topDesc: sgrStakingPointsTopDesc,
-        desc: sgrStakingPointsDesc,
-        link: schrodingerUrl,
-      };
-    }
+    const dapp = dappList?.filter((item) => item?.dappName === dappName)?.[0];
     return {
       name: dappName,
+      topDesc: dapp?.pointsType ? `${dapp?.pointsType} Points Staking` : '',
+      desc: 'Staking multiple types of points for more rewards',
+      link: dapp?.gainUrl,
     };
-  }, [dappName, schrodingerUrl, sgrStakingPointsDesc, sgrStakingPointsTopDesc]);
+  }, [dappList, dappName]);
 
   const learnMore = useMemo(() => {
     return dappInfo?.desc || dappInfo?.link ? (
@@ -58,6 +52,9 @@ export default function Intro({ dappName }: { dappName: string }) {
     ) : null;
   }, [dappInfo?.desc, dappInfo?.link]);
 
+  if (!dappInfo) {
+    return null;
+  }
   return (
     <>
       <div className="flex md:flex-row flex-col gap-x-4">

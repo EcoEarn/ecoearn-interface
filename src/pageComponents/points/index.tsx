@@ -20,10 +20,6 @@ export default function StakePage() {
     router.replace('/points');
   }, [router]);
 
-  if (decodeAppName !== 'Schrödinger') {
-    return null;
-  }
-
   return (
     <div>
       <Button
@@ -35,7 +31,7 @@ export default function StakePage() {
         <span className="text-sm font-medium text-neutralTitle">Back</span>
       </Button>
       <Intro dappName={decodeAppName} />
-      <PointsStakingList />
+      <PointsStakingList dappName={decodeAppName} />
     </div>
   );
 }

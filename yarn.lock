@@ -1568,6 +1568,67 @@
   resolved "https://registry.npmmirror.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
+"@etransfer/core@^1.2.1-alpha.3":
+  version "1.2.1-alpha.3"
+  resolved "https://registry.npmjs.org/@etransfer/core/-/core-1.2.1-alpha.3.tgz#f76c4137a140cee76c05bd4c460685c715143ec0"
+  integrity sha512-ZIcsNu4F3VsidHlOWemqcrHz3r9O06CNnYJ0TS4e30hEp0RUUdIjuaDxnH2y+3+AwaFfQXhduc1X7TJyTd/Axw==
+  dependencies:
+    "@etransfer/services" "^1.2.1-alpha.3"
+    "@etransfer/types" "^1.2.1-alpha.3"
+    "@etransfer/utils" "^1.2.1-alpha.3"
+
+"@etransfer/request@^1.2.1-alpha.3":
+  version "1.2.1-alpha.3"
+  resolved "https://registry.npmjs.org/@etransfer/request/-/request-1.2.1-alpha.3.tgz#d951b37f48e320d2c504f41776acf72f14924c9a"
+  integrity sha512-grW55/FYF+N1QLtVdbzjIRBb/zFQG9e//GCBUUH3E6+Qpom52F/TDY+b9U0lSTARXcrrW9waAqUXzNhkW6vlvQ==
+  dependencies:
+    "@etransfer/types" "^1.2.1-alpha.3"
+    "@etransfer/utils" "^1.2.1-alpha.3"
+    axios "^0.24.0"
+
+"@etransfer/services@^1.2.1-alpha.3":
+  version "1.2.1-alpha.3"
+  resolved "https://registry.npmjs.org/@etransfer/services/-/services-1.2.1-alpha.3.tgz#2ea8fd5620c710ee3226d619686c6193369b1b39"
+  integrity sha512-S1SsSGtVRTpWVqnMM8nNSkxWpe51JTzC/nvLLuKhDm7KYVAhfCATe5HlICB5R1Hubmtkcm6V47TtdvdyGqbE2Q==
+  dependencies:
+    "@etransfer/request" "^1.2.1-alpha.3"
+    "@etransfer/types" "^1.2.1-alpha.3"
+    "@etransfer/utils" "^1.2.1-alpha.3"
+    "@portkey/types" "2.6.6"
+
+"@etransfer/types@^1.2.1-alpha.3":
+  version "1.2.1-alpha.3"
+  resolved "https://registry.npmjs.org/@etransfer/types/-/types-1.2.1-alpha.3.tgz#f87626406babc0805759c42bef91d6585a195154"
+  integrity sha512-IaOsNHjwyo2gAdTS/EzVmD0LS6f9ntty0Ldvbd0oqkHrNdVl2DcpuNOP/4Kw2LEx5ihoF3P/URoqGux8rQk2rQ==
+
+"@etransfer/ui-react@^1.2.1-alpha.3":
+  version "1.2.1-alpha.3"
+  resolved "https://registry.npmjs.org/@etransfer/ui-react/-/ui-react-1.2.1-alpha.3.tgz#1bf55eb4a6c567bfc07cb6152e9ae876fe70597e"
+  integrity sha512-uMoZrQYUClHKdSeASRhUFHHXJOVrkdcoFV+EEaczF8IKFf6GcILLJ3aTMf9TAQ889zlXXtMjxZjvMUKGiyJquw==
+  dependencies:
+    "@etransfer/core" "^1.2.1-alpha.3"
+    "@etransfer/types" "^1.2.1-alpha.3"
+    "@etransfer/utils" "^1.2.1-alpha.3"
+    "@portkey/types" "2.6.6"
+    "@portkey/utils" "2.6.6"
+    antd "4.24.14"
+    bignumber.js "^9.1.0"
+    clsx "^1.2.1"
+    lottie-web "5.9.6"
+    moment "^2.29.4"
+    query-string "^7.1.1"
+    react-qrcode-logo "2.9.0"
+    react-use "^17.4.0"
+    uuid "^8.3.2"
+
+"@etransfer/utils@^1.2.1-alpha.3":
+  version "1.2.1-alpha.3"
+  resolved "https://registry.npmjs.org/@etransfer/utils/-/utils-1.2.1-alpha.3.tgz#3c423b523dd0b63516b0fd43182e6f492f612809"
+  integrity sha512-T/rXrYC/suOfCD2Gu3jE2OAGvFSwz80+SFFXGQpyvkyYvnhVaTzVUNs68CmyW5q/QuaNImICQaZ/+27h/cUupQ==
+  dependencies:
+    "@etransfer/services" "^1.2.1-alpha.3"
+    "@etransfer/types" "^1.2.1-alpha.3"
+
 "@firebase/analytics-compat@0.2.6":
   version "0.2.6"
   resolved "https://registry.npmmirror.com/@firebase/analytics-compat/-/analytics-compat-0.2.6.tgz#50063978c42f13eb800e037e96ac4b17236841f4"
@@ -2478,6 +2539,11 @@
     "@abp/signalr" "^7.0.0"
     "@portkey/utils" "^2.7.1-alpha.4"
 
+"@portkey/types@2.6.6":
+  version "2.6.6"
+  resolved "https://registry.npmjs.org/@portkey/types/-/types-2.6.6.tgz#07af958da36f777aa68149a6bfd7bb0df1c9f992"
+  integrity sha512-oMsduRi2juBqQffhIgD5NSoVxnmmG+lL3W6RnJueyfh/itbaEZfIlC1g9o4NM4TVuxZPIf0ahfPaXGR9CriIYQ==
+
 "@portkey/types@^1.0.0-alpha.4":
   version "1.5.3"
   resolved "https://registry.npmmirror.com/@portkey/types/-/types-1.5.3.tgz#6a20d091efd5d9297d7cb6bb41f6ce5d445835c2"
@@ -2492,6 +2558,11 @@
   version "2.7.1-alpha.4"
   resolved "https://registry.npmmirror.com/@portkey/types/-/types-2.7.1-alpha.4.tgz#5a46b51510bb0c18c351b28fd31d9a9266572a5c"
   integrity sha512-zxPnEJ9q1Pi1s5wp9U+G5Loy1qfkMkcAPNvZ32FVUYWbSuJulDYYXQJqlhJ9kMz0InBodjVat9F14ftj/kBa8A==
+
+"@portkey/utils@2.6.6":
+  version "2.6.6"
+  resolved "https://registry.npmjs.org/@portkey/utils/-/utils-2.6.6.tgz#8fa5eb93a4ca43baa14345a75876a8701de2c1f6"
+  integrity sha512-1hooVcRxGafEyyD/TGqx9vsGwsl50RElCBz5hqTJ1mUDy3Q5OWFtSPU0dnTPpUwJlzJHUJCZMvO+wI2dCJHncA==
 
 "@portkey/utils@^2.6.8":
   version "2.6.8"

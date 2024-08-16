@@ -17,7 +17,7 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useWalletService } from 'hooks/useWallet';
 import useLoading from 'hooks/useLoading';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import { divDecimals, getTargetUnlockTimeStamp } from 'utils/calculate';
+import { divDecimals } from 'utils/calculate';
 import dayjs from 'dayjs';
 import { useInterval } from 'ahooks';
 import MiningRewardsModal from 'components/MiningRewardsModal';
@@ -26,11 +26,13 @@ import { getRawTransaction } from 'utils/getRawTransaction';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { earlyStake as earlyStakeApi } from 'api/request';
 import { ISendResult } from 'types';
-import getBalanceTip from 'utils/stake';
+import getBalanceTip, { fixEarlyStakeData } from 'utils/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { matchErrorMsg } from 'utils/formatError';
 import { message } from 'antd';
 import useStakeConfig from 'hooks/useStakeConfig';
+import { RewardsTypeEnum } from '..';
+import { useRouter } from 'next/navigation';
 
 const stakeEarlyErrorTip =
   'Stake has expired, cannot be added stake. Please renew the staking first.';
@@ -39,9 +41,17 @@ const noStakeAmountTip =
 
 const withdrawDisabledTip = 'No withdrawable rewards. You can view "Details" for more information.';
 
-export default function useRewardsAggregation() {
-  const [data, setData] = useState<IPoolRewardsData>();
-  const [earlyStakeData, setEarlyStakeData] = useState<IEarlyStakeInfo>();
+export interface IRewardsListDataSource extends IPoolRewardsItem {
+  earlyStakeDisabled: boolean;
+  earlyStakeTip: string;
+  withdrawDisabled: boolean;
+  withdrawTip: string;
+  amount: any;
+}
+
+export default function useRewardsAggregation({ currentType }: { currentType: RewardsTypeEnum }) {
+  const [data, setData] = useState<Array<IPoolRewardsItem>>();
+  const [earlyStakeData, setEarlyStakeData] = useState<Array<IEarlyStakeInfo>>();
   const stakeModal = useModal(StakeModal);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [confirmModalLoading, setConfirmModalLoading] = useState(false);
@@ -52,7 +62,6 @@ export default function useRewardsAggregation() {
   const [confirmModalTransactionId, setConfirmModalTransactionId] = useState<string>('');
   const [confirmModalErrorTip, setConfirmModalErrorTip] = useState('');
   const [confirmModalType, setConfirmModalType] = useState<ConfirmModalTypeEnum>();
-  const [curTrigger, setCurTrigger] = useState<'pointsWithdraw' | 'tokenWithdraw' | 'LPWithdraw'>();
   const { isLogin } = useGetLoginStatus();
   const { wallet, walletType } = useWalletService();
   const { showLoading, closeLoading } = useLoading();
@@ -60,93 +69,57 @@ export default function useRewardsAggregation() {
   const config = useGetCmsInfo();
   const rewardsDetailModal = useModal(MiningRewardsModal);
   const { min } = useStakeConfig();
+  const [curItem, setCurItem] = useState<IRewardsListDataSource>();
+  const router = useRouter();
 
-  const earlyStakedPoolIsUnLock = useMemo(() => {
-    if (earlyStakeData?.staked && !BigNumber(earlyStakeData?.staked).isZero()) {
-      return dayjs(earlyStakeData?.unlockTime).isBefore(dayjs());
-    } else {
-      return false;
-    }
-  }, [earlyStakeData?.staked, earlyStakeData?.unlockTime]);
-
-  const pointsEarlyStakeNotEnough = useMemo(() => {
-    const { frozen, withdrawable } = data?.pointsPoolAgg || {};
-    return divDecimals(
-      ZERO.plus(frozen || 0).plus(withdrawable || 0),
-      data?.pointsPoolAgg?.decimal,
-    ).lt(min);
-  }, [data?.pointsPoolAgg, min]);
-
-  const pointsEarlyStakeDisabled = useMemo(() => {
-    return !earlyStakeData || pointsEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
-  }, [earlyStakeData, earlyStakedPoolIsUnLock, pointsEarlyStakeNotEnough]);
-
-  const tokenEarlyStakeNotEnough = useMemo(() => {
-    const { frozen, withdrawable } = data?.tokenPoolAgg || {};
-    return divDecimals(
-      ZERO.plus(frozen || 0).plus(withdrawable || 0),
-      data?.tokenPoolAgg?.decimal,
-    ).lt(min);
-  }, [data?.tokenPoolAgg, min]);
-
-  const tokenEarlyStakeDisabled = useMemo(() => {
-    return !earlyStakeData || tokenEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
-  }, [earlyStakeData, earlyStakedPoolIsUnLock, tokenEarlyStakeNotEnough]);
-
-  const lpEarlyStakeNotEnough = useMemo(() => {
-    const { frozen, withdrawable } = data?.lpPoolAgg || {};
-    return divDecimals(ZERO.plus(frozen || 0).plus(withdrawable || 0), data?.lpPoolAgg?.decimal).lt(
-      min,
-    );
-  }, [data?.lpPoolAgg, min]);
-
-  const lpEarlyStakeDisabled = useMemo(() => {
-    return !earlyStakeData || lpEarlyStakeNotEnough || earlyStakedPoolIsUnLock;
-  }, [earlyStakeData, earlyStakedPoolIsUnLock, lpEarlyStakeNotEnough]);
+  const poolType = useMemo(() => {
+    if (currentType === RewardsTypeEnum.Points) return PoolType.POINTS;
+    else if (currentType === RewardsTypeEnum.Simple) return PoolType.TOKEN;
+    else if (currentType === RewardsTypeEnum.Farms) return PoolType.LP;
+    else return PoolType.ALL;
+  }, [currentType]);
 
   const fetchData = useCallback(
     async (props?: { needLoading?: boolean }) => {
       const { needLoading = true } = props || {};
-      if (!isLogin) return;
+      if (!isLogin || !curChain) return;
       needLoading && showLoading();
       try {
-        const data = await getPoolRewards({ address: wallet.address || '' });
-        if (data) {
+        const data = await getPoolRewards({
+          address: wallet.address || '',
+          poolType,
+        });
+        if (data && data?.length > 0) {
           setData(data);
           try {
-            needLoading && showLoading();
             const earlyStakeData = await getEarlyStakeInfo({
-              tokenName: data?.pointsPoolAgg?.rewardsTokenName,
+              tokenName: '',
               address: wallet.address || '',
               chainId: curChain!,
               rate: 0,
               poolType: PoolType.TOKEN,
             });
             needLoading && closeLoading();
-            if (earlyStakeData) {
-              const fixedEarlyStakeData = {
-                ...earlyStakeData,
-                unlockTime: getTargetUnlockTimeStamp(
-                  earlyStakeData?.stakingPeriod || 0,
-                  earlyStakeData?.lastOperationTime || 0,
-                  earlyStakeData?.unlockWindowDuration || 0,
-                ).unlockTime,
-              };
-              setEarlyStakeData(fixedEarlyStakeData);
-            }
+            const fixedEarlyStakeData = fixEarlyStakeData(
+              earlyStakeData || [],
+            ) as Array<IEarlyStakeInfo>;
+            setEarlyStakeData(fixedEarlyStakeData);
           } catch (error) {
             console.error('getEarlyStakeInfo error', error);
           } finally {
             needLoading && closeLoading();
           }
+        } else {
+          setData([]);
         }
+        closeLoading();
       } catch (error) {
         console.error('getPoolRewards error', error);
       } finally {
         needLoading && closeLoading();
       }
     },
-    [closeLoading, curChain, isLogin, showLoading, wallet.address],
+    [closeLoading, curChain, isLogin, poolType, showLoading, wallet.address],
   );
 
   useEffect(() => {
@@ -171,143 +144,82 @@ export default function useRewardsAggregation() {
     fetchData();
   }, [fetchData]);
 
-  const getEarlyStakeAmount = useCallback(
-    (type: PoolType) => {
-      const { pointsPoolAgg, tokenPoolAgg, lpPoolAgg } = data || {};
-      if (type === PoolType.POINTS) {
-        return ZERO.plus(pointsPoolAgg?.frozen || 0)
-          .plus(pointsPoolAgg?.withdrawable || 0)
-          .toString();
-      } else if (type === PoolType.TOKEN) {
-        return ZERO.plus(tokenPoolAgg?.frozen || 0)
-          .plus(tokenPoolAgg?.withdrawable || 0)
-          .toString();
-      } else {
-        return ZERO.plus(lpPoolAgg?.frozen || 0)
-          .plus(lpPoolAgg?.withdrawable || 0)
-          .toString();
-      }
-    },
-    [data],
-  );
+  const getEarlyStakeAmount = useCallback((data: IRewardsListDataSource) => {
+    const { frozen, withdrawable } = data?.rewardsInfo || {};
+    return ZERO.plus(frozen || 0)
+      .plus(withdrawable || 0)
+      .toString();
+  }, []);
 
-  const getClaimInfos = useCallback(
-    (type: PoolType) => {
-      const claimInfos =
-        (type === PoolType.POINTS
-          ? data?.pointsPoolAgg?.claimInfos
-          : type === PoolType.TOKEN
-          ? data?.tokenPoolAgg?.claimInfos
-          : data?.lpPoolAgg?.claimInfos) || [];
-      const withdrawClaimInfos =
-        (type === PoolType.POINTS
-          ? data?.pointsPoolAgg?.withdrawableClaimInfos
-          : type === PoolType.TOKEN
-          ? data?.tokenPoolAgg?.withdrawableClaimInfos
-          : data?.lpPoolAgg?.withdrawableClaimInfos) || [];
-      const claimIds = claimInfos.map((item) => {
-        return item.claimId;
-      });
-      const withdrawClaimIds = withdrawClaimInfos.map((item) => {
-        return item.claimId;
-      });
-      return {
-        claimInfos,
-        claimIds,
-        withdrawClaimInfos,
-        withdrawClaimIds,
-      };
-    },
-    [
-      data?.lpPoolAgg?.claimInfos,
-      data?.lpPoolAgg?.withdrawableClaimInfos,
-      data?.pointsPoolAgg?.claimInfos,
-      data?.pointsPoolAgg?.withdrawableClaimInfos,
-      data?.tokenPoolAgg?.claimInfos,
-      data?.tokenPoolAgg?.withdrawableClaimInfos,
-    ],
-  );
+  const getClaimInfos = useCallback((data: IRewardsListDataSource) => {
+    const claimInfos = data?.rewardsInfo?.claimInfos || [];
+    const withdrawClaimInfos = data?.rewardsInfo?.withdrawableClaimInfos || [];
+    const claimIds = claimInfos.map((item) => {
+      return item.claimId;
+    });
+    const withdrawClaimIds = withdrawClaimInfos.map((item) => {
+      return item.claimId;
+    });
+    return {
+      claimInfos,
+      claimIds,
+      withdrawClaimInfos,
+      withdrawClaimIds,
+    };
+  }, []);
 
-  const getFreeAmount = useCallback(
-    (type: PoolType) => {
-      return type === PoolType.POINTS
-        ? ZERO.plus(data?.pointsPoolAgg?.frozen || 0)
-            .plus(data?.pointsPoolAgg?.withdrawable || 0)
-            .toString()
-        : type === PoolType.TOKEN
-        ? ZERO.plus(data?.tokenPoolAgg?.frozen || 0)
-            .plus(data?.tokenPoolAgg?.withdrawable || 0)
-            .toString()
-        : ZERO.plus(data?.lpPoolAgg?.frozen || 0)
-            .plus(data?.lpPoolAgg?.withdrawable || 0)
-            .toString();
-    },
-    [
-      data?.lpPoolAgg?.frozen,
-      data?.lpPoolAgg?.withdrawable,
-      data?.pointsPoolAgg?.frozen,
-      data?.pointsPoolAgg?.withdrawable,
-      data?.tokenPoolAgg?.frozen,
-      data?.tokenPoolAgg?.withdrawable,
-    ],
-  );
+  const getFreeAmount = useCallback((data: IRewardsListDataSource) => {
+    const { frozen, withdrawable } = data?.rewardsInfo || {};
+    return ZERO.plus(frozen || 0)
+      .plus(withdrawable || 0)
+      .toString();
+  }, []);
 
-  const getLongestReleaseTime = useCallback(
-    (type: PoolType) => {
-      const { pointsPoolAgg, lpPoolAgg, tokenPoolAgg } = data || {};
-      if (type === PoolType.POINTS) {
-        const { claimInfos } = pointsPoolAgg || {};
-        return claimInfos && claimInfos?.length > 0
-          ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
-          : 0;
-      } else if (type === PoolType.TOKEN) {
-        const { claimInfos } = tokenPoolAgg || {};
-        return claimInfos && claimInfos?.length > 0
-          ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
-          : 0;
-      } else {
-        const { claimInfos } = lpPoolAgg || {};
-        return claimInfos && claimInfos?.length > 0
-          ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
-          : 0;
-      }
-    },
-    [data],
-  );
+  const getLongestReleaseTime = useCallback((data: IRewardsListDataSource) => {
+    const { claimInfos } = data?.rewardsInfo || {};
+    return claimInfos && claimInfos?.length > 0
+      ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
+      : 0;
+  }, []);
 
   const earlyStake = useCallback(
-    async (type: PoolType) => {
+    async (data: IRewardsListDataSource) => {
       try {
-        const claimInfos = getClaimInfos(type)?.claimInfos || [];
-        const claimIds = getClaimInfos(type)?.claimIds || [];
-        const hasHistoryStake = !BigNumber(earlyStakeData?.staked || 0).isZero();
-        console.log('earlyStakeData', earlyStakeData);
+        const { claimIds, claimInfos } = getClaimInfos(data);
+        const earlyStakePoolData = earlyStakeData?.filter(
+          (poolData) => poolData?.earnedSymbol === data?.rewardsTokenName,
+        )?.[0];
+
+        const hasHistoryStake = !BigNumber(earlyStakePoolData?.staked || 0).isZero();
+        console.log('earlyStakeData', earlyStakePoolData);
         stakeModal.show({
           isStakeRewards: true,
           isFreezeAmount: true,
           isEarlyStake: true,
           type: hasHistoryStake ? StakeType.ADD : StakeType.STAKE,
-          balanceDec: getBalanceTip(type),
-          freezeAmount: getFreeAmount(type),
+          balanceDec: getBalanceTip(data?.poolType),
+          freezeAmount: getFreeAmount(data),
           earlyAmount: hasHistoryStake
-            ? BigNumber(earlyStakeData?.staked || 0).toNumber()
+            ? BigNumber(earlyStakePoolData?.staked || 0).toNumber()
             : undefined,
           stakeData: {
-            ...earlyStakeData,
-            stakeInfos: earlyStakeData?.subStakeInfos,
-            longestReleaseTime: getLongestReleaseTime(type) || 0,
+            ...earlyStakePoolData,
+            stakeInfos: earlyStakePoolData?.subStakeInfos,
+            longestReleaseTime: getLongestReleaseTime(data) || 0,
           },
           onStake: async (amount, period = 0, poolId) => {
             const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-            const stakeAmount = getEarlyStakeAmount(type);
-            const signParams = {
+            const stakeAmount = getEarlyStakeAmount(data);
+            const signParams: IEarlyStakeSignParams = {
               amount: Number(stakeAmount),
-              poolType: type,
+              poolType: data?.poolType,
               address: wallet.address,
               dappId: data?.dappId || '',
               period: periodInSeconds,
-              poolId: earlyStakeData?.poolId || '',
+              poolId: earlyStakePoolData?.poolId || '',
               claimInfos,
+              operationPoolIds: data?.poolType === PoolType.POINTS ? [] : [data?.poolId || ''],
+              operationDappIds: data?.poolType === PoolType.POINTS ? [data?.dappId || ''] : [],
             };
             const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
             if (!signature || !seed || !expirationTime) throw Error();
@@ -333,7 +245,7 @@ export default function useRewardsAggregation() {
                       account: wallet.address,
                       amount: stakeAmount,
                       seed,
-                      poolId: earlyStakeData?.poolId || '',
+                      poolId: earlyStakePoolData?.poolId || '',
                       expirationTime,
                       period: periodInSeconds,
                       dappId: data?.dappId || '',
@@ -393,7 +305,6 @@ export default function useRewardsAggregation() {
       closeLoading,
       config,
       curChain,
-      data?.dappId,
       earlyStakeData,
       fetchData,
       getClaimInfos,
@@ -425,168 +336,206 @@ export default function useRewardsAggregation() {
     [initModalState],
   );
 
-  const pointsWithdraw = useCallback(async () => {
-    setCurTrigger('pointsWithdraw');
-    initWithdrawModal(
-      divDecimals(
-        data?.pointsPoolAgg?.withdrawable || 0,
-        data?.pointsPoolAgg?.decimal || 8,
-      ).toNumber(),
-      data?.pointsPoolAgg?.rewardsTokenName || '',
-    );
-  }, [
-    data?.pointsPoolAgg?.decimal,
-    data?.pointsPoolAgg?.rewardsTokenName,
-    data?.pointsPoolAgg?.withdrawable,
-    initWithdrawModal,
-  ]);
-
-  const tokenWithdraw = useCallback(() => {
-    setCurTrigger('tokenWithdraw');
-    initWithdrawModal(
-      divDecimals(
-        data?.tokenPoolAgg?.withdrawable || 0,
-        data?.tokenPoolAgg?.decimal || 8,
-      ).toNumber(),
-      data?.tokenPoolAgg?.rewardsTokenName || '',
-    );
-  }, [
-    data?.tokenPoolAgg?.decimal,
-    data?.tokenPoolAgg?.rewardsTokenName,
-    data?.tokenPoolAgg?.withdrawable,
-    initWithdrawModal,
-  ]);
-
-  const LPWithdraw = useCallback(() => {
-    setCurTrigger('LPWithdraw');
-    initWithdrawModal(
-      divDecimals(data?.lpPoolAgg?.withdrawable || 0, data?.lpPoolAgg?.decimal || 8).toNumber(),
-      data?.lpPoolAgg?.rewardsTokenName || '',
-    );
-  }, [
-    data?.lpPoolAgg?.decimal,
-    data?.lpPoolAgg?.rewardsTokenName,
-    data?.lpPoolAgg?.withdrawable,
-    initWithdrawModal,
-  ]);
-
-  const withDrawConfirm = useCallback(
-    async (poolType: PoolType, amount: string | number) => {
-      try {
-        showLoading();
-        const claimParams = getClaimInfos(poolType);
-        const signParams = {
-          amount: Number(amount),
-          poolType,
-          address: wallet.address,
-          claimInfos: claimParams?.withdrawClaimInfos || [],
-          dappId: data?.dappId || '',
-        };
-        const { signature, seed, expirationTime } = (await withdrawSign(signParams)) || {};
-        if (!signature || !seed || !expirationTime) throw Error();
-        const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
-        let rawTransaction = null;
-        try {
-          rawTransaction = await getRawTransaction({
-            walletInfo: wallet,
-            walletType,
-            caContractAddress: caContractAddress || '',
-            contractAddress: rewardsContractAddress || '',
-            methodName: 'Withdraw',
-            params: {
-              claimIds: claimParams?.withdrawClaimIds || [],
-              account: wallet.address,
-              amount,
-              seed,
-              signature,
-              expirationTime,
-              dappId: data?.dappId || '',
-            },
-            rpcUrl,
-            chainId: curChain!,
-          });
-        } catch (error) {
-          await cancelSign(signParams);
-          throw Error();
-        }
-        console.log('rawTransaction', rawTransaction);
-        if (!rawTransaction) {
-          await cancelSign(signParams);
-          throw Error();
-        }
-        const { data: TransactionId, message: errorMessage } = await withdraw({
-          chainId: curChain!,
-          rawTransaction: rawTransaction || '',
-        });
-        closeLoading();
-        if (TransactionId) {
-          const { TransactionId: resultTransactionId } = await getTxResult(
-            TransactionId,
-            rpcUrl,
-            curChain!,
-          );
-          if (resultTransactionId) {
-            setConfirmModalTransactionId(resultTransactionId);
-            setConfirmModalStatus('success');
-          } else {
-            throw Error();
-          }
-        } else {
-          const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'Withdraw');
-          if (!showInModal) message.error(matchedErrorMsg);
-          throw Error(showInModal ? matchedErrorMsg : '');
-        }
-      } catch (error) {
-        const errorTip = (error as Error).message;
-        console.error('WithDraw error', errorTip);
-        setConfirmModalTransactionId('');
-        errorTip && setConfirmModalErrorTip(errorTip);
-        setConfirmModalStatus('error');
-      } finally {
-        closeLoading();
-      }
+  const onWithdraw = useCallback(
+    (data: IRewardsListDataSource) => {
+      setCurItem(data);
+      const { withdrawable, decimal, rewardsTokenName } = data?.rewardsInfo || {};
+      initWithdrawModal(
+        divDecimals(withdrawable || 0, decimal || 8).toNumber(),
+        rewardsTokenName || '',
+      );
     },
-    [
-      caContractAddress,
-      closeLoading,
-      config,
-      curChain,
-      data?.dappId,
-      getClaimInfos,
-      rewardsContractAddress,
-      showLoading,
-      wallet,
-      walletType,
-    ],
+    [initWithdrawModal],
   );
 
-  const pointsWithdrawConfirm = useCallback(async () => {
-    withDrawConfirm(PoolType.POINTS, data?.pointsPoolAgg?.withdrawable || '');
-  }, [data?.pointsPoolAgg?.withdrawable, withDrawConfirm]);
-
-  const tokenWithdrawConfirm = useCallback(async () => {
-    withDrawConfirm(PoolType.TOKEN, data?.tokenPoolAgg?.withdrawable || '');
-  }, [data?.tokenPoolAgg?.withdrawable, withDrawConfirm]);
-
-  const LPWithdrawConfirm = useCallback(async () => {
-    withDrawConfirm(PoolType.LP, data?.lpPoolAgg?.withdrawable || '');
-  }, [data?.lpPoolAgg?.withdrawable, withDrawConfirm]);
-
-  const confirmModalOnConfirm = useCallback(async () => {
-    setConfirmModalLoading(true);
-    if (curTrigger === 'pointsWithdraw') {
-      await pointsWithdrawConfirm();
-    } else if (curTrigger === 'LPWithdraw') {
-      await LPWithdrawConfirm();
-    } else {
-      await tokenWithdrawConfirm();
+  const onWithDrawConfirm = useCallback(async () => {
+    const data = curItem;
+    if (!data) return;
+    const { withdrawable: amount } = data?.rewardsInfo || {};
+    try {
+      setConfirmModalLoading(true);
+      showLoading();
+      const claimParams = getClaimInfos(data);
+      const signParams: IWithdrawSignParams = {
+        amount: Number(amount || 0),
+        poolType: data?.poolType,
+        address: wallet.address,
+        claimInfos: claimParams?.withdrawClaimInfos || [],
+        dappId: data?.dappId || '',
+        operationPoolIds: data?.poolType === PoolType.POINTS ? [] : [data?.poolId || ''],
+        operationDappIds: data?.poolType === PoolType.POINTS ? [data?.dappId || ''] : [],
+      };
+      const { signature, seed, expirationTime } = (await withdrawSign(signParams)) || {};
+      if (!signature || !seed || !expirationTime) throw Error();
+      const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
+      let rawTransaction = null;
+      try {
+        rawTransaction = await getRawTransaction({
+          walletInfo: wallet,
+          walletType,
+          caContractAddress: caContractAddress || '',
+          contractAddress: rewardsContractAddress || '',
+          methodName: 'Withdraw',
+          params: {
+            claimIds: claimParams?.withdrawClaimIds || [],
+            account: wallet.address,
+            amount,
+            seed,
+            signature,
+            expirationTime,
+            dappId: data?.dappId || '',
+          },
+          rpcUrl,
+          chainId: curChain!,
+        });
+      } catch (error) {
+        await cancelSign(signParams);
+        throw Error();
+      }
+      console.log('rawTransaction', rawTransaction);
+      if (!rawTransaction) {
+        await cancelSign(signParams);
+        throw Error();
+      }
+      const { data: TransactionId, message: errorMessage } = await withdraw({
+        chainId: curChain!,
+        rawTransaction: rawTransaction || '',
+      });
+      closeLoading();
+      if (TransactionId) {
+        const { TransactionId: resultTransactionId } = await getTxResult(
+          TransactionId,
+          rpcUrl,
+          curChain!,
+        );
+        if (resultTransactionId) {
+          setConfirmModalTransactionId(resultTransactionId);
+          setConfirmModalStatus('success');
+        } else {
+          throw Error();
+        }
+      } else {
+        const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'Withdraw');
+        if (!showInModal) message.error(matchedErrorMsg);
+        throw Error(showInModal ? matchedErrorMsg : '');
+      }
+    } catch (error) {
+      const errorTip = (error as Error).message;
+      console.error('WithDraw error', errorTip);
+      setConfirmModalTransactionId('');
+      errorTip && setConfirmModalErrorTip(errorTip);
+      setConfirmModalStatus('error');
+    } finally {
+      closeLoading();
+      setConfirmModalLoading(false);
     }
-    setConfirmModalLoading(false);
-  }, [LPWithdrawConfirm, curTrigger, pointsWithdrawConfirm, tokenWithdrawConfirm]);
+  }, [
+    caContractAddress,
+    closeLoading,
+    config,
+    curChain,
+    curItem,
+    getClaimInfos,
+    rewardsContractAddress,
+    showLoading,
+    wallet,
+    walletType,
+  ]);
 
-  const handleRewardsDetail = useCallback(
-    async (type: PoolType) => {
+  const getRewardsAmount = useCallback((rewardsItem: IPoolRewardsItem) => {
+    const { totalRewards, totalRewardsInUsd, decimal, rewardsTokenName } =
+      rewardsItem?.rewardsInfo || {};
+    return {
+      totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
+      totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
+      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
+    };
+  }, []);
+
+  const isWithdrawDisabled = useCallback((rewardsItem: IPoolRewardsItem) => {
+    const { withdrawable } = rewardsItem?.rewardsInfo || {};
+    return BigNumber(withdrawable || 0).isZero();
+  }, []);
+
+  const getWithdrawTip = useCallback((isWithdrawDisabled: boolean) => {
+    return isWithdrawDisabled ? withdrawDisabledTip : '';
+  }, []);
+
+  const getEarlyStakeTip = useCallback(
+    ({
+      isAmountEnough,
+      isPoolUnlocked,
+      rewardsItem,
+    }: {
+      isAmountEnough: boolean;
+      isPoolUnlocked: boolean;
+      rewardsItem: IPoolRewardsItem;
+    }) => {
+      const { frozen, withdrawable, rewardsTokenName } = rewardsItem?.rewardsInfo || {};
+      return !isAmountEnough
+        ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
+          ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
+          : noStakeAmountTip
+        : isPoolUnlocked
+        ? stakeEarlyErrorTip
+        : '';
+    },
+    [min],
+  );
+
+  const isEarlyStakeAmountNotEnough = useCallback(
+    (rewardsItem: IPoolRewardsItem) => {
+      const { frozen, withdrawable, decimal } = rewardsItem?.rewardsInfo || {};
+      return divDecimals(ZERO.plus(frozen || 0).plus(withdrawable || 0), decimal).lt(min);
+    },
+    [min],
+  );
+
+  const isEarlyStakePoolIsUnlock = useCallback((earlyStakeData?: IEarlyStakeInfo) => {
+    if (earlyStakeData?.staked && !BigNumber(earlyStakeData?.staked).isZero()) {
+      return dayjs(earlyStakeData?.unlockTime).isBefore(dayjs());
+    } else {
+      return false;
+    }
+  }, []);
+
+  const dataSource: Array<IRewardsListDataSource> = useMemo(() => {
+    return (data || []).map((rewardsItem) => {
+      const earlyStakePoolData = earlyStakeData?.filter(
+        (data) => data?.earnedSymbol === rewardsItem?.rewardsTokenName,
+      )?.[0];
+      const earlyStakeAmountNotEnough = isEarlyStakeAmountNotEnough(rewardsItem);
+      const earlyStakePoolIsUnlock = isEarlyStakePoolIsUnlock(earlyStakePoolData);
+      const withdrawDisabled = isWithdrawDisabled(rewardsItem);
+      return {
+        ...rewardsItem,
+        earlyStakeDisabled:
+          !earlyStakePoolData || earlyStakeAmountNotEnough || earlyStakePoolIsUnlock,
+        earlyStakeTip: getEarlyStakeTip({
+          isAmountEnough: !earlyStakeAmountNotEnough,
+          isPoolUnlocked: earlyStakePoolIsUnlock,
+          rewardsItem,
+        }),
+        withdrawDisabled,
+        withdrawTip: getWithdrawTip(withdrawDisabled),
+        amount: getRewardsAmount(rewardsItem),
+      };
+    });
+  }, [
+    data,
+    earlyStakeData,
+    getEarlyStakeTip,
+    getRewardsAmount,
+    getWithdrawTip,
+    isEarlyStakeAmountNotEnough,
+    isEarlyStakePoolIsUnlock,
+    isWithdrawDisabled,
+  ]);
+
+  const handleDetail = useCallback(
+    async (data: IRewardsListDataSource) => {
       await fetchData();
+      showLoading();
       const {
         totalRewards,
         totalRewardsInUsd,
@@ -603,24 +552,19 @@ export default function useRewardsAggregation() {
         earlyStakedAmountInUsd,
         claimInfos,
         allRewardsRelease,
-      } =
-        (type === PoolType.POINTS
-          ? data?.pointsPoolAgg
-          : type === PoolType.TOKEN
-          ? data?.tokenPoolAgg
-          : data?.lpPoolAgg) || {};
+        decimal,
+      } = data?.rewardsInfo || {};
       const isAllReleased = dayjs(claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0).isBefore(
         dayjs(),
       );
+      const earlyStakePoolData = earlyStakeData?.filter(
+        (earlyData) => earlyData?.earnedSymbol === data?.rewardsTokenName,
+      )?.[0];
+      const earlyStakePoolIsUnlock = isEarlyStakePoolIsUnlock(earlyStakePoolData);
+      closeLoading();
       rewardsDetailModal.show({
-        symbol: type === PoolType.POINTS ? 'XPSGR' : type === PoolType.TOKEN ? 'SGR' : 'Lp',
-        decimal: Number(
-          (type === PoolType.POINTS
-            ? data?.pointsPoolAgg?.decimal
-            : type === PoolType.TOKEN
-            ? data?.tokenPoolAgg?.decimal
-            : data?.lpPoolAgg?.decimal) || 0,
-        ),
+        symbol: data?.poolName,
+        decimal: Number(decimal || 8),
         totalAmount: totalRewards,
         totalAmountUsd: totalRewardsInUsd,
         frozenAmount: frozen,
@@ -634,156 +578,63 @@ export default function useRewardsAggregation() {
         nextReleaseTime: nextRewardsRelease,
         earlyStakedAmount,
         earlyStakedAmountInUsd,
-        earlyStakedPoolIsUnLock,
+        earlyStakedPoolIsUnLock: earlyStakePoolIsUnlock,
         isAllReleased,
         allRewardsRelease,
         claimInfos,
+        showEarlyStake: data?.supportEarlyStake,
         onEarlyStake: () => {
-          earlyStake(type);
+          earlyStake(data);
         },
       });
     },
     [
-      data?.lpPoolAgg,
-      data?.pointsPoolAgg,
-      data?.tokenPoolAgg,
+      closeLoading,
       earlyStake,
-      earlyStakedPoolIsUnLock,
+      earlyStakeData,
       fetchData,
+      isEarlyStakePoolIsUnlock,
       rewardsDetailModal,
+      showLoading,
     ],
   );
 
-  const handlePointsDetail = useCallback(() => {
-    handleRewardsDetail(PoolType.POINTS);
-  }, [handleRewardsDetail]);
+  const confirmModalOnConfirm = useCallback(
+    async (type: 'earlyStake' | 'withdraw' = 'withdraw') => {
+      if (type === 'withdraw') {
+        await onWithDrawConfirm();
+      }
+    },
+    [onWithDrawConfirm],
+  );
 
-  const handleTokenDetail = useCallback(() => {
-    handleRewardsDetail(PoolType.TOKEN);
-  }, [handleRewardsDetail]);
-
-  const handleLpDetail = useCallback(() => {
-    handleRewardsDetail(PoolType.LP);
-  }, [handleRewardsDetail]);
-
-  const pointsPoolsAmount = useMemo(() => {
-    const { totalRewards, totalRewardsInUsd, decimal, rewardsTokenName } =
-      data?.pointsPoolAgg || {};
-    return {
-      totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
-      totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
-      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
-    };
-  }, [data?.pointsPoolAgg]);
-
-  const tokenPoolsAmount = useMemo(() => {
-    const { totalRewards, totalRewardsInUsd, decimal, rewardsTokenName } = data?.tokenPoolAgg || {};
-    return {
-      totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
-      totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
-      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
-    };
-  }, [data?.tokenPoolAgg]);
-
-  const lpPoolsAmount = useMemo(() => {
-    const { totalRewards, totalRewardsInUsd, decimal, rewardsTokenName } = data?.lpPoolAgg || {};
-    return {
-      totalRewards: formatTokenPrice(divDecimals(totalRewards, decimal)),
-      totalRewardsUsd: formatUSDPrice(divDecimals(totalRewardsInUsd, decimal)),
-      rewardsTokenName: formatTokenSymbol(rewardsTokenName || ''),
-    };
-  }, [data?.lpPoolAgg]);
-
-  const pointsWithdrawDisabled = useMemo(() => {
-    return BigNumber(data?.pointsPoolAgg?.withdrawable || 0).isZero();
-  }, [data?.pointsPoolAgg?.withdrawable]);
-
-  const pointsWithdrawTip = useMemo(() => {
-    return pointsWithdrawDisabled ? withdrawDisabledTip : '';
-  }, [pointsWithdrawDisabled]);
-
-  const tokenWithdrawDisabled = useMemo(() => {
-    return BigNumber(data?.tokenPoolAgg?.withdrawable || 0).isZero();
-  }, [data?.tokenPoolAgg?.withdrawable]);
-
-  const tokenWithdrawTip = useMemo(() => {
-    return tokenWithdrawDisabled ? withdrawDisabledTip : '';
-  }, [tokenWithdrawDisabled]);
-
-  const lpWithdrawDisabled = useMemo(() => {
-    return BigNumber(data?.lpPoolAgg?.withdrawable || 0).isZero();
-  }, [data?.lpPoolAgg?.withdrawable]);
-
-  const lpWithdrawTip = useMemo(() => {
-    return lpWithdrawDisabled ? withdrawDisabledTip : '';
-  }, [lpWithdrawDisabled]);
-
-  const pointsStakeDisabledTip = useMemo(() => {
-    const { frozen, withdrawable, rewardsTokenName } = data?.pointsPoolAgg || {};
-    return pointsEarlyStakeNotEnough
-      ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
-        : noStakeAmountTip
-      : earlyStakedPoolIsUnLock
-      ? stakeEarlyErrorTip
-      : undefined;
-  }, [data?.pointsPoolAgg, earlyStakedPoolIsUnLock, min, pointsEarlyStakeNotEnough]);
-
-  const tokenStakeDisabledTip = useMemo(() => {
-    const { frozen, withdrawable, rewardsTokenName } = data?.tokenPoolAgg || {};
-    return tokenEarlyStakeNotEnough
-      ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
-        : noStakeAmountTip
-      : earlyStakedPoolIsUnLock
-      ? stakeEarlyErrorTip
-      : undefined;
-  }, [data?.tokenPoolAgg, earlyStakedPoolIsUnLock, min, tokenEarlyStakeNotEnough]);
-
-  const lpStakeDisabledTip = useMemo(() => {
-    const { frozen, withdrawable, rewardsTokenName } = data?.lpPoolAgg || {};
-    return lpEarlyStakeNotEnough
-      ? BigNumber(ZERO.plus(frozen || 0).plus(withdrawable || 0)).gt(ZERO)
-        ? `Min staking ${min} ${formatTokenSymbol(rewardsTokenName || '')}`
-        : noStakeAmountTip
-      : earlyStakedPoolIsUnLock
-      ? stakeEarlyErrorTip
-      : undefined;
-  }, [data?.lpPoolAgg, earlyStakedPoolIsUnLock, lpEarlyStakeNotEnough, min]);
+  const onClickEmptyBtn = useCallback(() => {
+    if (poolType === PoolType.POINTS) {
+      router.push('/');
+    } else if (poolType === PoolType.LP) {
+      router.push('/farms');
+    } else {
+      router.push('/simple');
+    }
+  }, [poolType, router]);
 
   return {
     data,
     earlyStake,
-    pointsWithdraw,
-    tokenWithdraw,
-    LPWithdraw,
-    pointsPoolsAmount,
-    tokenPoolsAmount,
-    lpPoolsAmount,
     confirmModalContent,
     confirmModalErrorTip,
     confirmModalLoading,
     confirmModalOnClose,
-    confirmModalOnConfirm,
     confirmModalStatus,
     confirmModalTransactionId,
     confirmModalVisible,
     confirmModalType,
-    pointsEarlyStakeDisabled,
-    tokenEarlyStakeDisabled,
-    lpEarlyStakeDisabled,
     fetchData,
-    handleLpDetail,
-    handlePointsDetail,
-    handleTokenDetail,
-    tokenStakeDisabledTip,
-    pointsStakeDisabledTip,
-    lpStakeDisabledTip,
-    pointsWithdrawDisabled,
-    tokenWithdrawDisabled,
-    lpWithdrawDisabled,
-    pointsWithdrawTip,
-    tokenWithdrawTip,
-    lpWithdrawTip,
+    dataSource,
+    handleDetail,
+    onWithdraw,
+    onWithDrawConfirm,
+    confirmModalOnConfirm,
+    onClickEmptyBtn,
   };
 }

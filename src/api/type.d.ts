@@ -64,6 +64,7 @@ interface IStakePoolData {
   latestClaimTime?: string | number;
   usdRate?: number | string;
   longestReleaseTime?: number | string;
+  supportEarlyStake?: boolean;
 }
 
 type TStakePoolDataKey = keyof IStakePoolData;
@@ -74,6 +75,10 @@ interface IStakingItem {
   stakingAddress: number;
   isOpenStake: boolean;
   projectOwner: string;
+  dappId: string;
+  rulesText: Array<string>;
+  gainUrl: string;
+  pointsType: string;
 }
 
 interface IChildTextNode {
@@ -98,6 +103,7 @@ interface IPointsPoolParams {
   skipCount: number;
   maxResultCount: number;
   address: string;
+  dappId: string;
 }
 
 interface IPointsPoolItem {
@@ -127,87 +133,46 @@ interface ICreateTradeParams {
   chainId: Chain;
 }
 
-interface IPoolRewardsData {
+interface IRewardsInfo {
+  claimInfos: Array<{
+    claimId: string;
+    releaseTime: number;
+  }>;
+  withdrawableClaimInfos: Array<{
+    claimId: string;
+    releaseTime: number;
+  }>;
+  totalRewards: string;
+  totalRewardsInUsd: string;
+  rewardsTokenName: string;
+  decimal: string;
+  withdrawn: string;
+  withdrawnInUsd: string;
+  frozen: string;
+  frozenInUsd: string;
+  withdrawable: string;
+  withdrawableInUsd: string;
+  earlyStakedAmount: string;
+  earlyStakedAmountInUsd: string;
+  nextRewardsRelease: number;
+  nextRewardsReleaseAmount: string;
+  allRewardsRelease: boolean;
+}
+
+interface IPoolRewardsItem {
+  poolName: string;
+  poolType: PoolType;
+  poolId: string;
+  rewardsInfo: IRewardsInfo;
+  supportEarlyStake: boolean;
   dappId: string;
-  pointsPoolAgg: {
-    claimInfos: Array<{
-      claimId: string;
-      releaseTime: number;
-    }>;
-    withdrawableClaimInfos: Array<{
-      claimId: string;
-      releaseTime: number;
-    }>;
-    totalRewards: string;
-    totalRewardsInUsd: string;
-    rewardsTokenName: string;
-    decimal: string;
-    withdrawn: string;
-    withdrawnInUsd: string;
-    frozen: string;
-    frozenInUsd: string;
-    withdrawable: string;
-    withdrawableInUsd: string;
-    earlyStakedAmount: string;
-    earlyStakedAmountInUsd: string;
-    nextRewardsRelease: number;
-    nextRewardsReleaseAmount: string;
-    allRewardsRelease: boolean;
-  };
-  tokenPoolAgg: {
-    claimInfos: Array<{
-      claimId: string;
-      releaseTime: number;
-    }>;
-    withdrawableClaimInfos: Array<{
-      claimId: string;
-      releaseTime: number;
-    }>;
-    totalRewards: string;
-    totalRewardsInUsd: string;
-    rewardsTokenName: string;
-    decimal: string;
-    withdrawn: string;
-    withdrawnInUsd: string;
-    frozen: string;
-    frozenInUsd: string;
-    withdrawable: string;
-    withdrawableInUsd: string;
-    earlyStakedAmount: string;
-    earlyStakedAmountInUsd: string;
-    nextRewardsRelease: number;
-    nextRewardsReleaseAmount: string;
-    allRewardsRelease: boolean;
-  };
-  lpPoolAgg: {
-    claimInfos: Array<{
-      claimId: string;
-      releaseTime: number;
-    }>;
-    withdrawableClaimInfos: Array<{
-      claimId: string;
-      releaseTime: number;
-    }>;
-    totalRewards: string;
-    totalRewardsInUsd: string;
-    rewardsTokenName: string;
-    decimal: string;
-    withdrawn: string;
-    withdrawnInUsd: string;
-    frozen: string;
-    frozenInUsd: string;
-    withdrawable: string;
-    withdrawableInUsd: string;
-    earlyStakedAmount: string;
-    earlyStakedAmountInUsd: string;
-    nextRewardsRelease: number;
-    nextRewardsReleaseAmount: string;
-    allRewardsRelease: boolean;
-  };
+  rewardsTokenName: string;
+  rate: string;
 }
 
 interface IRewardListParams {
-  poolType?: 'Points' | 'Token' | 'Lp' | 'All';
+  poolType: 'Points' | 'Token' | 'Lp' | 'All';
+  id: string;
   skipCount: number;
   maxResultCount: number;
   filterUnlocked?: boolean;
@@ -226,6 +191,7 @@ interface IRewardListItem {
   date: number;
   lockUpPeriod: number;
   rewardsTokenDecimal: number;
+  rate: number;
 }
 
 interface IRewardListData {
@@ -257,6 +223,7 @@ interface IEarlyStakeInfo {
   stakingPeriod?: number | string;
   lastOperationTime?: number | string;
   subStakeInfos: Array<IStakeInfoItem>;
+  earnedSymbol: string;
 }
 
 interface IFetchStakeParams {
@@ -286,6 +253,8 @@ interface IEarlyStakeSignParams {
   dappId: string;
   poolId: string;
   period: number;
+  operationPoolIds: Array<string>;
+  operationDappIds: Array<string>;
 }
 
 interface IWithdrawSignParams {
@@ -297,6 +266,8 @@ interface IWithdrawSignParams {
     releaseTime: number;
   }>;
   dappId: string;
+  operationPoolIds: Array<string>;
+  operationDappIds: Array<string>;
 }
 
 interface IEarlyStakeSignData {
@@ -349,6 +320,8 @@ interface IAddLiquiditySignParams {
   period: number;
   tokenAMin: string | number;
   tokenBMin: string | number;
+  operationPoolIds: Array<string>;
+  operationDappIds: Array<string>;
 }
 
 interface ILiquidityStakeSignParams {
@@ -373,4 +346,10 @@ interface ISendTransactionResult {
   data: string;
   code: number;
   message: string;
+}
+
+interface IRewardsTypeItem {
+  filterName: string;
+  id: string;
+  poolType: PoolType;
 }

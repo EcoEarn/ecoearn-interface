@@ -33,6 +33,7 @@ interface IStakeModalProps {
   poolType?: PoolType;
   modalTitle?: string;
   stakeData: IStakePoolData;
+  fetchBalance?: () => Promise<string | undefined>;
   onStake: (
     amount: number | string,
     period: number | string,
@@ -58,6 +59,7 @@ function StakeModalWithConfirm({
   balanceDec,
   modalTitle,
   poolType,
+  fetchBalance,
   onStake,
   onSuccess,
   balance,
@@ -204,6 +206,7 @@ function StakeModalWithConfirm({
         type={type}
         balance={balance}
         onClose={onClose}
+        fetchBalance={fetchBalance}
         onConfirm={onStakeModalConfirm}
         stakeData={stakeData}
       />
