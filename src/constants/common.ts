@@ -1,4 +1,4 @@
-export const appName = 'schrodinger';
+export const appName = 'ecoearn';
 
 export const currentRpcUrl = {
   AELF: 'rpcUrlAELF',
@@ -12,3 +12,5 @@ const env = process.env.NEXT_PUBLIC_APP_ENV;
 
 export const PrimaryDomainName =
   env === 'test' ? 'https://schrodingerai.com' : 'https://schrodingernft.ai';
+
+export const PORTKEY_LOGIN_CHAIN_ID_KEY = 'PortkeyOriginChainId';

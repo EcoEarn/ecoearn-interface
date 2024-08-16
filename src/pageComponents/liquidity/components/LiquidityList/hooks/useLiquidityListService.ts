@@ -39,8 +39,10 @@ import {
   getTargetUnlockTimeStamp,
   timesDecimals,
 } from 'utils/calculate';
+import { formatTokenSymbol, isTokenSymbolNeedReverse } from 'utils/format';
 import { matchErrorMsg } from 'utils/formatError';
 import { getRawTransaction } from 'utils/getRawTransaction';
+import { fixEarlyStakeData } from 'utils/stake';
 import useResponsive from 'utils/useResponsive';
 
 export enum LiquidityListTypeEnum {
@@ -70,6 +72,7 @@ export default function useLiquidityListService() {
       try {
         const data = await getPoolRewards({
           address: wallet.address,
+          poolType: PoolType.ALL,
         });
         return data;
       } catch (error) {
@@ -80,8 +83,51 @@ export default function useLiquidityListService() {
   );
 
   const rewardsSymbol = useMemo(() => {
-    return rewardsData?.pointsPoolAgg?.rewardsTokenName || '';
-  }, [rewardsData?.pointsPoolAgg?.rewardsTokenName]);
+    //FIXME:
+    return 'SGR-1';
+  }, []);
+
+  const rewardsInfoToStake = useMemo(() => {
+    return rewardsData?.filter(
+      (item) =>
+        item.rewardsTokenName === rewardsSymbol &&
+        ZERO.plus(item?.rewardsInfo?.frozen || 0)
+          .plus(item?.rewardsInfo?.withdrawable || 0)
+          .gt(0),
+    );
+  }, [rewardsData, rewardsSymbol]);
+
+  const claimInfosToStake = useMemo(() => {
+    const claimInfos: Array<any> = [];
+    rewardsInfoToStake?.forEach((item) => {
+      claimInfos.push(...(item?.rewardsInfo?.claimInfos || []));
+    });
+    return claimInfos;
+  }, [rewardsInfoToStake]);
+
+  const poolIdsToStake = useMemo(() => {
+    return rewardsInfoToStake?.map((item) => item?.poolId)?.filter((i) => i);
+  }, [rewardsInfoToStake]);
+
+  const dappIdToStake = useMemo(() => {
+    //FIXME:
+    const pointsPoolsIds = rewardsInfoToStake
+      ?.filter((item) => item?.poolType === PoolType.POINTS)
+      ?.map((item) => item?.dappId);
+    return pointsPoolsIds && pointsPoolsIds?.length > 0 ? pointsPoolsIds : [];
+  }, [rewardsInfoToStake]);
+
+  const dappIdToStakeOrRemove = useMemo(() => {
+    //FIXME:
+    return (
+      rewardsData?.filter((item) => item?.rewardsTokenName === rewardsSymbol)?.[0]?.dappId || ''
+    );
+  }, [rewardsData, rewardsSymbol]);
+
+  const dappId = useMemo(() => {
+    //FIXME:
+    return rewardsInfoToStake?.[0]?.dappId || '';
+  }, [rewardsInfoToStake]);
 
   const getEarlyStakeInfoParams: Array<IGetEarlyStakeInfoParams> = useMemo(() => {
     return data.map((item) => {
@@ -105,12 +151,13 @@ export default function useLiquidityListService() {
           }),
         );
         return (await (data || [])).map((item) => {
+          const data = item?.[0];
           return {
-            ...item,
+            ...data,
             unlockTime: getTargetUnlockTimeStamp(
-              item?.stakingPeriod || 0,
-              item?.lastOperationTime || 0,
-              item?.unlockWindowDuration || 0,
+              data?.stakingPeriod || 0,
+              data?.lastOperationTime || 0,
+              data?.unlockWindowDuration || 0,
             ).unlockTime,
           };
         });
@@ -121,27 +168,24 @@ export default function useLiquidityListService() {
     { pollingInterval: 10000, refreshDeps: [data] },
   );
 
-  console.log('=====earlyStakeInfos', earlyStakeInfos);
-
   useWebLoginEvent(WebLoginEvents.LOGOUT, () => {
     router.replace('/farms');
   });
 
   const totalEarlyStakeAmount = useMemo(() => {
-    if (!rewardsData) return 0;
-    const { pointsPoolAgg, tokenPoolAgg, lpPoolAgg } = rewardsData;
-    return ZERO.plus(pointsPoolAgg?.frozen || 0)
-      .plus(pointsPoolAgg?.withdrawable || 0)
-      .plus(tokenPoolAgg?.frozen || 0)
-      .plus(tokenPoolAgg?.withdrawable || 0)
-      .plus(lpPoolAgg?.frozen || 0)
-      .plus(lpPoolAgg?.withdrawable || 0)
-      .toString();
-  }, [rewardsData]);
+    if (!rewardsInfoToStake) return 0;
+    let total = ZERO;
+    rewardsInfoToStake?.forEach((rewardsItem) => {
+      const { withdrawable, frozen } = rewardsItem?.rewardsInfo || {};
+      total = total.plus(withdrawable || 0).plus(frozen || 0);
+    });
+    return total.toString();
+  }, [rewardsInfoToStake]);
 
   const totalStakeAmount = useMemo(() => {
-    return divDecimals(totalEarlyStakeAmount, rewardsData?.pointsPoolAgg?.decimal || 8).toString();
-  }, [rewardsData?.pointsPoolAgg?.decimal, totalEarlyStakeAmount]);
+    //FIXME: 8
+    return divDecimals(totalEarlyStakeAmount, 8).toString();
+  }, [totalEarlyStakeAmount]);
 
   const totalStakeAmountNotEnough = useMemo(() => {
     return BigNumber(totalStakeAmount).lt(min);
@@ -181,16 +225,17 @@ export default function useLiquidityListService() {
   const getAddBtnTip = useCallback(
     ({ index }: { index: number }) => {
       const bigValue = BigNumber(totalStakeAmount || 0);
+      const rewardsTokenSymbol = formatTokenSymbol(rewardsSymbol);
       return bigValue.isZero()
-        ? 'You currently have no SGR rewards available for adding liquidity.'
+        ? `You currently have no ${rewardsTokenSymbol} rewards available for adding liquidity.`
         : bigValue.lt(min)
-        ? `The reward amount for adding liquidity can not be less than ${min} SGR.`
+        ? `The reward amount for adding liquidity can not be less than ${min} ${rewardsTokenSymbol}.`
         : !BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
           dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs())
         ? 'Your staking has expired and cannot be added. Please proceed to "Farms(LP Staking)" for renewal.'
         : '';
     },
-    [earlyStakeInfos, min, totalStakeAmount],
+    [earlyStakeInfos, min, rewardsSymbol, totalStakeAmount],
   );
 
   const getStakeBtnTip = useCallback(
@@ -263,28 +308,14 @@ export default function useLiquidityListService() {
   );
 
   const longestReleaseTime = useMemo(() => {
-    const { pointsPoolAgg, tokenPoolAgg, lpPoolAgg } = rewardsData || {};
-    let pointsLongestReleaseTime = 0;
-    let tokenLongestReleaseTime = 0;
-    let lpLongestReleaseTime = 0;
-    const { claimInfos: pointsClaimInfos } = pointsPoolAgg || {};
-    const { claimInfos: tokenClaimInfos } = tokenPoolAgg || {};
-    const { claimInfos: lpClaimInfos } = lpPoolAgg || {};
-    if (pointsClaimInfos && pointsClaimInfos?.length > 0) {
-      pointsLongestReleaseTime = pointsClaimInfos?.[pointsClaimInfos?.length - 1]?.releaseTime || 0;
-    }
-    if (tokenClaimInfos && tokenClaimInfos?.length > 0) {
-      tokenLongestReleaseTime = tokenClaimInfos?.[tokenClaimInfos?.length - 1]?.releaseTime || 0;
-    }
-    if (lpClaimInfos && lpClaimInfos?.length > 0) {
-      lpLongestReleaseTime = lpClaimInfos?.[lpClaimInfos?.length - 1]?.releaseTime || 0;
-    }
-    return max([
-      pointsLongestReleaseTime || 0,
-      tokenLongestReleaseTime || 0,
-      lpLongestReleaseTime || 0,
-    ]);
-  }, [rewardsData]);
+    let longestReleaseTime = 0;
+    rewardsInfoToStake?.forEach((item) => {
+      const claimInfos = item?.rewardsInfo?.claimInfos || [];
+      longestReleaseTime =
+        max([longestReleaseTime, claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0]) || 0;
+    });
+    return longestReleaseTime;
+  }, [rewardsInfoToStake]);
 
   const onAddAndStake = useCallback(
     async ({
@@ -323,7 +354,7 @@ export default function useLiquidityListService() {
           unStakingAmount: tokenBUnStakingAmount,
         },
       ];
-      const tokens = tokenASymbol === rewardsSymbol ? defaultTokens : defaultTokens.reverse();
+      const tokens = tokenASymbol === rewardsSymbol ? defaultTokens : [...defaultTokens].reverse();
       const decimals = [
         tokens[0].symbol === 'USDT' ? usdDecimal || 6 : decimal || 8,
         tokens[1].symbol === 'USDT' ? usdDecimal || 6 : decimal || 8,
@@ -365,7 +396,7 @@ export default function useLiquidityListService() {
             balance: String(totalEarlyStakeAmount),
             decimal: decimals[0],
             usdPrice: tokenAPrice || '0',
-            icon: icons?.[0] || '',
+            icon: isTokenSymbolNeedReverse(lpSymbol || '') ? icons?.[1] || '' : icons?.[0] || '',
             symbol: tokens[0].symbol,
             position: String(
               currentList === LiquidityListTypeEnum.Market
@@ -378,7 +409,7 @@ export default function useLiquidityListService() {
             balance: String(tokenBBalance),
             decimal: decimals[1],
             usdPrice: tokenBPrice || '0',
-            icon: icons?.[1] || '',
+            icon: isTokenSymbolNeedReverse(lpSymbol || '') ? icons?.[0] || '' : icons?.[1] || '',
             symbol: tokens[1].symbol,
             position: String(
               currentList === LiquidityListTypeEnum.Market
@@ -401,12 +432,10 @@ export default function useLiquidityListService() {
           per2,
           reserves: pairInfo.reserves,
           totalSupply: pairInfo?.totalSupply || '0',
-          dappId: rewardsData?.dappId || '',
-          claimInfos: [
-            ...(rewardsData?.pointsPoolAgg?.claimInfos || []),
-            ...(rewardsData?.tokenPoolAgg?.claimInfos || []),
-            ...(rewardsData?.lpPoolAgg?.claimInfos || []),
-          ],
+          dappId: dappId || '',
+          poolIdsToStake: poolIdsToStake || [],
+          dappIdsToStake: dappIdToStake || [],
+          claimInfos: claimInfosToStake || [],
           longestReleaseTime,
           onSuccess: () => {
             addModal?.remove();
@@ -422,17 +451,17 @@ export default function useLiquidityListService() {
     },
     [
       addModal,
+      claimInfosToStake,
       closeLoading,
       currentList,
+      dappId,
+      dappIdToStake,
       fetchData,
       getBalance,
       getPairInfo,
       getPrice,
       longestReleaseTime,
-      rewardsData?.dappId,
-      rewardsData?.lpPoolAgg?.claimInfos,
-      rewardsData?.pointsPoolAgg?.claimInfos,
-      rewardsData?.tokenPoolAgg?.claimInfos,
+      poolIdsToStake,
       rewardsSymbol,
       showLoading,
       totalEarlyStakeAmount,
@@ -460,7 +489,7 @@ export default function useLiquidityListService() {
         { symbol: tokenASymbol, amount: tokenAAmount },
         { symbol: tokenBSymbol, amount: tokenBAmount },
       ];
-      const tokens = tokenASymbol === rewardsSymbol ? defaultTokens : defaultTokens.reverse();
+      const tokens = tokenASymbol === rewardsSymbol ? defaultTokens : [...defaultTokens].reverse();
       const decimals = [
         tokens[0].symbol === 'USDT' ? usdDecimal || 6 : decimal || 8,
         tokens[1].symbol === 'USDT' ? usdDecimal || 6 : decimal || 8,
@@ -498,14 +527,14 @@ export default function useLiquidityListService() {
           tokenA: {
             amount: timesDecimals(tokens[0].amount, decimals[0]).toString(),
             decimal: decimals[0],
-            icon: icons?.[0] || '',
+            icon: isTokenSymbolNeedReverse(lpSymbol || '') ? icons?.[1] || '' : icons?.[0] || '',
             symbol: tokens[0].symbol,
             fromRewards: true,
           },
           tokenB: {
             amount: timesDecimals(tokens[1].amount, decimals[1]).toString(),
             decimal: decimals[1],
-            icon: icons?.[1] || '',
+            icon: isTokenSymbolNeedReverse(lpSymbol || '') ? icons?.[0] || '' : icons?.[1] || '',
             symbol: tokens[1].symbol,
           },
           lpToken: {
@@ -520,7 +549,7 @@ export default function useLiquidityListService() {
           reserves: pairInfo.reserves,
           fee: transactionFee?.transactionFee || '0',
           liquidityIds,
-          dappId: rewardsData?.dappId || '',
+          dappId: dappIdToStakeOrRemove || '',
           totalSupply: pairInfo?.totalSupply || '0',
           lpAmount,
           onSuccess: () => {
@@ -536,10 +565,10 @@ export default function useLiquidityListService() {
     },
     [
       closeLoading,
+      dappIdToStakeOrRemove,
       fetchData,
       getPairInfo,
       removeModal,
-      rewardsData?.dappId,
       rewardsSymbol,
       showLoading,
     ],
@@ -547,7 +576,7 @@ export default function useLiquidityListService() {
 
   const onStake = useCallback(
     async ({ banlance, lpSymbol, rate, decimal, liquidityIds, lpAmount }: ILiquidityItem) => {
-      let stakeData: IEarlyStakeInfo;
+      let stakeData: any;
       try {
         showLoading();
         stakeData = await getEarlyStakeInfo({
@@ -558,15 +587,8 @@ export default function useLiquidityListService() {
           rate: rate,
         });
         closeLoading();
-        if (stakeData) {
-          const fixedEarlyStakeData = {
-            ...stakeData,
-            unlockTime: getTargetUnlockTimeStamp(
-              stakeData?.stakingPeriod || 0,
-              stakeData?.lastOperationTime || 0,
-              stakeData?.unlockWindowDuration || 0,
-            ).unlockTime,
-          };
+        const fixedEarlyStakeData = (fixEarlyStakeData(stakeData) as Array<IEarlyStakeInfo>)?.[0];
+        if (fixedEarlyStakeData) {
           stakeData = fixedEarlyStakeData;
           if (
             !BigNumber(stakeData?.staked || 0).isZero() &&
@@ -609,13 +631,12 @@ export default function useLiquidityListService() {
           try {
             showLoading();
             const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-            const dappId = rewardsData?.dappId || '';
             const signParams: ILiquidityStakeSignParams = {
               lpAmount: String(lpAmount || ''),
               poolId: stakeData?.poolId || '',
               period: periodInSeconds,
               address: wallet?.address || '',
-              dappId,
+              dappId: dappIdToStakeOrRemove,
               liquidityIds,
             };
             const { seed, signature, expirationTime } =
@@ -696,9 +717,9 @@ export default function useLiquidityListService() {
       closeLoading,
       config,
       curChain,
+      dappIdToStakeOrRemove,
       fetchData,
       rewardsContractAddress,
-      rewardsData?.dappId,
       showLoading,
       stakeModal,
       wallet,

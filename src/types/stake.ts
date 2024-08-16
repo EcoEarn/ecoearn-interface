@@ -9,4 +9,5 @@ export enum PoolType {
   POINTS = 'Points',
   TOKEN = 'Token',
   LP = 'Lp',
+  ALL = 'All',
 }

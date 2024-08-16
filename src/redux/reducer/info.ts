@@ -23,6 +23,9 @@ export const infoSlice = createSlice({
     setCmsInfo(state, action) {
       state.cmsInfo = action.payload;
     },
+    setDappList(state, action) {
+      state.dappList = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -36,6 +39,6 @@ export const infoSlice = createSlice({
   },
 });
 
-export const { setIsMobile, setCmsInfo } = infoSlice.actions;
+export const { setIsMobile, setCmsInfo, setDappList } = infoSlice.actions;
 export const selectInfo = (state: AppState) => state.info;
 export default infoSlice.reducer;

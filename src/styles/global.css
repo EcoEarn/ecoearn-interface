@@ -43,8 +43,23 @@ code {
     */
 }
 
-.portkey-ui-wrapper{
+.portkey-ui-wrapper {
 	height: 100% !important;
+}
+
+.etransfer-ui-wrapper {
+	height: 100% !important;
+}
+
+.etransfer-ui-deposit-detail-drawer, .etransfer-ui-common-drawer {
+	z-index: 9999 !important;
+} 
+
+.etransfer-ant-modal-wrap {
+	z-index: 10000 !important;
+	.etransfer-ui-common-svg {
+		display:  inline-flex !important;
+	}
 }
 
 .earn-notification-notice-wrapper{

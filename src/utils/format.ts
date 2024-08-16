@@ -279,7 +279,7 @@ export function orderPairTokens(tokenA: string, tokenB: string) {
   const defaultRes = [formatSymbol(tokenA), formatSymbol(tokenB)];
   const tokenAWeight = getTokenWeights(tokenA);
   const tokenBWeight = getTokenWeights(tokenB);
-  return tokenAWeight <= tokenBWeight ? defaultRes : defaultRes.reverse();
+  return tokenAWeight <= tokenBWeight ? defaultRes : [...defaultRes].reverse();
 }
 
 export const SYMBOL_FORMAT_MAP: Record<string, string> = {

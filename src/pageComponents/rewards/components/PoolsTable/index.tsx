@@ -11,6 +11,7 @@ import { AELFDProviderTheme } from 'provider/config';
 import CommonTooltip from 'components/CommonTooltip';
 import { DownOutlined } from '@ant-design/icons';
 import CommonTable from 'components/CommonTable';
+import { APP_PREFIX } from 'constants/index';
 
 export default function PoolsTable({
   page,
@@ -18,19 +19,29 @@ export default function PoolsTable({
   dataList,
   loading,
   totalCount,
+  rewardsTypeList,
   onPaginationChange,
   onChange,
-  onCountDownFinish,
 }: {
   page: number;
   pageSize: number;
   totalCount: number;
   dataList: Array<IRewardListItem>;
   loading: boolean;
+  rewardsTypeList: Array<IRewardsTypeItem>;
   onPaginationChange: (params: { page?: number; pageSize?: number }) => void;
   onChange: (pagination: any, filters: Record<string, any>, sorter: any) => void;
   onCountDownFinish?: () => void;
 }) {
+  const poolsFilters = useMemo(() => {
+    return rewardsTypeList.map((item) => {
+      return {
+        text: item?.filterName,
+        value: item?.id,
+      };
+    });
+  }, [rewardsTypeList]);
+
   const columns: TableColumnsType<IRewardListItem> = useMemo(() => {
     return [
       {
@@ -38,12 +49,7 @@ export default function PoolsTable({
         dataIndex: 'pools',
         title: 'Pools',
         filterMultiple: false,
-        filters: [
-          { text: 'All', value: 'All' },
-          { text: 'XPSGR', value: 'Points' },
-          { text: 'SGR', value: 'Token' },
-          { text: 'LP', value: 'Lp' },
-        ],
+        filters: poolsFilters,
         filterIcon: <DownOutlined />,
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
@@ -53,6 +59,7 @@ export default function PoolsTable({
               icons={tokenIcon}
               tokenName={tokenName}
               projectName={projectOwner}
+              rate={item?.rate}
             />
           );
         },
@@ -102,10 +109,11 @@ export default function PoolsTable({
         },
       },
     ];
-  }, []);
+  }, [poolsFilters]);
 
   return (
     <AELFDProvider
+      prefixCls={APP_PREFIX}
       theme={{
         ...AELFDProviderTheme,
         components: { ...AELFDProviderTheme.components, ...theme.components },

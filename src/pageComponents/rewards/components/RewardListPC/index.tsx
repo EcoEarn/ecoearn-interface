@@ -3,30 +3,16 @@ import PoolsTable from '../PoolsTable';
 import { useEffect } from 'react';
 
 export default function RewardListPC({
-  updateHasHistoryDate,
-  onCountDownFinish,
+  rewardsTypeList,
 }: {
-  updateHasHistoryDate: (value: boolean) => void;
-  onCountDownFinish?: () => void;
+  rewardsTypeList: Array<IRewardsTypeItem>;
 }) {
-  const {
-    page,
-    pageSize,
-    dataList,
-    loading,
-    poolType,
-    totalCount,
-    onPaginationChange,
-    onChange,
-    hasHistoryData,
-  } = useRewardsListService();
-
-  useEffect(() => {
-    updateHasHistoryDate(hasHistoryData);
-  }, [hasHistoryData, updateHasHistoryDate]);
+  const { page, pageSize, dataList, loading, totalCount, onPaginationChange, onChange } =
+    useRewardsListService({ rewardsTypeList });
 
   return (
     <PoolsTable
+      rewardsTypeList={rewardsTypeList}
       page={page}
       pageSize={pageSize}
       dataList={dataList}
@@ -34,7 +20,6 @@ export default function RewardListPC({
       onPaginationChange={onPaginationChange}
       loading={loading}
       totalCount={totalCount}
-      onCountDownFinish={onCountDownFinish}
     />
   );
 }

@@ -1,16 +1,12 @@
-import { sleep } from '@portkey/utils';
-import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
-import { useRequest } from 'ahooks';
 import { message } from 'antd';
 import { getPointsPoolList, pointsClaim, stakingClaim } from 'api/request';
+import useDappList from 'hooks/useDappList';
 import useEarlyStake from 'hooks/useEarlyStake';
 import useLoading from 'hooks/useLoading';
-import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useWalletService } from 'hooks/useWallet';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { ICMSInfo } from 'redux/types/reducerTypes';
-import { ISendResult } from 'types';
 import { PoolType } from 'types/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { timesDecimals } from 'utils/calculate';
@@ -23,15 +19,12 @@ export enum ListTypeEnum {
   All = 'All',
 }
 
-export default function usePointsPoolService() {
+export default function usePointsPoolService({ dappName }: { dappName: string }) {
   const [currentList, setCurrentList] = useState<ListTypeEnum>(ListTypeEnum.All);
   const { showLoading, closeLoading } = useLoading();
   const { wallet, walletType } = useWalletService();
   const { pointsContractAddress, curChain, caContractAddress, ...config } = useGetCmsInfo() || {};
-  const { isLogin } = useGetLoginStatus();
-  const { checkLogin } = useCheckLoginAndToken();
   const { isLG } = useResponsive();
-  const { schrodingerUrl } = useGetCmsInfo() || {};
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [curItem, setCurItem] = useState<IPointsPoolItem>();
@@ -39,11 +32,21 @@ export default function usePointsPoolService() {
   const [transactionId, setTransactionId] = useState<string>();
   const [errorTip, setErrorTip] = useState('');
   const { stake } = useEarlyStake();
+  const { dappList } = useDappList();
+  const [data, setData] = useState<Array<IPointsPoolItem>>();
 
   const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
     { label: 'All', value: ListTypeEnum.All },
     { label: 'Staked', value: ListTypeEnum.Staked },
   ];
+
+  const dappId = useMemo(() => {
+    return dappList?.filter((item) => item?.dappName === dappName)?.[0]?.dappId || '';
+  }, [dappList, dappName]);
+
+  const gainUrl = useMemo(() => {
+    return dappList?.filter((item) => item?.dappName === dappName)?.[0]?.gainUrl || '';
+  }, [dappList, dappName]);
 
   const handleSegmentChange = useCallback(
     (value: string) => {
@@ -53,8 +56,8 @@ export default function usePointsPoolService() {
   );
 
   const handleGain = useCallback(() => {
-    window.open(schrodingerUrl, '_blank');
-  }, [schrodingerUrl]);
+    gainUrl && window.open(gainUrl, '_blank');
+  }, [gainUrl]);
 
   const handleClaim = useCallback((item: IPointsPoolItem) => {
     setCurItem(item);
@@ -69,35 +72,28 @@ export default function usePointsPoolService() {
     setCurItem(undefined);
   }, []);
 
-  const {
-    run,
-    data,
-    loading: requestLoading,
-    refresh,
-  } = useRequest(
-    () => {
-      if (!wallet.address && currentList === ListTypeEnum.Staked) return Promise.resolve(null);
-      return getPointsPoolList({
+  const fetchData = useCallback(async () => {
+    if (!dappId) {
+      return;
+    }
+    try {
+      showLoading();
+      const data = await getPointsPoolList({
         type: currentList,
         sorting: '',
         name: '',
         skipCount: 0,
         maxResultCount: 20,
         address: wallet.address || '',
+        dappId: dappId,
       });
-    },
-    {
-      manual: true,
-    },
-  );
-
-  useEffect(() => {
-    if (requestLoading) {
-      showLoading();
-    } else {
+      data && setData(data);
+    } catch (err) {
+      console.error('getPointsPoolList err', err);
+    } finally {
       closeLoading();
     }
-  }, [closeLoading, loading, requestLoading, showLoading]);
+  }, [closeLoading, currentList, dappId, showLoading, wallet.address]);
 
   const onClaim = useCallback(
     async (item: IPointsPoolItem) => {
@@ -183,38 +179,29 @@ export default function usePointsPoolService() {
     }
   }, [curItem, onClaim]);
 
-  const handleEarlyStake = useCallback(async () => {
-    await stake({
-      poolType: PoolType.POINTS,
-      onSuccess: () => {
-        setModalVisible(false);
-      },
-    });
-  }, [stake]);
+  const handleEarlyStake = useCallback(
+    async (tokenName: string) => {
+      await stake({
+        poolType: PoolType.POINTS,
+        rewardsTokenName: tokenName,
+        onSuccess: () => {
+          setModalVisible(false);
+        },
+      });
+    },
+    [stake],
+  );
 
   useEffect(() => {
-    currentList && run();
-  }, [currentList, run]);
-
-  useWebLoginEvent(WebLoginEvents.LOGOUT, () => {
-    if (currentList === ListTypeEnum.All) {
-      run();
-    } else {
-      setCurrentList(ListTypeEnum.All);
-    }
-  });
-
-  useWebLoginEvent(WebLoginEvents.LOGINED, async () => {
-    await sleep(500);
-    run();
-  });
+    fetchData();
+  }, [currentList, fetchData]);
 
   return {
     data,
     loading,
     currentList,
     setCurrentList,
-    fetchData: run,
+    fetchData,
     onClaim,
     curItem,
     modalVisible,
