@@ -17,7 +17,8 @@ interface IPositionProps {
 }
 
 export default function Position(props: IPositionProps) {
-  const { lpBalance, lpSymbol, rate, tokenABalance, tokenAName, tokenBBalance, tokenBName } = props;
+  const { lpBalance, lpSymbol, rate, tokenABalance, tokenAName, tokenBBalance, tokenBName, icons } =
+    props;
   const { isLG } = useResponsive();
 
   const tokenAValue = useMemo(() => {
@@ -52,6 +53,7 @@ export default function Position(props: IPositionProps) {
         <span className="text-lg font-medium text-neutralTitle">Your Position</span>
         <Flex justify={isLG ? 'space-between' : 'start'} gap={8} align="center">
           <StakeToken
+            icons={icons}
             className="lg:!items-center"
             type={PoolTypeEnum.Lp}
             tokenName={lpSymbol}

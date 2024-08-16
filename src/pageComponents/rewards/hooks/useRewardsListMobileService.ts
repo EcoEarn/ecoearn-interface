@@ -7,7 +7,11 @@ const PAGE_CONTAINER_ID = 'pageContainer';
 
 const pageSize = 10;
 
-export default function useRewardsListMobileService() {
+export default function useRewardsListMobileService({
+  rewardsTypeList,
+}: {
+  rewardsTypeList: Array<IRewardsTypeItem>;
+}) {
   const [total, setTotal] = useState(0);
   const [dataSource, setDataSource] = useState<IRewardListItem[]>([]);
   const loading = useRef(false);
@@ -16,16 +20,16 @@ export default function useRewardsListMobileService() {
   const { showLoading, closeLoading, visible: isLoading } = useLoading();
   const { wallet } = useWalletService();
   const [poolType, setPoolType] = useState<'Points' | 'Token' | 'Lp' | 'All'>('All');
-  const [hasHistoryData, setHasHistoryData] = useState(false);
+  const [rewardsTypeId, setRewardsTypeId] = useState('');
 
   const selectOptions = useMemo(() => {
-    return [
-      { value: 'All', label: 'All' },
-      { value: 'Points', label: 'XPSGR' },
-      { value: 'Token', label: 'SGR' },
-      { value: 'Lp', label: 'LP' },
-    ];
-  }, []);
+    return rewardsTypeList?.map((item) => {
+      return {
+        value: item?.id,
+        label: item?.filterName,
+      };
+    });
+  }, [rewardsTypeList]);
 
   const requestParams = useMemo(() => {
     const params: IRewardListParams = {
@@ -33,9 +37,10 @@ export default function useRewardsListMobileService() {
       skipCount: current === 1 ? 0 : (current - 1) * pageSize,
       maxResultCount: pageSize,
       poolType,
+      id: rewardsTypeId || (poolType === 'All' ? 'all' : ''),
     };
     return params;
-  }, [current, poolType, wallet?.address]);
+  }, [current, poolType, rewardsTypeId, wallet?.address]);
 
   const fetchData = useCallback(async () => {
     if (loading.current || !hasMore) {
@@ -58,24 +63,26 @@ export default function useRewardsListMobileService() {
       } else {
         setHasMore(true);
       }
-      if (current === 1 && poolType === 'All' && res?.items?.length) {
-        setHasHistoryData(true);
-      }
     } finally {
       closeLoading();
       loading.current = false;
     }
-  }, [closeLoading, current, hasMore, poolType, requestParams, showLoading]);
+  }, [closeLoading, current, hasMore, requestParams, showLoading]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const handleChange = (value: 'Points' | 'Token' | 'Lp' | 'All') => {
-    setPoolType(value);
-    setHasMore(true);
-    setCurrent(1);
-  };
+  const handleChange = useCallback(
+    (value: string) => {
+      setRewardsTypeId(value || '');
+      const poolType = rewardsTypeList?.find((item) => item?.id === value)?.poolType || 'All';
+      setPoolType(poolType);
+      setHasMore(true);
+      setCurrent(1);
+    },
+    [rewardsTypeList],
+  );
 
   const loadMoreData = useCallback(() => {
     if (loading.current || !hasMore) return;
@@ -118,6 +125,5 @@ export default function useRewardsListMobileService() {
     total,
     loadMoreData,
     loading: loading.current,
-    hasHistoryData,
   };
 }

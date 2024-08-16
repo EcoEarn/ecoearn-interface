@@ -13,6 +13,7 @@ import { APP_PREFIX } from 'constants/index';
 import { store } from 'redux/store';
 import { getCmsInfo } from 'api/request';
 import { setCmsInfo } from 'redux/reducer/info';
+import ETransferLayout from './ETransferLayout';
 
 const Updater = dynamic(() => import('components/Updater'), { ssr: false });
 
@@ -49,8 +50,10 @@ function Provider({ children }: { children: React.ReactNode }) {
               <Loading content="Enrollment in progress" />
             ) : (
               <WebLoginProvider>
-                <Updater />
-                <NiceModal.Provider>{children}</NiceModal.Provider>
+                <ETransferLayout>
+                  <Updater />
+                  <NiceModal.Provider>{children}</NiceModal.Provider>
+                </ETransferLayout>
               </WebLoginProvider>
             )}
           </ConfigProvider>

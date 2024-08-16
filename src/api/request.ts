@@ -1,6 +1,8 @@
 import { ICMSInfo } from 'redux/types/reducerTypes';
-import request, { awakenRequest, cmsRequest, tokenRequest } from './axios';
+import request, { cmsRequest, tokenRequest } from './axios';
 import qs from 'qs';
+import { PoolType } from 'types/stake';
+import { store } from 'redux/store';
 
 export const fetchToken = async (data: ITokenParams) => {
   return tokenRequest.post<
@@ -60,7 +62,10 @@ export const pointsStakingState = async (data: ICreateTradeParams): Promise<stri
   return request.post('/app/points/staking/stake', data);
 };
 
-export const getPoolRewards = async (data: { address: string }): Promise<IPoolRewardsData> => {
+export const getPoolRewards = async (data: {
+  address: string;
+  poolType: PoolType;
+}): Promise<Array<IPoolRewardsItem>> => {
   return request.post('/app/rewards/aggregation', data);
 };
 
@@ -70,7 +75,7 @@ export const getRewardsList = async (data: IRewardListParams): Promise<IRewardLi
 
 export const getEarlyStakeInfo = async (
   data: IGetEarlyStakeInfoParams,
-): Promise<IEarlyStakeInfo> => {
+): Promise<Array<IEarlyStakeInfo>> => {
   return request.post('/app/points/staking/early/stake/info', data);
 };
 
@@ -86,11 +91,13 @@ export const getCmsInfo = async (): Promise<{ data: ICMSInfo }> => {
 };
 
 export const getTokenPrice = async (params: IGetUsdPriceParams): Promise<string> => {
-  return awakenRequest.get('/api/app/token/price', { params });
+  const awakenUrl = store.getState()?.info?.cmsInfo?.awakenUrl || '';
+  return request.get('/api/app/token/price', { params, baseURL: awakenUrl });
 };
 
 export const getSwapTransactionFee = async (): Promise<{ transactionFee: string }> => {
-  return awakenRequest.get('/api/app/transaction-fee');
+  const awakenUrl = store.getState()?.info?.cmsInfo?.awakenUrl || '';
+  return request.get('/api/app/transaction-fee', { baseURL: awakenUrl });
 };
 
 export const earlyStakeSign = async (data: IEarlyStakeSignParams): Promise<IEarlyStakeSignData> => {
@@ -155,4 +162,8 @@ export const liquidityRemove = async (
   data: IAddLiquidityParams,
 ): Promise<ISendTransactionResult> => {
   return request.post('/app/rewards/remove/liquidity', data);
+};
+
+export const getRewardsType = async (): Promise<any> => {
+  return request.get('/app/rewards/filter/items');
 };

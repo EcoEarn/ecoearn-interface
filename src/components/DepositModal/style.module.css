@@ -1,0 +1,169 @@
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable color-function-notation */
+/* stylelint-disable alpha-value-notation */
+.etransfer-deposit-wrap-custom {
+  :global {
+    .etransfer-ui-deposit-title{
+      @apply hidden;
+    }
+
+    .etransfer-ui-deposit-for-web {
+      @apply px-0 mb-0 pb-0;;
+    }
+
+    .etransfer-ui-selected-data-wrapper,
+    .calculator-header-title,
+    .receive-amount,
+    .deposit-address-label,
+    .etransfer-ui-deposit-info .info-line .etransfer-ui-text-right.info-value{
+      @apply text-neutralTitle;
+    }
+
+    .selected-token,
+    .selected-chain {
+      @apply !bg-neutralWhiteBg;
+    }
+
+    .selected-token,
+    .selected-chain,
+    .you-pay-main,
+    .deposit-address-wrapper,
+    .etransfer-ui-deposit-retry {
+      @apply !border-[1px] !border-solid !border-neutralBorder !bg-neutralWhiteBg !rounded-lg;
+    }
+
+    .etransfer-ui-deposit-tip {
+      background: rgba(125, 72, 232, 0.05);
+      @apply !border-brandDisable;
+      svg path{
+        @apply fill-brandDefault;
+      }
+    }
+
+    .etransfer-ui-description-wrapper {
+      background: rgba(125, 72, 232, 0.05);
+    }
+
+    .etransfer-ui-calculator {
+      background: rgba(125, 72, 232, 0.05);
+    }
+
+    .etransfer-ui-selected-data-wrapper .etransfer-ui-selected-token-wrapper:not(:first-child),
+    .etransfer-ui-selected-data-wrapper .etransfer-ui-selected-chain-wrapper:not(:first-child),
+    .etransfer-ui-selected-data-wrapper .etransfer-ui-selected-token-wrapper .etransfer-ui-dynamic-arrow,
+    .etransfer-ui-selected-data-wrapper .space,
+    .etransfer-ui-row-center,
+    .etransfer-ui-description-wrapper {
+      @apply !hidden;
+    }
+
+    .etransfer-ui-selected-data-wrapper .etransfer-ui-selected-token-wrapper .label,
+    .etransfer-ui-selected-data-wrapper .etransfer-ui-selected-chain-wrapper .label{
+      @apply !text-lg
+    }
+
+    .etransfer-ui-selected-data-wrapper {
+      @apply mt-6;
+    }
+
+    .etransfer-ui-deposit-select-token {
+      pointer-events: none;
+    }
+
+    .etransfer-ui-common-svg {
+      @apply !inline-flex;
+    }
+
+    .etransfer-ui-deposit-select-token-for-web.selected-token .etransfer-ui-select-token-result .select-token-value-selected .primary{
+      @apply leading-6;
+    }
+
+    .etransfer-ui-calculator .etransfer-ui-calculator-header .etransfer-ui-common-svg.calculator-icon {
+      svg path {
+        @apply stroke-brandDefault;
+      }
+    }
+
+    .etransfer-ui-deposit-network-select-dropdown {
+      @apply !border-[1px] !border-solid !border-neutralBorder !rounded-lg !overflow-hidden;
+    }
+  }
+}
+
+.etransfer-deposit-wrap-custom-mobile {
+  :global {
+    .etransfer-ui-common-svg {
+      @apply !inline-flex;
+      svg {
+        @apply !h-auto !w-auto;
+      }
+    }
+
+    .etransfer-ui-deposit-for-mobile {
+      @apply !p-0 !pt-2;
+    }
+
+    .calculator-header-title,
+    .receive-amount {
+      @apply text-neutralTitle;
+    }
+
+    .etransfer-ui-deposit-select-token-network,
+    .etransfer-ui-deposit-select-token-chain {
+      @apply bg-neutralWhiteBg !border-[1px] !border-solid !border-neutralBorder;
+    }
+
+    .etransfer-ui-calculator {
+      background: rgba(125, 72, 232, 0.05);
+      .etransfer-ui-calculator-content {
+        @apply flex-col;
+      }
+    }
+
+    .you-pay-main {
+      @apply !border-neutralBorder;
+    }
+
+    .etransfer-ui-calculator .etransfer-ui-calculator-header .etransfer-ui-common-svg.calculator-icon {
+      svg path {
+        @apply stroke-brandDefault;
+      }
+    }
+
+    .etransfer-ui-deposit-detail-for-mobile-next-button {
+      @apply bg-brandDefault active:!text-white;
+    }
+
+    #etransfer-ui-deposit-select-token-result .etransfer-ui-dynamic-arrow,
+    .etransfer-ui-deposit-select-token-chain,
+    .etransfer-ui-description-wrapper {
+      display: none !important;
+    }
+
+    .etransfer-ui-deposit-select-token {
+      pointer-events: none;
+    }
+
+    .etransfer-ui-exchange-rate div:last-child {
+      text-align: end;
+      min-width: 80px;
+    }
+    
+    .etransfer-ui-deposit-tip {
+      background-color: transparent;
+      border-color: #e1e1e1;
+    }
+
+    .etransfer-ui-description-wrapper{
+      display: none !important;
+    }
+  }
+}
+
+.modalCustom {
+  :global(.earn-modal-content) {
+    @apply !min-h-[90vh];
+  }
+}
+
+

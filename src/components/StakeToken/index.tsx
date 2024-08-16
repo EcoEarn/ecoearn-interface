@@ -67,11 +67,12 @@ const StakeToken = memo(
     }, [tokenName]);
 
     const tokenIconList = useMemo(() => {
-      if (type === PoolTypeEnum.Points) {
-        return [];
-      }
-      return icons?.length <= 0 ? symbolTextList : isSymbolNeedReverse ? icons?.reverse() : icons;
-    }, [icons, isSymbolNeedReverse, symbolTextList, type]);
+      return icons?.length <= 0
+        ? symbolTextList
+        : isSymbolNeedReverse
+        ? [...icons]?.reverse()
+        : icons;
+    }, [icons, isSymbolNeedReverse, symbolTextList]);
 
     const tokenNameText = useMemo(() => {
       return tokenName ? formatTokenSymbol(tokenName) || '' : '--';
@@ -111,7 +112,7 @@ const StakeToken = memo(
                   width={size === 'small' ? 24 : size === 'middle' ? 32 : isLG ? 40 : 48}
                   height={size === 'small' ? 24 : size === 'middle' ? 32 : isLG ? 40 : 48}
                   className={clsx(
-                    '!rounded-[50%]  flex-shrink-0',
+                    '!rounded-[50%]  flex-shrink-0 !overflow-hidden',
                     index !== 0 &&
                       (size === 'small'
                         ? 'ml-[-6px]'

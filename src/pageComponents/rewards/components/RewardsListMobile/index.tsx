@@ -1,22 +1,15 @@
 import { Select } from 'antd';
 import ScrollContent from '../ScrollContent';
 import useRewardsListMobileService from 'pageComponents/rewards/hooks/useRewardsListMobileService';
-import { useEffect } from 'react';
 import styles from './index.module.css';
 
 export default function RewardsListMobile({
-  updateHasHistoryDate,
-  onCountDownFinish,
+  rewardsTypeList,
 }: {
-  updateHasHistoryDate: (value: boolean) => void;
-  onCountDownFinish?: () => void;
+  rewardsTypeList: Array<IRewardsTypeItem>;
 }) {
-  const { currentSelect, handleChange, selectOptions, dataSource, hasHistoryData, loading } =
-    useRewardsListMobileService();
-
-  useEffect(() => {
-    updateHasHistoryDate(hasHistoryData);
-  }, [hasHistoryData, updateHasHistoryDate]);
+  const { currentSelect, handleChange, selectOptions, dataSource, loading } =
+    useRewardsListMobileService({ rewardsTypeList });
 
   return (
     <div>
@@ -28,11 +21,7 @@ export default function RewardsListMobile({
         options={selectOptions}
       />
       <div className="mt-4">
-        <ScrollContent
-          dataList={dataSource || []}
-          loading={loading}
-          onCountDownFinish={onCountDownFinish}
-        />
+        <ScrollContent dataList={dataSource || []} loading={loading} />
       </div>
     </div>
   );

@@ -105,17 +105,27 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
 
   const onClaim = useCallback(
     (stakeData: IStakePoolData) => {
-      const { earnedSymbol = '--', stakeId, earned, decimal, releasePeriod, poolId } = stakeData;
+      const {
+        earnedSymbol = '--',
+        stakeId,
+        earned,
+        decimal,
+        releasePeriod,
+        poolId,
+        supportEarlyStake,
+      } = stakeData;
       claimModal.show({
         amount: earned,
         tokenSymbol: earnedSymbol,
         decimal,
         poolId: String(poolId) || '',
         releasePeriod,
+        supportEarlyStake,
         onSuccess: () => getStakeData(),
         onEarlyStake: () => {
           earlyStake({
             poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
+            rewardsTokenName: earnedSymbol,
             onSuccess: () => {
               claimModal.remove();
             },
@@ -137,6 +147,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         poolId = '',
         decimal,
         releasePeriod,
+        supportEarlyStake,
       } = stakeData;
       if (!stakeId || !poolId) {
         singleMessage.error('missing params');
@@ -167,10 +178,12 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           rewardsSymbol: earnedSymbol,
           poolId,
           releasePeriod,
+          supportEarlyStake,
           onSuccess: () => getStakeData(),
           onEarlyStake: () => {
             earlyStake({
               poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
+              rewardsTokenName: earnedSymbol,
               onSuccess: () => {
                 unlockModal.remove();
               },
@@ -210,6 +223,45 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     [curChain, getLpTokenContractAddress, poolType, tokensContractAddress],
   );
 
+  const getSymbolBalance = useCallback(
+    async ({
+      stakeSymbol,
+      rate,
+      decimal,
+    }: {
+      stakeSymbol: string;
+      rate: number | string;
+      decimal: number;
+    }): Promise<string | undefined> => {
+      try {
+        showLoading();
+        let balance = 0;
+        const balanceParams = {
+          symbol: stakeSymbol,
+          owner: wallet.address,
+        };
+        if (poolType === 'Lp') {
+          balance = (
+            await GetLpBalance(
+              balanceParams,
+              getLpTokenContractAddress(rate as unknown as TFeeType) || '',
+            )
+          ).amount;
+        } else {
+          balance = (await GetBalance(balanceParams)).balance;
+        }
+        return divDecimals(balance || 0, decimal).toFixed(4);
+      } catch (error) {
+        singleMessage.error('get balance error.');
+        console.error('GetBalance error', error);
+        return;
+      } finally {
+        closeLoading();
+      }
+    },
+    [closeLoading, getLpTokenContractAddress, poolType, showLoading, wallet.address],
+  );
+
   const showStakeModal = useCallback(
     async (type: StakeType, stakeData: IStakePoolData) => {
       const { stakeSymbol = '', decimal = 8, rate = 0.003 } = stakeData;
@@ -217,30 +269,14 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         singleMessage.error('stakeSymbol is required.');
         return;
       }
-      let symbolBalance = '';
+      let symbolBalance;
       if (type !== StakeType.RENEW) {
-        try {
-          showLoading();
-          let balance = 0;
-          const balanceParams = {
-            symbol: stakeSymbol,
-            owner: wallet.address,
-          };
-          if (poolType === 'Lp') {
-            balance = (
-              await GetLpBalance(balanceParams, getLpTokenContractAddress(rate as TFeeType) || '')
-            ).amount;
-          } else {
-            balance = (await GetBalance(balanceParams)).balance;
-          }
-          symbolBalance = divDecimals(balance, decimal).toFixed(4);
-        } catch (error) {
-          singleMessage.error('get balance error.');
-          console.error('GetBalance error', error);
-          return;
-        } finally {
-          closeLoading();
-        }
+        symbolBalance = await getSymbolBalance({
+          stakeSymbol,
+          rate,
+          decimal,
+        });
+        if (!symbolBalance) return;
       }
       const symbol = formatTokenSymbol(stakeData?.stakeSymbol || '');
       const balanceDec =
@@ -255,6 +291,12 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         stakeData,
         balanceDec,
         balance: symbolBalance,
+        fetchBalance: async () =>
+          await getSymbolBalance({
+            stakeSymbol,
+            rate,
+            decimal,
+          }),
         onStake: async (amount, period) => {
           const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
           if (type === StakeType.RENEW) {
@@ -306,16 +348,15 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       });
     },
     [
-      closeLoading,
+      poolType,
+      stakeModal,
+      getSymbolBalance,
       checkApproveParams,
+      tokensContractAddress,
+      wallet.address,
       curChain,
       getLpTokenContractAddress,
       getStakeData,
-      poolType,
-      showLoading,
-      stakeModal,
-      tokensContractAddress,
-      wallet.address,
     ],
   );
 

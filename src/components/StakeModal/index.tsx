@@ -4,7 +4,7 @@ import { Button, Typography, FontWeightEnum, ToolTip } from 'aelf-design';
 import InputNumberBase from 'components/InputNumberBase';
 import DaysSelect from 'components/DaysSelect';
 import ViewItem from 'components/ViewItem';
-import { Form } from 'antd';
+import { Form, message } from 'antd';
 import { ZERO, DEFAULT_DATE_FORMAT } from 'constants/index';
 import { MIN_STAKE_PERIOD, MAX_STAKE_PERIOD, ONE_DAY_IN_SECONDS } from 'constants/stake';
 import { RightOutlined } from '@ant-design/icons';
@@ -16,6 +16,7 @@ import {
   formatTokenPrice,
   formatTokenSymbol,
   formatUSDPrice,
+  splitTokensFromPairSymbol,
 } from 'utils/format';
 import clsx from 'clsx';
 import { getPoolTotalStaked } from 'api/request';
@@ -25,6 +26,9 @@ import { getTotalStakedWithAdd, getOwnerAprK, divDecimals, timesDecimals } from 
 import RateTag from 'components/RateTag';
 import BigNumber from 'bignumber.js';
 import useStakeConfig from 'hooks/useStakeConfig';
+import { useModal } from '@ebay/nice-modal-react';
+import DepositModal from 'components/DepositModal';
+import { useETransferAuthToken } from 'hooks/useETransferAuthToken';
 
 const FormItem = Form.Item;
 const { Title, Text } = Typography;
@@ -56,6 +60,7 @@ interface IStakeModalProps {
   balance?: string;
   noteList?: Array<string>;
   stakeData: IStakePoolData;
+  fetchBalance?: () => Promise<string | undefined>;
   onConfirm?: (amount: string, period: string) => void;
   onClose?: () => void;
 }
@@ -74,9 +79,10 @@ function StakeModal({
   balanceDec,
   modalTitle,
   customAmountModule,
-  balance,
+  balance: defaultBalance,
   noteList,
   stakeData,
+  fetchBalance,
   onClose,
   onConfirm,
 }: IStakeModalProps) {
@@ -104,6 +110,8 @@ function StakeModal({
   const [totalStaked, setTotalStaked] = useState<string>();
   const { getAprK, getAprKAve } = useAPRK();
   const { min } = useStakeConfig();
+  const [balance, setBalance] = useState<string>(defaultBalance || '0');
+  const { getETransferAuthToken } = useETransferAuthToken();
 
   const typeIsExtend = useMemo(() => type === StakeType.EXTEND, [type]);
   const typeIsStake = useMemo(() => type === StakeType.STAKE, [type]);
@@ -111,6 +119,7 @@ function StakeModal({
   const typeIsAdd = useMemo(() => type === StakeType.ADD, [type]);
   const [amountValid, setAmountValid] = useState(typeIsExtend || isFreezeAmount);
   const [periodValid, setPeriodValid] = useState(typeIsAdd || typeIsRenew);
+  const depositModal = useModal(DepositModal);
 
   const boostedAmountTotal = useMemo(() => {
     let amount = ZERO;
@@ -122,7 +131,7 @@ function StakeModal({
 
   const {
     curChain,
-    awakenSGRUrl,
+    awakenUrl,
     stakeNotes = [],
     addStakeNotes = [],
     extendStakeNotes = [],
@@ -580,26 +589,46 @@ function StakeModal({
     ],
   );
 
-  const displayGainToken = useMemo(() => {
-    //FIXME:
-    return true;
-    return stakeSymbol === 'ALP ELF-USDT' || stakeSymbol === 'SGR';
+  const gainUrl = useMemo(() => {
+    let tradeUrl = '';
+    const symbolSplit = stakeSymbol?.split(' ');
+    if (symbolSplit?.[0] === 'ALP' && Number(rate) !== 0) {
+      const pairName = splitTokensFromPairSymbol(symbolSplit?.[1])?.join('_');
+      tradeUrl = `${awakenUrl}/trading/${pairName}_${Number(rate) * 100}`;
+    } else {
+      tradeUrl = '';
+    }
+    return tradeUrl;
+  }, [awakenUrl, rate, stakeSymbol]);
+
+  const needTransfer = useMemo(() => {
+    return ['SGR-1', 'ACORNS', 'ELF'].includes(stakeSymbol || '');
   }, [stakeSymbol]);
 
-  const jumpUrl = useCallback(() => {
-    let awakenTradeUrl = '';
-    if (stakeSymbol === 'ALP ELF-USDT' && Number(rate) !== 0) {
-      awakenTradeUrl = `/trading/ELF_USDT_${Number(rate) * 100}`;
-    } else if (stakeSymbol === 'SGR') {
-      awakenTradeUrl = '/trading/SGR-1_ELF_3';
-    } else {
-      //FIXME:
-      awakenTradeUrl = '/trading/SGR-1_ELF_3';
+  const displayGainToken = useMemo(() => {
+    return !!gainUrl || needTransfer;
+  }, [gainUrl, needTransfer]);
+
+  const jumpUrl = useCallback(async () => {
+    if (needTransfer) {
+      try {
+        await getETransferAuthToken();
+        depositModal.show({
+          defaultReceiveToken: stakeSymbol,
+          onCancel: async () => {
+            const curBalance = await fetchBalance?.();
+            curBalance && setBalance(curBalance);
+          },
+        });
+      } catch (error) {
+        message.error(error as string);
+      }
+      return;
     }
-    if (awakenTradeUrl) {
-      window.open(`${awakenSGRUrl}${awakenTradeUrl}`, '_blank');
+    if (gainUrl) {
+      window.open(gainUrl, '_blank');
     }
-  }, [awakenSGRUrl, rate, stakeSymbol]);
+  }, [depositModal, fetchBalance, gainUrl, getETransferAuthToken, needTransfer, stakeSymbol]);
 
   const getTotalStaked = useCallback(async () => {
     try {
@@ -1025,8 +1054,8 @@ function StakeModal({
           </FormItem>
         )}
         {!typeIsExtend && !isFreezeAmount && displayGainToken && (
-          <div className="flex justify-end items-center cursor-pointer mb-4">
-            <div onClick={jumpUrl}>
+          <div className="flex justify-end items-center mb-4">
+            <div onClick={jumpUrl} className="cursor-pointer w-fit">
               <span className="text-brandDefault hover:text-brandHover text-sm">
                 Get {formatTokenSymbol(stakeSymbol || '')}
               </span>

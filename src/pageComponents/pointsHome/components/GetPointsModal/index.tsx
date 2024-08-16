@@ -8,7 +8,7 @@ export interface IPointsModalProps {
   icon: string;
   name: string;
   desc: string;
-  rulesContent?: string;
+  rulesContent?: Array<string>;
   handleConfirm?: () => void;
   confirmText?: string;
 }
@@ -54,9 +54,15 @@ function GetPointsModal({
         </div>
       </div>
       <div className="text-neutralPrimary font-semibold py-4 text-lg">Points Rules</div>
-      {rulesContent && (
-        <div className="text-base text-neutralPrimary font-normal">{rulesContent}</div>
-      )}
+      {rulesContent &&
+        rulesContent?.length > 0 &&
+        rulesContent?.map((text, index) => {
+          return (
+            <div key={index} className="text-base text-neutralPrimary font-normal">
+              {text}
+            </div>
+          );
+        })}
     </CommonModal>
   );
 }

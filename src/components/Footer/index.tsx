@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
+import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 
-interface ILinkItem {
+export interface ILinkItem {
   label?: string;
   icon?: string;
   url?: string;
@@ -11,6 +12,8 @@ interface ILinkItem {
 }
 
 export default function Footer() {
+  const { socialList } = useGetCmsInfo() || {};
+
   const linkList: Array<ILinkItem> = useMemo(() => {
     return [
       {
@@ -24,21 +27,6 @@ export default function Footer() {
       {
         label: 'Docs',
         url: 'https://docs.ecoearn.io/',
-        target: '_blank',
-      },
-    ];
-  }, []);
-
-  const socialList: Array<ILinkItem> = useMemo(() => {
-    return [
-      {
-        icon: 'twitter',
-        url: 'https://x.com/ecoearn_web3',
-        target: '_blank',
-      },
-      {
-        icon: 'telegram',
-        url: 'https://t.me/ecoearn_web3',
         target: '_blank',
       },
     ];
@@ -94,7 +82,7 @@ export default function Footer() {
           />
           <div className="hidden lg:block">{renderLinkList}</div>
           <div className="flex items-center gap-8 lg:gap-6 ml-auto">
-            {socialList.map((item, index) => {
+            {socialList?.map((item, index) => {
               return (
                 <img
                   onClick={() => {

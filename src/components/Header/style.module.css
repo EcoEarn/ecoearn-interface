@@ -1,10 +1,10 @@
 /* stylelint-disable no-descending-specificity */
 .dropdown {
   @apply !min-w-[260px];
-  :global(.aelfd-dropdown-menu) {
+  :global(.earn-dropdown-menu) {
     @apply rounded-[12px] border-[#EDEDED] border-solid border-[1px] shadow-none !p-0 overflow-hidden;
   }
-  :global(.aelfd-dropdown-menu-item) {
+  :global(.earn-dropdown-menu-item) {
     transition: none !important;
     @apply h-[48px];
     span {
@@ -31,16 +31,16 @@
     @apply !shadow-none;
   }
   :global {
-    .aelfd-modal-content {
+    .earn-modal-content {
       @apply w-full  h-full rounded-none !px-0 !py-[20px];
     }
-    .aelfd-modal-title {
+    .earn-modal-title {
       @apply !font-semibold;
     }
-    .aelfd-modal-header {
+    .earn-modal-header {
       @apply !mb-[16px] px-[16px];
     }
-    .aelfd-modal-close {
+    .earn-modal-close {
       @apply !top-[23px];
     }
   }
