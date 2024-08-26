@@ -1,10 +1,6 @@
 import Script from 'next/script';
 import Layout from 'pageComponents/layout';
 import 'styles/tailwindBase.css';
-
-import '@portkey/did-ui-react/dist/assets/index.css';
-import 'aelf-web-login/dist/assets/index.css';
-
 import 'styles/global.css';
 import 'styles/theme.css';
 

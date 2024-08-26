@@ -67,7 +67,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           name: '',
           skipCount: 0,
           maxResultCount: 20,
-          address: wallet.address || '',
+          address: wallet?.address || '',
           chainId: curChain!,
         });
         const stakeData = (pools || []).map((item, index) => {
@@ -88,7 +88,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         withLoading && closeLoading();
       }
     },
-    [closeLoading, curChain, poolType, showLoading, wallet.address],
+    [closeLoading, curChain, poolType, showLoading, wallet?.address],
   );
 
   useInterval(
@@ -238,7 +238,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         let balance = 0;
         const balanceParams = {
           symbol: stakeSymbol,
-          owner: wallet.address,
+          owner: wallet?.address || '',
         };
         if (poolType === 'Lp') {
           balance = (
@@ -259,7 +259,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         closeLoading();
       }
     },
-    [closeLoading, getLpTokenContractAddress, poolType, showLoading, wallet.address],
+    [closeLoading, getLpTokenContractAddress, poolType, showLoading, wallet?.address],
   );
 
   const showStakeModal = useCallback(
@@ -317,7 +317,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
             try {
               checked = await checkAllowanceAndApprove({
                 spender: tokensContractAddress || '',
-                address: wallet.address,
+                address: wallet?.address || '',
                 chainId: curChain,
                 symbol: stakeSymbol,
                 decimals: decimal,
@@ -353,7 +353,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       getSymbolBalance,
       checkApproveParams,
       tokensContractAddress,
-      wallet.address,
+      wallet?.address,
       curChain,
       getLpTokenContractAddress,
       getStakeData,

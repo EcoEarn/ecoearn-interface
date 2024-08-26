@@ -11,7 +11,6 @@ import Footer from 'components/Footer';
 import { useWalletInit } from 'hooks/useWallet';
 import WebLoginInstance from 'contract/webLogin';
 import { SupportedELFChainId } from 'types';
-import useGetStoreInfo from 'redux/hooks/useGetStoreInfo';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import WalletAndTokenInfo from 'utils/walletAndTokenInfo';
@@ -19,32 +18,15 @@ import { useGetToken } from 'hooks/useGetToken';
 import VConsole from 'vconsole';
 
 const Layout = dynamic(async () => {
-  const { useWebLogin, useCallContract } = await import('aelf-web-login').then((module) => module);
+  const { useConnectWallet } = await import('@aelf-web-login/wallet-adapter-react').then(
+    (module) => module,
+  );
   return (props: React.PropsWithChildren<{}>) => {
     const { children } = props;
-
-    const { cmsInfo } = useGetStoreInfo();
-
-    const webLoginContext = useWebLogin();
+    const webLoginContext = useConnectWallet();
     const { getToken } = useGetToken();
-
     const pathname = usePathname();
-
-    const { callSendMethod: callAELFSendMethod, callViewMethod: callAELFViewMethod } =
-      useCallContract({
-        chainId: SupportedELFChainId.MAIN_NET,
-        rpcUrl: cmsInfo?.rpcUrlAELF,
-      });
-    const { callSendMethod: callTDVVSendMethod, callViewMethod: callTDVVViewMethod } =
-      useCallContract({
-        chainId: SupportedELFChainId.TDVV_NET,
-        rpcUrl: cmsInfo?.rpcUrlTDVV,
-      });
-    const { callSendMethod: callTDVWSendMethod, callViewMethod: callTDVWViewMethod } =
-      useCallContract({
-        chainId: SupportedELFChainId.TDVW_NET,
-        rpcUrl: cmsInfo?.rpcUrlTDVW,
-      });
+    const { callSendMethod, callViewMethod } = useConnectWallet();
 
     useEffect(() => {
       if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') {
@@ -71,26 +53,25 @@ const Layout = dynamic(async () => {
     }, []);
 
     useEffect(() => {
-      console.log('webLoginContext.loginState', webLoginContext.loginState);
+      console.log('webLoginContext.isConnected', webLoginContext.isConnected);
       WebLoginInstance.get().setContractMethod([
         {
           chain: SupportedELFChainId.MAIN_NET,
-          sendMethod: callAELFSendMethod as MethodType,
-          viewMethod: callAELFViewMethod as MethodType,
+          sendMethod: callSendMethod as MethodType,
+          viewMethod: callViewMethod as MethodType,
         },
         {
           chain: SupportedELFChainId.TDVV_NET,
-          sendMethod: callTDVVSendMethod as MethodType,
-          viewMethod: callTDVVViewMethod as MethodType,
+          sendMethod: callSendMethod as MethodType,
+          viewMethod: callViewMethod as MethodType,
         },
         {
           chain: SupportedELFChainId.TDVW_NET,
-          sendMethod: callTDVWSendMethod as MethodType,
-          viewMethod: callTDVWViewMethod as MethodType,
+          sendMethod: callSendMethod as MethodType,
+          viewMethod: callViewMethod as MethodType,
         },
       ]);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [webLoginContext.loginState]);
+    }, [callSendMethod, callViewMethod, webLoginContext.isConnected]);
 
     useWalletInit();
 
@@ -99,11 +80,7 @@ const Layout = dynamic(async () => {
     }, [pathname]);
 
     useEffect(() => {
-      WalletAndTokenInfo.setWallet(
-        webLoginContext.walletType,
-        webLoginContext.wallet,
-        webLoginContext.version,
-      );
+      WalletAndTokenInfo.setWallet(webLoginContext.walletType, webLoginContext.walletInfo);
       WalletAndTokenInfo.setSignMethod(getToken);
     }, [getToken, webLoginContext]);
 

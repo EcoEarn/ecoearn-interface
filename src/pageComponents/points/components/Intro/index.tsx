@@ -42,7 +42,7 @@ export default function Intro({ dappName }: { dappName: string }) {
               Gain points
             </span>
             <RightOutlined
-              className={clsx('w-[14px] h-[14px] text-sm leading-[14px] text-brandDefault ml-2')}
+              className={clsx('w-[14px] h-[14px] text-sm leading-[14px] !text-brandDefault ml-2')}
               width={14}
               height={14}
             />

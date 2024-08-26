@@ -1,5 +1,5 @@
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
-import { detectDiscoverProvider } from 'aelf-web-login';
 import elliptic from 'elliptic';
 import { useCallback } from 'react';
 import { zeroFill } from 'utils/calculate';
@@ -7,17 +7,18 @@ import { zeroFill } from 'utils/calculate';
 const ec = new elliptic.ec('secp256k1');
 
 export default function useDiscoverProvider() {
+  const { walletInfo } = useConnectWallet();
   const discoverProvider = useCallback(async () => {
-    const provider: IPortkeyProvider | null = await detectDiscoverProvider();
+    const provider: IPortkeyProvider | null = walletInfo?.extraInfo?.provider;
     if (provider) {
-      if (!provider.isPortkey) {
+      if (!provider?.isPortkey) {
         throw new Error('Discover provider found, but check isPortkey failed');
       }
       return provider;
     } else {
       return null;
     }
-  }, []);
+  }, [walletInfo?.extraInfo?.provider]);
 
   const getSignatureAndPublicKey = useCallback(
     async (data: string) => {

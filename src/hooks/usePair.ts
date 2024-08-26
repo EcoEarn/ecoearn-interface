@@ -34,7 +34,7 @@ export default function usePair() {
         GetBalance(
           {
             symbol,
-            owner: wallet.address,
+            owner: wallet?.address || '',
           },
           tokenContractAddress,
         ),
@@ -57,7 +57,7 @@ export default function usePair() {
         balance: balance.amount,
       };
     },
-    [getAddress, wallet.address],
+    [getAddress, wallet?.address],
   );
 
   return {

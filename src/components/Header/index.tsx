@@ -3,18 +3,16 @@ import { useCheckLoginAndToken } from 'hooks/useWallet';
 import { ReactComponent as CloseSVG } from 'assets/img/close.svg';
 import { Modal } from 'antd';
 import styles from './style.module.css';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
 import useResponsive from 'hooks/useResponsive';
 import clsx from 'clsx';
 import { NEED_LOGIN_PAGE } from 'constants/router';
 
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
-import { IMenuItem } from './type';
 import { CompassLink } from './components/CompassLink';
-import ConnectWallet from './components/ConnectWallet';
 import { DropMenu, DropMenuTypeEnum } from './components/DropMenu';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 
 export default function Header() {
   const { checkLogin } = useCheckLoginAndToken();
@@ -22,7 +20,7 @@ export default function Header() {
   const { isLG } = useResponsive();
   const router = useRouter();
   const [menuModalVisibleModel, setMenuModalVisibleModel] = useState(false);
-  const [logoutComplete, setLogoutComplete] = useState(true);
+  const { isConnected } = useConnectWallet();
 
   const menuItems = useMemo(() => {
     return [
@@ -64,10 +62,11 @@ export default function Header() {
     [checkLogin, isLogin, router],
   );
 
-  useWebLoginEvent(WebLoginEvents.LOGOUT, () => {
-    setLogoutComplete(true);
-    setMenuModalVisibleModel(false);
-  });
+  useEffect(() => {
+    if (!isConnected) {
+      setMenuModalVisibleModel(false);
+    }
+  }, [isConnected]);
 
   const FunctionalArea = useMemo(() => {
     if (!isLG) {

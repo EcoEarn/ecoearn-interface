@@ -54,7 +54,7 @@ export default function useEarlyStake() {
     async (poolType: PoolType, rewardsTokenName?: string) => {
       const rewardsData =
         (await getPoolRewards({
-          address: wallet.address,
+          address: wallet?.address || '',
           poolType,
         })) || [];
       const rewardsInfo = rewardsData?.filter(
@@ -84,7 +84,7 @@ export default function useEarlyStake() {
         stakeTotal.isZero() ? noAmountErrorTip : getAmountNotEnoughErrorTip(rewardsTokenName || ''),
       );
     },
-    [getAmountNotEnoughErrorTip, min, wallet.address],
+    [getAmountNotEnoughErrorTip, min, wallet?.address],
   );
 
   const stake = useCallback(
@@ -102,7 +102,7 @@ export default function useEarlyStake() {
         } = (await checkRewardsAmount(poolType, rewardsTokenName)) || {};
         const earlyStakeData = await getEarlyStakeInfo({
           tokenName: tokenName || '',
-          address: wallet.address || '',
+          address: wallet?.address || '',
           chainId: curChain!,
           poolType: PoolType.TOKEN,
           rate,
@@ -138,7 +138,7 @@ export default function useEarlyStake() {
               const signParams: IEarlyStakeSignParams = {
                 amount: Number(earlyStakeAmount),
                 poolType,
-                address: wallet.address,
+                address: wallet?.address || '',
                 claimInfos,
                 dappId,
                 poolId: fixedEarlyStakeData?.poolId || '',
@@ -168,7 +168,7 @@ export default function useEarlyStake() {
                     params: {
                       stakeInput: {
                         claimIds,
-                        account: wallet.address,
+                        account: wallet?.address,
                         amount: earlyStakeAmount,
                         seed,
                         poolId: fixedEarlyStakeData?.poolId || '',
