@@ -1568,47 +1568,47 @@
   resolved "https://registry.npmmirror.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@etransfer/core@^1.2.1-alpha.3":
-  version "1.2.1-alpha.3"
-  resolved "https://registry.npmjs.org/@etransfer/core/-/core-1.2.1-alpha.3.tgz#f76c4137a140cee76c05bd4c460685c715143ec0"
-  integrity sha512-ZIcsNu4F3VsidHlOWemqcrHz3r9O06CNnYJ0TS4e30hEp0RUUdIjuaDxnH2y+3+AwaFfQXhduc1X7TJyTd/Axw==
+"@etransfer/core@^1.4.1":
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@etransfer/core/-/core-1.5.0.tgz#ade5cc0bd7447a518528dfa617c766703d5becfb"
+  integrity sha512-/33xcqkv6k3gFj/YIzcVCUWCDg5Jr2te9NLsicpB9aNLz/1qepGANQTwVgvI5MFlCRMSsitHhznIoD9wUP/tEg==
   dependencies:
-    "@etransfer/services" "^1.2.1-alpha.3"
-    "@etransfer/types" "^1.2.1-alpha.3"
-    "@etransfer/utils" "^1.2.1-alpha.3"
+    "@etransfer/services" "^1.5.0"
+    "@etransfer/types" "^1.5.0"
+    "@etransfer/utils" "^1.5.0"
 
-"@etransfer/request@^1.2.1-alpha.3":
-  version "1.2.1-alpha.3"
-  resolved "https://registry.npmjs.org/@etransfer/request/-/request-1.2.1-alpha.3.tgz#d951b37f48e320d2c504f41776acf72f14924c9a"
-  integrity sha512-grW55/FYF+N1QLtVdbzjIRBb/zFQG9e//GCBUUH3E6+Qpom52F/TDY+b9U0lSTARXcrrW9waAqUXzNhkW6vlvQ==
+"@etransfer/request@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@etransfer/request/-/request-1.5.0.tgz#ea3de8064a9ba628eff66e6ac93e6bcffb3ebe49"
+  integrity sha512-g5nx/IHRNicnzQyxSZpaRYO/XWcTx9Uha2G3HLxqsRewGzxCezPeSnsHuN/pNntIjj0XH+7R2fV9sDQ0E5qR1Q==
   dependencies:
-    "@etransfer/types" "^1.2.1-alpha.3"
-    "@etransfer/utils" "^1.2.1-alpha.3"
+    "@etransfer/types" "^1.5.0"
+    "@etransfer/utils" "^1.5.0"
     axios "^0.24.0"
 
-"@etransfer/services@^1.2.1-alpha.3":
-  version "1.2.1-alpha.3"
-  resolved "https://registry.npmjs.org/@etransfer/services/-/services-1.2.1-alpha.3.tgz#2ea8fd5620c710ee3226d619686c6193369b1b39"
-  integrity sha512-S1SsSGtVRTpWVqnMM8nNSkxWpe51JTzC/nvLLuKhDm7KYVAhfCATe5HlICB5R1Hubmtkcm6V47TtdvdyGqbE2Q==
+"@etransfer/services@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@etransfer/services/-/services-1.5.0.tgz#524fdea6cf084dca96aecf5d31ebbc5bd1e5f6d6"
+  integrity sha512-glE45pxj2Yzpe+jF5sg8TyHI2b1fMhcwPXIBEGUQtiPvp2PPxaeJqLB0uOYgsYRDXU9zhzL4N21PsXPZF1Xedg==
   dependencies:
-    "@etransfer/request" "^1.2.1-alpha.3"
-    "@etransfer/types" "^1.2.1-alpha.3"
-    "@etransfer/utils" "^1.2.1-alpha.3"
+    "@etransfer/request" "^1.5.0"
+    "@etransfer/types" "^1.5.0"
+    "@etransfer/utils" "^1.5.0"
     "@portkey/types" "2.6.6"
 
-"@etransfer/types@^1.2.1-alpha.3":
-  version "1.2.1-alpha.3"
-  resolved "https://registry.npmjs.org/@etransfer/types/-/types-1.2.1-alpha.3.tgz#f87626406babc0805759c42bef91d6585a195154"
-  integrity sha512-IaOsNHjwyo2gAdTS/EzVmD0LS6f9ntty0Ldvbd0oqkHrNdVl2DcpuNOP/4Kw2LEx5ihoF3P/URoqGux8rQk2rQ==
+"@etransfer/types@^1.4.1", "@etransfer/types@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@etransfer/types/-/types-1.5.0.tgz#63e43154ff5a2b6b5b400ebeda602c6335a14c1d"
+  integrity sha512-DSebjNUc0ufQs2/vaBaahuFHNgPOKLQiBRT7HE2h4kgg5uJtnGdaDAN5D8Dmshn69CZwcbOOb+wgOTmkiQolHw==
 
-"@etransfer/ui-react@^1.2.1-alpha.3":
-  version "1.2.1-alpha.3"
-  resolved "https://registry.npmjs.org/@etransfer/ui-react/-/ui-react-1.2.1-alpha.3.tgz#1bf55eb4a6c567bfc07cb6152e9ae876fe70597e"
-  integrity sha512-uMoZrQYUClHKdSeASRhUFHHXJOVrkdcoFV+EEaczF8IKFf6GcILLJ3aTMf9TAQ889zlXXtMjxZjvMUKGiyJquw==
+"@etransfer/ui-react@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.npmjs.org/@etransfer/ui-react/-/ui-react-1.4.1.tgz#171531534ae9684d9edbb25202dc6110364984c7"
+  integrity sha512-Tkmj2W7Kg0SPUZZaDy8ntOXwnCgn7B7V4QGATbta+R+IMaC3QZHXO/tdG09ojZYrmDkyNkxlYfd+g/IRYW3PGg==
   dependencies:
-    "@etransfer/core" "^1.2.1-alpha.3"
-    "@etransfer/types" "^1.2.1-alpha.3"
-    "@etransfer/utils" "^1.2.1-alpha.3"
+    "@etransfer/core" "^1.4.1"
+    "@etransfer/types" "^1.4.1"
+    "@etransfer/utils" "^1.4.1"
     "@portkey/types" "2.6.6"
     "@portkey/utils" "2.6.6"
     antd "4.24.14"
@@ -1617,17 +1617,18 @@
     lottie-web "5.9.6"
     moment "^2.29.4"
     query-string "^7.1.1"
+    react-infinite-scroll-component "^6.1.0"
     react-qrcode-logo "2.9.0"
     react-use "^17.4.0"
     uuid "^8.3.2"
 
-"@etransfer/utils@^1.2.1-alpha.3":
-  version "1.2.1-alpha.3"
-  resolved "https://registry.npmjs.org/@etransfer/utils/-/utils-1.2.1-alpha.3.tgz#3c423b523dd0b63516b0fd43182e6f492f612809"
-  integrity sha512-T/rXrYC/suOfCD2Gu3jE2OAGvFSwz80+SFFXGQpyvkyYvnhVaTzVUNs68CmyW5q/QuaNImICQaZ/+27h/cUupQ==
+"@etransfer/utils@^1.4.1", "@etransfer/utils@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@etransfer/utils/-/utils-1.5.0.tgz#105c9c9b662eaccf1f9be92d7dc20588fd220c1a"
+  integrity sha512-yD5WMVX98rOZq1KlAk6uXkmr5dfhhYmFR+z4z5cUVmEGL3IPxOQxix8a5hlKUDJ+71uJpGhAlB7neI4GURpdYw==
   dependencies:
-    "@etransfer/services" "^1.2.1-alpha.3"
-    "@etransfer/types" "^1.2.1-alpha.3"
+    "@etransfer/services" "^1.5.0"
+    "@etransfer/types" "^1.5.0"
 
 "@firebase/analytics-compat@0.2.6":
   version "0.2.6"
@@ -8650,6 +8651,13 @@ react-i18next@^11.18.6:
     "@babel/runtime" "^7.14.5"
     html-parse-stringify "^3.0.1"
 
+react-infinite-scroll-component@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.npmjs.org/react-infinite-scroll-component/-/react-infinite-scroll-component-6.1.0.tgz#7e511e7aa0f728ac3e51f64a38a6079ac522407f"
+  integrity sha512-SQu5nCqy8DxQWpnUVLx7V7b7LcA37aM7tvoWjTLZp1dk6EJibM5/4EJKzOnl07/BsM1Y40sKLuqjCwwH/xV0TQ==
+  dependencies:
+    throttle-debounce "^2.1.0"
+
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.npmmirror.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -9794,6 +9802,11 @@ thenify-all@^1.0.0:
   integrity sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==
   dependencies:
     any-promise "^1.0.0"
+
+throttle-debounce@^2.1.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/throttle-debounce/-/throttle-debounce-2.3.0.tgz#fd31865e66502071e411817e241465b3e9c372e2"
+  integrity sha512-H7oLPV0P7+jgvrk+6mwwwBDmxTaxnu9HMXmloNLXwnNO0ZxZ31Orah2n8lU1eMPvsaowP2CX+USCgyovXfdOFQ==
 
 throttle-debounce@^3.0.1:
   version "3.0.1"
