@@ -66,6 +66,7 @@ export default function useWebLoginConfig() {
         appName: APP_NAME,
         chainId: curChain as TChainId,
         autoShowUnlock: true,
+        noNeedForConfirm: true,
       }),
       new PortkeyDiscoverWallet({
         networkType: networkTypeV2 as NetworkEnum,

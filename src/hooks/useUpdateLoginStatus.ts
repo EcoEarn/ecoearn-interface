@@ -7,7 +7,7 @@ import { useGetToken } from './useGetToken';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 
 const useUpdateLoginStatus = () => {
-  const { isConnected } = useConnectWallet();
+  const { isConnected, walletInfo } = useConnectWallet();
   const { hasToken } = useGetLoginStatus();
   const { checkTokenValid } = useGetToken();
 
@@ -19,10 +19,10 @@ const useUpdateLoginStatus = () => {
       setLoginStatus({
         isConnectWallet,
         hasToken: hasLocalToken,
-        isLogin: isConnectWallet && hasLocalToken,
+        isLogin: isConnectWallet && walletInfo && hasLocalToken,
       }),
     );
-  }, [checkTokenValid, isConnected]);
+  }, [checkTokenValid, isConnected, walletInfo]);
 };
 
 export default useUpdateLoginStatus;

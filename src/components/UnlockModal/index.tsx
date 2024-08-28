@@ -19,6 +19,7 @@ interface IUnlockModalProps {
   releasePeriod: string | number;
   supportEarlyStake: boolean;
   onSuccess?: () => void;
+  onClose?: () => void;
   onEarlyStake?: () => void;
 }
 
@@ -33,6 +34,7 @@ function UnlockModal({
   releasePeriod,
   supportEarlyStake,
   onSuccess,
+  onClose,
   onEarlyStake,
 }: IUnlockModalProps) {
   const modal = useModal();
@@ -53,6 +55,7 @@ function UnlockModal({
       if (TransactionId) {
         setTransactionId(TransactionId);
         setStatus('success');
+        onSuccess?.();
       } else {
         throw new Error();
       }
@@ -66,13 +69,13 @@ function UnlockModal({
     } finally {
       setLoading(false);
     }
-  }, [poolId]);
+  }, [onSuccess, poolId]);
 
-  const onClose = useCallback(() => {
+  const onclose = useCallback(() => {
     setLoading(false);
     modal.remove();
-    onSuccess?.();
-  }, [modal, onSuccess]);
+    onClose?.();
+  }, [modal, onClose]);
 
   return (
     <ConfirmModal
@@ -91,7 +94,7 @@ function UnlockModal({
         releasePeriod,
         supportEarlyStake,
       }}
-      onClose={onClose}
+      onClose={onclose}
       afterClose={() => {
         modal.remove();
       }}

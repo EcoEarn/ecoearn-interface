@@ -85,11 +85,6 @@ export const useWalletInit = () => {
       message.error(`${loginError?.message || 'LOGIN_ERROR'}`);
     }
   }, [loginError]);
-
-  //FIXME:
-  // useWebLoginEvent(WebLoginEvents.DISCOVER_DISCONNECTED, () => {
-  //   logout();
-  // });
 };
 
 export const useWalletService = () => {
@@ -210,7 +205,7 @@ export const useWalletSyncCompleted = (contractChainId = mainChain) => {
 };
 
 export const useCheckLoginAndToken = () => {
-  const { connectWallet, disConnectWallet, isConnected } = useConnectWallet();
+  const { connectWallet, disConnectWallet, isConnected, walletInfo } = useConnectWallet();
   const isConnectWallet = useMemo(() => isConnected, [isConnected]);
   const { getToken, checkTokenValid } = useGetToken();
   const { isLogin } = useGetLoginStatus();
@@ -219,7 +214,7 @@ export const useCheckLoginAndToken = () => {
   const checkLogin = async (params?: { onSuccess?: <T = any>() => T | void }) => {
     const { onSuccess } = params || {};
     const accountInfo = JSON.parse(localStorage.getItem(storages.accountInfo) || '{}');
-    if (isConnectWallet) {
+    if (isConnectWallet && walletInfo) {
       console.log('getToken----isConnectWallet');
       if (accountInfo.token && checkTokenValid()) {
         store.dispatch(

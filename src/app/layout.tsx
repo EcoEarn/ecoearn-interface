@@ -3,8 +3,8 @@ import Layout from 'pageComponents/layout';
 import 'styles/tailwindBase.css';
 import 'styles/global.css';
 import 'styles/theme.css';
-
 import Provider from 'provider';
+import StyleRegistry from './StyleRegistry';
 
 export const metadata = {
   title: 'ecoearn',
@@ -31,9 +31,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         `}
       </Script>
       <body>
-        <Provider>
-          <Layout>{children}</Layout>
-        </Provider>
+        <StyleRegistry>
+          <Provider>
+            <Layout>{children}</Layout>
+          </Provider>
+        </StyleRegistry>
       </body>
     </html>
   );

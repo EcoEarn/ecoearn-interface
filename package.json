@@ -14,6 +14,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@aelf-react/types": "^0.1.10",
     "@aelf-web-login/utils": "^0.1.3-alpha.21",
     "@aelf-web-login/wallet-adapter-base": "^0.1.3-alpha.21",
     "@aelf-web-login/wallet-adapter-bridge": "^0.1.3-alpha.21",

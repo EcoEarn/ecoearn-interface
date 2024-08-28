@@ -353,3 +353,9 @@ interface IRewardsTypeItem {
   id: string;
   poolType: PoolType;
 }
+
+interface ISaveTransactionParams {
+  address: string;
+  transactionType: string;
+  amount: string;
+}

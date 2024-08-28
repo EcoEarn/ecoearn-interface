@@ -1,15 +1,15 @@
 import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
 import { useModal } from '@ebay/nice-modal-react';
 import ClaimModal from 'components/ClaimModal';
 import { singleMessage } from '@portkey/did-ui-react';
-import { PoolType, StakeType } from 'types/stake';
+import { PoolType, StakeType, TransactionType } from 'types/stake';
 import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
 import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
-import { fetchStakingPoolsData } from 'api/request';
+import { fetchStakingPoolsData, saveTransaction } from 'api/request';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import dayjs from 'dayjs';
 import { GetBalance } from 'contract/multiToken';
@@ -43,6 +43,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const { curChain, tokensContractAddress } = useGetCmsInfo() || {};
   const { stake: earlyStake } = useEarlyStake();
   const { getAddress } = useGetAwakenContract();
+  const operationAmount = useRef('0');
 
   const goLiquidity = useCallback(() => {
     if (!isLogin) {
@@ -121,7 +122,17 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         poolId: String(poolId) || '',
         releasePeriod,
         supportEarlyStake,
-        onSuccess: () => getStakeData(),
+        onClose: () => {
+          getStakeData();
+        },
+        onSuccess: () => {
+          saveTransaction({
+            address: wallet?.address || '',
+            amount: String(earned || ''),
+            transactionType:
+              poolType === 'Token' ? TransactionType.TokenClaim : TransactionType.LpClaim,
+          });
+        },
         onEarlyStake: () => {
           earlyStake({
             poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
@@ -133,7 +144,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         },
       });
     },
-    [claimModal, earlyStake, getStakeData, poolType],
+    [claimModal, earlyStake, getStakeData, poolType, wallet?.address],
   );
 
   const onUnlock = useCallback(
@@ -179,7 +190,19 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           poolId,
           releasePeriod,
           supportEarlyStake,
-          onSuccess: () => getStakeData(),
+          onClose: () => {
+            getStakeData();
+          },
+          onSuccess: () => {
+            saveTransaction({
+              address: wallet?.address || '',
+              amount: String(staked || ''),
+              transactionType:
+                poolType === 'Token'
+                  ? TransactionType.TokenStakeUnlock
+                  : TransactionType.LpStakeUnlock,
+            });
+          },
           onEarlyStake: () => {
             earlyStake({
               poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
@@ -200,7 +223,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         closeLoading();
       }
     },
-    [closeLoading, earlyStake, getStakeData, poolType, showLoading, unlockModal],
+    [closeLoading, earlyStake, getStakeData, poolType, showLoading, unlockModal, wallet?.address],
   );
 
   const getLpTokenContractAddress = useCallback(
@@ -300,6 +323,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         onStake: async (amount, period) => {
           const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
           if (type === StakeType.RENEW) {
+            operationAmount.current = stakeData?.staked || '';
             try {
               const renewRes = await Renew({
                 poolId: stakeData?.poolId || '',
@@ -330,6 +354,10 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
             }
             if (checked) {
               try {
+                operationAmount.current =
+                  type !== StakeType.EXTEND
+                    ? timesDecimals(amount, decimal).toFixed(0)
+                    : stakeData?.staked || '';
                 const stakeRes = await tokenStake({
                   poolId: stakeData?.poolId || '',
                   amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
@@ -344,7 +372,31 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
             }
           }
         },
-        onSuccess: () => getStakeData(),
+        onClose: () => {
+          getStakeData();
+        },
+        onSuccess: () => {
+          saveTransaction({
+            transactionType:
+              poolType === 'Token'
+                ? type === StakeType.STAKE
+                  ? TransactionType.TokenStake
+                  : type === StakeType.ADD
+                  ? TransactionType.TokenAddStake
+                  : type === StakeType.RENEW
+                  ? TransactionType.TokenStakeRenew
+                  : TransactionType.TokenStakeExtend
+                : type === StakeType.STAKE
+                ? TransactionType.LpStake
+                : type === StakeType.ADD
+                ? TransactionType.LpAddStake
+                : type === StakeType.RENEW
+                ? TransactionType.LpStakeRenew
+                : TransactionType.LpStakeExtend,
+            address: wallet?.address || '',
+            amount: operationAmount.current,
+          });
+        },
       });
     },
     [

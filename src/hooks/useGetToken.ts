@@ -35,7 +35,7 @@ export const useGetToken = () => {
       try {
         const res = await fetchToken(params);
         needLoading && closeLoading();
-        if (isConnectWallet) {
+        if (isConnectWallet && walletInfo) {
           store.dispatch(
             setLoginStatus({
               hasToken: true,
@@ -66,14 +66,13 @@ export const useGetToken = () => {
           });
         } else {
           message.error(LoginFailed);
-          // FIXME:  isConnectWallet && disConnectWallet({ noModal: true });
           isConnectWallet && disConnectWallet();
           needLoading && closeLoading();
           return '';
         }
       }
     },
-    [closeLoading, disConnectWallet, isConnectWallet, showLoading, walletInfo?.address],
+    [closeLoading, disConnectWallet, isConnectWallet, showLoading, walletInfo],
   );
 
   const checkTokenValid = useCallback(() => {
@@ -122,7 +121,6 @@ export const useGetToken = () => {
           const resError = error as IContractError;
           const errorMessage = formatErrorMsg(resError).errorMessage.message;
           message.error(errorMessage);
-          //FIXME:
           isConnectWallet && disConnectWallet();
           return;
         }
@@ -139,7 +137,6 @@ export const useGetToken = () => {
           const errorMessage = formatErrorMsg(sign?.errorMessage as unknown as IContractError)
             .errorMessage.message;
           message.error(errorMessage);
-          //FIXME:
           isConnectWallet && disConnectWallet();
           return;
         }

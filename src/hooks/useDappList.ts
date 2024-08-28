@@ -2,25 +2,24 @@ import { getStakingItems } from 'api/request';
 import useGetStoreInfo from 'redux/hooks/useGetStoreInfo';
 import { setDappList } from 'redux/reducer/info';
 import { store } from 'redux/store';
-import useLoading from './useLoading';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function useDappList() {
-  const { showLoading, closeLoading, visible } = useLoading();
+  const [loading, setLoading] = useState(false);
   const { dappList } = useGetStoreInfo();
 
   const fetchData = useCallback(async () => {
     if (dappList) return;
     try {
-      showLoading();
+      setLoading(true);
       const data = await getStakingItems();
       if (data) store.dispatch(setDappList(data));
     } catch (err) {
       console.error('getStakingItems error', err);
     } finally {
-      closeLoading();
+      setLoading(false);
     }
-  }, [closeLoading, dappList, showLoading]);
+  }, [dappList]);
 
   useEffect(() => {
     fetchData();
@@ -28,6 +27,6 @@ export default function useDappList() {
 
   return {
     dappList,
-    loading: visible,
+    loading,
   };
 }

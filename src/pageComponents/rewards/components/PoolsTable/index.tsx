@@ -1,5 +1,5 @@
 import { Pagination } from 'aelf-design';
-import { Flex, TableColumnsType } from 'antd';
+import { Flex } from 'antd';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
@@ -12,6 +12,7 @@ import CommonTooltip from 'components/CommonTooltip';
 import { DownOutlined } from '@ant-design/icons';
 import CommonTable from 'components/CommonTable';
 import { APP_PREFIX } from 'constants/index';
+import { ColumnsType } from 'antd/es/table';
 
 export default function PoolsTable({
   page,
@@ -42,7 +43,7 @@ export default function PoolsTable({
     });
   }, [rewardsTypeList]);
 
-  const columns: TableColumnsType<IRewardListItem> = useMemo(() => {
+  const columns: ColumnsType<IRewardListItem> = useMemo(() => {
     return [
       {
         key: 'pools',
@@ -120,7 +121,7 @@ export default function PoolsTable({
       }}
     >
       <CommonTable
-        columns={columns}
+        columns={columns as any}
         // rowKey={(record) => `${record.claimId}-${record.date}`}
         scroll={{ x: 'max-content' }}
         dataSource={dataList}
