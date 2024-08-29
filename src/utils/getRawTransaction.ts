@@ -46,10 +46,10 @@ export const getRawTransaction: <T>(
         });
         break;
       case WalletTypeEnum.discover:
-        if (!walletInfo?.extraInfo?.discoverInfo) return Promise.reject('');
+        if (!walletInfo?.address) return Promise.reject('');
         res = await getRawTransactionDiscover({
           contractAddress,
-          caAddress: walletInfo?.extraInfo?.discoverInfo.address,
+          caAddress: walletInfo?.address,
           caContractAddress,
           rpcUrl,
           params,
