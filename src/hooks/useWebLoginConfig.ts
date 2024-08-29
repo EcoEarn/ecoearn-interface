@@ -14,6 +14,7 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { APP_NAME } from 'constants/index';
 
 export default function useWebLoginConfig() {
+  const cmsInfo = useGetCmsInfo();
   const {
     networkTypeV2,
     curChain,
@@ -24,7 +25,7 @@ export default function useWebLoginConfig() {
     rpcUrlAELF,
     rpcUrlTDVV,
     rpcUrlTDVW,
-  } = useGetCmsInfo() || {};
+  } = cmsInfo || {};
 
   const didConfig: GlobalConfigProps = useMemo(() => {
     return {
@@ -100,13 +101,14 @@ export default function useWebLoginConfig() {
     ];
   }, [curChain, networkTypeV2, rpcUrlAELF, rpcUrlTDVV, rpcUrlTDVW]);
 
-  const config: IConfigProps = useMemo(() => {
+  const config: IConfigProps | null = useMemo(() => {
+    if (!cmsInfo) return null;
     return {
       didConfig,
       baseConfig,
       wallets,
     };
-  }, [baseConfig, didConfig, wallets]);
+  }, [baseConfig, cmsInfo, didConfig, wallets]);
 
   return config;
 }
