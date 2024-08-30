@@ -2461,7 +2461,7 @@
   dependencies:
     "@portkey/provider-types" "^2.2.3"
 
-"@portkey/did-ui-react@^2.7.1-alpha.0":
+"@portkey/did-ui-react@^2.7.1-alpha.3":
   version "2.9.1"
   resolved "https://registry.npmjs.org/@portkey/did-ui-react/-/did-ui-react-2.9.1.tgz#611d961d63ca814c1f4eaaaf18664313404b1b4d"
   integrity sha512-f+mDHPJzff+ONUcrm8ErHZdlA40uL3wIb9ktJfVB2Bn49jYaUn/yRZ3UNAyzdMpRYosA4U4yBo9lZziUoW2W1w==

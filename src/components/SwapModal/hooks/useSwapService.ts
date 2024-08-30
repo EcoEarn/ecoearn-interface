@@ -1,5 +1,5 @@
-import { did, getChainInfo, managerApprove, NetworkType } from '@portkey/did-ui-react';
-import { useCallback, useEffect } from 'react';
+import { getChainInfo, managerApprove, NetworkType } from '@portkey/did-ui-react';
+import { useCallback } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { aelf } from '@portkey/utils';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
@@ -7,7 +7,6 @@ import { getContractBasic } from '@portkey/contracts';
 import { PORTKEY_LOGIN_CHAIN_ID_KEY } from 'constants/common';
 import { ChainId } from '@portkey/types';
 import { TTokenApproveHandler } from '@portkey/trader-core';
-import { APP_NAME } from 'constants/index';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { useAElfReact } from '@aelf-react/core';
@@ -93,18 +92,18 @@ export default function useSwapService() {
         ),
       );
 
-      // console.log('====params', params, caHash, chainInfo, portkeyContract, {
-      //   originChainId: originChainId,
-      //   symbol: params.symbol,
-      //   caHash,
-      //   amount: params.amount,
-      //   spender: params.spender,
-      //   targetChainId: curChain!,
-      //   networkType: networkTypeV2 as NetworkType,
-      //   dappInfo: {
-      //     name: 'ecoearn',
-      //   },
-      // });
+      console.log('====params', params, caHash, chainInfo, portkeyContract, {
+        originChainId: originChainId,
+        symbol: params.symbol,
+        caHash,
+        amount: params.amount,
+        spender: params.spender,
+        targetChainId: curChain!,
+        networkType: networkTypeV2 as NetworkType,
+        dappInfo: {
+          name: 'ecoearn',
+        },
+      });
 
       const result = await managerApprove({
         originChainId: originChainId,

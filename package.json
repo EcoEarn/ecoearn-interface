@@ -27,7 +27,7 @@
     "@etransfer/ui-react": "^1.2.1-alpha.3",
     "@portkey/contracts": "^2.7.1-alpha.0",
     "@portkey/detect-provider": "^2.1.0",
-    "@portkey/did-ui-react": "^2.7.1-alpha.0",
+    "@portkey/did-ui-react": "^2.7.1-alpha.3",
     "@portkey/onboarding": "^2.2.0",
     "@portkey/provider-types": "^2.1.0",
     "@portkey/request": "^2.7.1-alpha.0",
