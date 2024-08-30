@@ -1,4 +1,4 @@
-import { Flex, Segmented, TableColumnsType } from 'antd';
+import { Flex, Segmented } from 'antd';
 import clsx from 'clsx';
 import Empty from 'components/Empty';
 import useLiquidityListService, { LiquidityListTypeEnum } from './hooks/useLiquidityListService';
@@ -14,6 +14,7 @@ import OperationDrop from '../OperationDrop';
 import { theme } from './config';
 import { AELFDProviderTheme } from 'provider/config';
 import { APP_PREFIX } from 'constants/index';
+import { ColumnsType } from 'antd/es/table';
 
 export default function LiquidityList() {
   const {
@@ -35,8 +36,8 @@ export default function LiquidityList() {
     onStake,
   } = useLiquidityListService();
 
-  const columns: TableColumnsType<ILiquidityItem> = useMemo(() => {
-    const allColumns: TableColumnsType<ILiquidityItem> = [
+  const columns: ColumnsType<ILiquidityItem> = useMemo(() => {
+    const allColumns: ColumnsType<ILiquidityItem> = [
       {
         key: 'lpSymbol',
         dataIndex: 'lpSymbol',
@@ -278,7 +279,7 @@ export default function LiquidityList() {
       {data?.length && data.length > 0 ? (
         !isLG ? (
           <CommonTable
-            columns={columns}
+            columns={columns as any}
             dataSource={data}
             scroll={{ x: 'max-content' }}
             className={clsx('mt-6', styles.table)}

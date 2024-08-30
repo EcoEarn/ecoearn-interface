@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from 'redux/store';
 import { HYDRATE } from 'next-redux-wrapper';
-import { LoginState, TLoginStatusType } from 'redux/types/reducerTypes';
+import { TLoginStatusType } from 'redux/types/reducerTypes';
 
 const initialState: TLoginStatusType = {
   loginStatus: {
-    walletStatus: LoginState.initial,
     isConnectWallet: false,
     hasToken: false,
     isLogin: false,

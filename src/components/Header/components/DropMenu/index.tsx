@@ -35,8 +35,8 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
   const { isInTelegram } = useTelegram();
 
   const fullAddress = useMemo(() => {
-    return addPrefixSuffix(wallet.address, curChain);
-  }, [curChain, wallet.address]);
+    return addPrefixSuffix(wallet?.address || '', curChain);
+  }, [curChain, wallet?.address]);
 
   const formatAddress = useMemo(() => {
     return getOmittedStr(fullAddress, OmittedType.ADDRESS);
@@ -64,8 +64,8 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
   }, []);
 
   const addressExploreUrl = useMemo(() => {
-    return `${explorerUrl}/address/${addPrefixSuffix(wallet.address, curChain)}`;
-  }, [curChain, explorerUrl, wallet.address]);
+    return `${explorerUrl}/address/${addPrefixSuffix(wallet?.address || '', curChain)}`;
+  }, [curChain, explorerUrl, wallet?.address]);
 
   const menuItemsMy = useMemo(() => {
     return [

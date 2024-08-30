@@ -167,3 +167,7 @@ export const liquidityRemove = async (
 export const getRewardsType = async (): Promise<any> => {
   return request.get('/app/rewards/filter/items');
 };
+
+export const saveTransaction = async (data: ISaveTransactionParams): Promise<any> => {
+  return request.post('/app/rewards/transaction/record', data);
+};

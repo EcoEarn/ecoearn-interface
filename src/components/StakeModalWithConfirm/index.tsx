@@ -40,6 +40,7 @@ interface IStakeModalProps {
     poolId?: number | string,
   ) => Promise<ISendResult | void>;
   onSuccess: () => void;
+  onClose?: () => void;
 }
 
 type TStakeExtendContent = Partial<IStakeContent> | IExtendedLockupContent;
@@ -62,6 +63,7 @@ function StakeModalWithConfirm({
   fetchBalance,
   onStake,
   onSuccess,
+  onClose,
   balance,
 }: IStakeModalProps) {
   const modal = useModal();
@@ -89,7 +91,7 @@ function StakeModalWithConfirm({
     [unlockTime],
   );
 
-  const onClose = useCallback(() => {
+  const onclose = useCallback(() => {
     modal.remove();
   }, [modal]);
 
@@ -163,6 +165,7 @@ function StakeModalWithConfirm({
         if (res?.TransactionId) {
           setStatus('success');
           setTransactionId(res?.TransactionId);
+          onSuccess?.();
         } else {
           throw Error();
         }
@@ -175,7 +178,7 @@ function StakeModalWithConfirm({
         setLoading(false);
       }
     },
-    [onStake, poolId],
+    [onStake, onSuccess, poolId],
   );
 
   const onConfirmClose = useCallback(() => {
@@ -183,9 +186,9 @@ function StakeModalWithConfirm({
     setVisible(false);
     if (status === 'success') {
       modal.remove();
-      onSuccess?.();
+      onClose?.();
     }
-  }, [modal, onSuccess, status]);
+  }, [modal, onClose, status]);
 
   return (
     <>
@@ -205,7 +208,7 @@ function StakeModalWithConfirm({
         balanceDec={balanceDec}
         type={type}
         balance={balance}
-        onClose={onClose}
+        onClose={onclose}
         fetchBalance={fetchBalance}
         onConfirm={onStakeModalConfirm}
         stakeData={stakeData}

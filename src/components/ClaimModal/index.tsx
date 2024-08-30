@@ -17,6 +17,7 @@ interface IClaimModalProps {
   supportEarlyStake: boolean;
   onStake: (amount: number | string, period: number | string) => Promise<ISendResult>;
   onSuccess?: () => void;
+  onClose?: () => void;
   onEarlyStake?: () => void;
 }
 
@@ -26,6 +27,7 @@ function ClaimModal({
   decimal = 8,
   poolId,
   onSuccess,
+  onClose,
   releasePeriod,
   supportEarlyStake,
   onEarlyStake,
@@ -43,6 +45,7 @@ function ClaimModal({
       const { TransactionId } = await tokenClaim(poolId);
       setTransactionId(TransactionId);
       setStatus('success');
+      onSuccess?.();
     } catch (error) {
       const { showInModal, errorMessage } = error as any;
       const errorTip = errorMessage?.message;
@@ -53,13 +56,13 @@ function ClaimModal({
     } finally {
       setLoading(false);
     }
-  }, [poolId]);
+  }, [onSuccess, poolId]);
 
-  const onClose = useCallback(() => {
+  const onclose = useCallback(() => {
     setLoading(false);
     modal.remove();
-    onSuccess?.();
-  }, [modal, onSuccess]);
+    onClose?.();
+  }, [modal, onClose]);
 
   return (
     <ConfirmModal
@@ -74,7 +77,7 @@ function ClaimModal({
         releasePeriod,
         supportEarlyStake,
       }}
-      onClose={onClose}
+      onClose={onclose}
       afterClose={() => {
         modal.remove();
       }}

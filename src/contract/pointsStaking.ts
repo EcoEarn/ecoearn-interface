@@ -36,20 +36,20 @@ const pointsStakingContractRequest = async <T, R>(
     console.log('=====pointsStakingContractRequest params: ', method, params);
 
     if (options?.type === ContractMethodType.VIEW) {
-      const res: R = await webLoginInstance.callViewMethod(curChain, {
+      const res: { data: R } = await webLoginInstance.callViewMethod(curChain, {
         contractAddress: address,
         methodName: method,
         args: params,
       });
 
-      console.log('=====pointsStakingContractRequest res: ', method, res);
+      console.log('=====pointsStakingContractRequest res: ', method, res.data);
 
-      const result = res as unknown as IContractError;
+      const result = res.data as unknown as IContractError;
       if (result?.error || result?.code || result?.Error) {
         return Promise.reject(formatErrorMsg(result, method));
       }
 
-      return Promise.resolve(res);
+      return Promise.resolve(res.data);
     } else {
       const res: R = await webLoginInstance.callSendMethod(curChain, {
         contractAddress: address,

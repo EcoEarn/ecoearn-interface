@@ -1,9 +1,7 @@
 import { useCallback } from 'react';
-import { useWalletService } from './useWallet';
-import { SignatureParams, useWebLogin, WalletType } from 'aelf-web-login';
 import { did } from '@portkey/did-ui-react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
-import { ETransferConfig, etransferCore, getETransferReCaptcha } from '@etransfer/ui-react';
+import { ETransferConfig, etransferCore } from '@etransfer/ui-react';
 import { AuthTokenSource, PortkeyVersion } from '@etransfer/types';
 import { getCaInfo } from 'utils/getCaInfo';
 import { getETransferJWT, recoverPubKeyBySignature } from '@etransfer/utils';
@@ -11,21 +9,22 @@ import useDiscoverProvider from './useDiscoverProvider';
 import { asyncStorage } from 'utils/lib';
 import AElf from 'aelf-sdk';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { TSignatureParams, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
 export function useETransferAuthToken() {
-  const { wallet, walletType } = useWalletService();
   const { isLogin } = useGetLoginStatus();
   const { discoverProvider } = useDiscoverProvider();
-  const { getSignature: getSignatureWeb } = useWebLogin();
+  const { getSignature: getSignatureWeb, walletType, walletInfo } = useConnectWallet();
   const { etransferUrl } = useGetCmsInfo() || {};
 
   const getManagerAddress = useCallback(async () => {
     let managerAddress;
-    if (walletType === WalletType.discover) {
+    if (walletType === WalletTypeEnum.discover) {
       if (!discoverProvider) throw new Error('Please download extension');
       const provider = await discoverProvider();
       managerAddress = provider?.request({ method: 'wallet_getCurrentManagerAddress' });
-    } else if (walletType === WalletType.portkey) {
+    } else if (walletType === WalletTypeEnum.aa) {
       managerAddress = did.didWallet.managementAccount?.address;
     }
     if (managerAddress) return managerAddress;
@@ -33,7 +32,7 @@ export function useETransferAuthToken() {
   }, [discoverProvider, walletType]);
 
   const getDiscoverSignature = useCallback(
-    async (params: SignatureParams) => {
+    async (params: TSignatureParams) => {
       const provider = await discoverProvider();
       const signInfo = params.signInfo;
       const signedMsgObject = await provider?.request({
@@ -57,7 +56,7 @@ export function useETransferAuthToken() {
     [discoverProvider],
   );
 
-  const getPortKeySignature = useCallback(async (params: SignatureParams) => {
+  const getPortKeySignature = useCallback(async (params: TSignatureParams) => {
     // checkSignatureParams(params);
     let signInfo = '';
     if (params.hexToBeSign) {
@@ -80,31 +79,31 @@ export function useETransferAuthToken() {
     let signInfo: string;
     let getSignature;
     let address: string;
-    if (walletType === WalletType.discover) {
+    if (walletType === WalletTypeEnum.discover) {
       // discover
       signInfo = AElf.utils.sha256(plainText);
       getSignature = getDiscoverSignature;
-      address = wallet.address || '';
-    } else if (walletType === WalletType.elf) {
+      address = walletInfo?.address || '';
+    } else if (walletType === WalletTypeEnum.elf) {
       // nightElf
       signInfo = AElf.utils.sha256(plainText);
       getSignature = getSignatureWeb;
-      address = wallet.address || '';
+      address = walletInfo?.address || '';
     } else {
       // portkey sdk
       signInfo = Buffer.from(plainText).toString('hex');
       getSignature = getPortKeySignature;
-      address = wallet.address || '';
+      address = walletInfo?.address || '';
     }
     const result = await getSignature({
       appName: 'ecoearn',
       address,
       signInfo,
     });
-    if (result.error) throw result.errorMessage;
+    if (result?.error) throw result.errorMessage;
 
     return { signature: result?.signature || '', plainText };
-  }, [getDiscoverSignature, getPortKeySignature, getSignatureWeb, wallet.address, walletType]);
+  }, [getDiscoverSignature, getPortKeySignature, getSignatureWeb, walletInfo?.address, walletType]);
 
   const getUserInfo = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
@@ -122,9 +121,9 @@ export function useETransferAuthToken() {
   );
 
   const handleReCaptcha = useCallback(async (): Promise<any> => {
-    if (walletType === WalletType.elf) {
+    if (walletType === WalletTypeEnum.elf) {
       const isRegistered = await etransferCore.services.checkEOARegistration({
-        address: wallet.address,
+        address: walletInfo?.address || '',
       });
       console.log('isRegistered', isRegistered);
 
@@ -147,14 +146,14 @@ export function useETransferAuthToken() {
         }
       });
     }
-  }, [etransferUrl, wallet.address, walletType]);
+  }, [etransferUrl, walletInfo?.address, walletType]);
 
   const getETransferAuthTokenELF = useCallback(async () => {
-    if (!wallet) throw new Error('Failed to obtain walletInfo information.');
+    if (!walletInfo) throw new Error('Failed to obtain walletInfo information.');
     if (!isLogin) throw new Error('You are not logged in.');
 
     try {
-      const managerAddress = wallet.address;
+      const managerAddress = walletInfo?.address;
       let authToken;
       const jwtData = await getETransferJWT(asyncStorage, `nightElf${managerAddress}`);
       if (jwtData) {
@@ -166,7 +165,7 @@ export function useETransferAuthToken() {
           pubkey,
           signature,
           plainText,
-          managerAddress: wallet.address,
+          managerAddress: walletInfo?.address,
           version: PortkeyVersion.v2,
           source: AuthTokenSource.NightElf,
           recaptchaToken: recaptchaToken,
@@ -184,18 +183,18 @@ export function useETransferAuthToken() {
       console.log('=====getETransferAuthToken error', error);
       throw error;
     }
-  }, [getUserInfo, handleReCaptcha, isLogin, wallet]);
+  }, [getUserInfo, handleReCaptcha, isLogin, walletInfo]);
 
   const getETransferAuthTokenPortkeyAndDiscover = useCallback(async () => {
-    if (!wallet) throw new Error('Failed to obtain walletInfo information.');
+    if (!walletInfo) throw new Error('Failed to obtain walletInfo information.');
     if (!isLogin) throw new Error('You are not logged in.');
 
     try {
       const managerAddress = await getManagerAddress();
       const { caHash, originChainId } = await getCaInfo({
         walletType,
-        address: wallet.address,
-        walletInfo: wallet,
+        address: walletInfo?.address,
+        walletInfo: walletInfo,
       });
       let authToken;
       const jwtData = await getETransferJWT(asyncStorage, `${caHash}${managerAddress}`);
@@ -227,10 +226,10 @@ export function useETransferAuthToken() {
       console.log('=====getETransferAuthToken error', error);
       throw error;
     }
-  }, [getManagerAddress, getUserInfo, isLogin, wallet, walletType]);
+  }, [getManagerAddress, getUserInfo, isLogin, walletInfo, walletType]);
 
   const getETransferAuthToken = useCallback(async () => {
-    if (walletType === WalletType.elf) {
+    if (walletType === WalletTypeEnum.elf) {
       await getETransferAuthTokenELF();
     } else {
       await getETransferAuthTokenPortkeyAndDiscover();

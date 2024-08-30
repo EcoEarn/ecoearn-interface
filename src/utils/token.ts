@@ -1,4 +1,3 @@
-import { WebLoginState } from 'aelf-web-login';
 import { IAccountInfo } from 'types';
 import { storages } from 'storages';
 import { needCheckTokenUrl } from 'constants/token';
@@ -38,8 +37,8 @@ export const checkAccountExpired = (accountInfo: IAccountInfo, address: string):
   return true;
 };
 
-export const checkTokenValid = (loginState: WebLoginState, address: string) => {
-  if (loginState !== WebLoginState.logined) return false;
+export const checkTokenValid = (isWalletConnected: boolean, address: string) => {
+  if (!isWalletConnected) return false;
   const accountInfo = JSON.parse(localStorage.getItem(storages.accountInfo) || '{}');
 
   if (

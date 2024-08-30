@@ -145,7 +145,7 @@ export default function DappList({
               >
                 <span className={clsx(item.isOpenStake && 'text-brandDefault')}>Gain points</span>
                 <RightOutlined
-                  className={clsx('lg:ml-4', item.isOpenStake && 'text-brandDefault')}
+                  className={clsx('lg:ml-4', item.isOpenStake && '!text-brandDefault')}
                   width={20}
                   height={20}
                 />

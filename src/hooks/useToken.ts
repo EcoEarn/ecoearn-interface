@@ -24,14 +24,14 @@ export default function useToken() {
     async (symbol: string) => {
       const { balance } = await GetBalance(
         {
-          owner: wallet.address,
+          owner: wallet?.address || '',
           symbol,
         },
         multiTokenContractAddress || '',
       );
       return balance;
     },
-    [multiTokenContractAddress, wallet.address],
+    [multiTokenContractAddress, wallet?.address],
   );
 
   return {
