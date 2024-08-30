@@ -1,5 +1,5 @@
 import { getChainInfo, managerApprove, NetworkType } from '@portkey/did-ui-react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { aelf } from '@portkey/utils';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
@@ -10,14 +10,23 @@ import { TTokenApproveHandler } from '@portkey/trader-core';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { useAElfReact } from '@aelf-react/core';
+import { AElfContextType } from '@aelf-react/core/dist/types';
 
 export default function useSwapService() {
   const { walletType, walletInfo } = useConnectWallet();
   const cmsInfo = useGetCmsInfo();
   const { curChain, networkTypeV2 } = cmsInfo || {};
   const aelfReact = useAElfReact();
+  const aelfReactInstanceRef = useRef<AElfContextType>();
+  const discoverProviderInstanceRef = useRef<any>();
 
-  console.log('====walletInfo', walletInfo);
+  useEffect(() => {
+    aelfReactInstanceRef.current = aelfReact;
+  }, [aelfReact]);
+
+  useEffect(() => {
+    discoverProviderInstanceRef.current = walletInfo?.extraInfo?.provider;
+  }, [walletInfo?.extraInfo?.provider]);
 
   const getOptions: any = useCallback(async () => {
     if (walletType === WalletTypeEnum.unknown) throw 'unknown';
@@ -35,15 +44,14 @@ export default function useSwapService() {
         address: walletInfo?.extraInfo?.portkeyInfo?.caInfo?.caAddress || '',
       };
     } else if (walletType === WalletTypeEnum.discover) {
-      const provider = walletInfo?.extraInfo?.provider;
+      const provider = discoverProviderInstanceRef.current;
       if (!provider) return;
       const chainProvider = await provider.getChain(curChain);
       const accountsResult = await provider.request({ method: 'requestAccounts' });
       const caAddress = accountsResult[curChain!]?.[0];
-      console.log('===chainProvider, caAddress', chainProvider, caAddress);
       return { contractOptions: { chainProvider }, address: caAddress };
     } else {
-      const provider = await aelfReact.activate({
+      const provider = await aelfReactInstanceRef.current?.activate({
         tDVW: {
           rpcUrl: (cmsInfo as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`],
           chainId: curChain!,
@@ -64,14 +72,7 @@ export default function useSwapService() {
         address,
       };
     }
-  }, [
-    aelfReact,
-    cmsInfo,
-    curChain,
-    walletInfo?.extraInfo?.portkeyInfo,
-    walletInfo?.extraInfo?.provider,
-    walletType,
-  ]);
+  }, [cmsInfo, curChain, walletInfo?.extraInfo?.portkeyInfo, walletType]);
 
   const tokenApprove: TTokenApproveHandler = useCallback(
     async (params) => {
@@ -91,19 +92,6 @@ export default function useSwapService() {
           }),
         ),
       );
-
-      console.log('====params', params, caHash, chainInfo, portkeyContract, {
-        originChainId: originChainId,
-        symbol: params.symbol,
-        caHash,
-        amount: params.amount,
-        spender: params.spender,
-        targetChainId: curChain!,
-        networkType: networkTypeV2 as NetworkType,
-        dappInfo: {
-          name: 'ecoearn',
-        },
-      });
 
       const result = await managerApprove({
         originChainId: originChainId,

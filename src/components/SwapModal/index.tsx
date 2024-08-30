@@ -1,5 +1,5 @@
 import CommonModal from 'components/CommonModal';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import useResponsive from 'utils/useResponsive';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
@@ -21,9 +21,17 @@ function SwapModal(props: ISwapModalProps) {
   const cmsInfo = useGetCmsInfo();
   const { isMD } = useResponsive();
   const modal = useModal();
-  const awakenInstanceRef = useRef<IPortkeySwapperAdapter>();
+  const [awakenInstance, setAwakenInstance] = useState<IPortkeySwapperAdapter>();
   const { walletType } = useWalletService();
   const { getOptions, tokenApprove } = useSwapService();
+
+  const awakenProps = useMemo(() => {
+    return {
+      instance: awakenInstance,
+      tokenApprove: walletType === WalletTypeEnum.aa ? tokenApprove : undefined,
+      getOptions,
+    };
+  }, [awakenInstance, getOptions, tokenApprove, walletType]);
 
   const curRpcUrl = useMemo(() => {
     return (cmsInfo as Partial<ICMSInfo>)[`rpcUrl${cmsInfo?.curChain?.toLocaleUpperCase()}`];
@@ -31,7 +39,7 @@ function SwapModal(props: ISwapModalProps) {
 
   useEffect(() => {
     if (!cmsInfo) return;
-    awakenInstanceRef.current = new AwakenSwapper({
+    const awakenIns = new AwakenSwapper({
       contractConfig: {
         swapContractAddress: cmsInfo?.awakenSwapContractAddress,
         rpcUrl: curRpcUrl || '',
@@ -40,6 +48,7 @@ function SwapModal(props: ISwapModalProps) {
         baseURL: cmsInfo?.awakenUrl,
       },
     });
+    awakenIns && setAwakenInstance(awakenIns);
   }, [cmsInfo, curRpcUrl]);
 
   return (
@@ -59,11 +68,7 @@ function SwapModal(props: ISwapModalProps) {
         componentUiType={isMD ? ComponentType.Mobile : ComponentType.Web}
         onConfirmSwap={onCancel}
         chainId={cmsInfo?.curChain}
-        awaken={{
-          instance: awakenInstanceRef.current,
-          tokenApprove: walletType === WalletTypeEnum.aa ? tokenApprove : undefined,
-          getOptions,
-        }}
+        awaken={awakenProps}
       />
     </CommonModal>
   );

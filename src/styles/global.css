@@ -86,9 +86,16 @@ code {
 	}
 }
 
+.portkey-trade-ant-drawer-content.swap-confirm-modal {
+	.portkey-trade-ant-btn.swap-confirm-modal-btn{
+		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none;
+	}
+
+}
+
 .tips-modal-m.portkey-trade-ant-modal{
 	.tips-content .ok-btn{
-		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none;
+		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none !text-white;
 	}
 }
 
