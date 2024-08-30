@@ -97,10 +97,9 @@ function AddLiquidityModal({
   const stakeModal = useModal(StakeModalWithConfirm);
   const { getAddress } = useGetAwakenContract();
   const { curChain, rewardsContractAddress, caContractAddress } = useGetCmsInfo() || {};
-  const { wallet } = useWalletService();
+  const { wallet, walletType } = useWalletService();
   const { showLoading, closeLoading } = useLoading();
   const config = useGetCmsInfo() || {};
-  const { walletType } = useWalletService();
   const [tolerance, setTolerance] = useState('0.5');
   const [deadline, setDeadline] = useState('20');
 
@@ -268,7 +267,7 @@ function AddLiquidityModal({
         try {
           checked = await checkAllowanceAndApprove({
             spender: rewardsContractAddress || '',
-            address: wallet.address,
+            address: wallet?.address || '',
             chainId: curChain,
             symbol: tokenB.symbol,
             decimals: tokenB.decimal,
@@ -292,7 +291,7 @@ function AddLiquidityModal({
             const signParams: IAddLiquiditySignParams = {
               amount: tokenA.balance,
               poolType: 'All',
-              address: wallet.address,
+              address: wallet?.address || '',
               dappId,
               claimInfos: claimInfos || [],
               poolId: stakeData?.poolId || '',
@@ -318,7 +317,7 @@ function AddLiquidityModal({
                 params: {
                   stakeInput: {
                     claimIds: claimInfos.map((item) => item.claimId),
-                    account: wallet.address,
+                    account: wallet?.address || '',
                     amount: tokenA.balance,
                     seed,
                     expirationTime,

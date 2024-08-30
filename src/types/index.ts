@@ -1,7 +1,6 @@
 import { Accounts, ChainId } from '@portkey/provider-types';
 import { IBlockchainWallet } from '@portkey/types';
 import { ManagerInfoType } from '@portkey/did-ui-react';
-import { DiscoverInfo, PortkeyInfo, PortkeyInfoV1 } from 'aelf-web-login';
 
 export type TokenInfo = {
   decimals: number;
@@ -94,8 +93,9 @@ export type WalletInfoType = {
   address: string;
   publicKey?: string;
   token?: string;
-  discoverInfo?: DiscoverInfo;
-  portkeyInfo?: PortkeyInfo | PortkeyInfoV1;
+  //FIXME:
+  discoverInfo?: any;
+  portkeyInfo?: any;
   aelfChainAddress?: string;
 };
 

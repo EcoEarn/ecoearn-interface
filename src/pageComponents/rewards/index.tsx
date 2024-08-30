@@ -29,7 +29,7 @@ export default function Rewards() {
   const [rewardsTypeList, setRewardsTypeList] = useState<Array<IRewardsTypeItem>>();
 
   const fetchInitData = useCallback(async () => {
-    if (!wallet.address) return;
+    if (!wallet?.address) return;
     try {
       showLoading();
       const [rewardsList, rewardsTypeList] = await Promise.all([
@@ -55,7 +55,7 @@ export default function Rewards() {
     } finally {
       closeLoading();
     }
-  }, [closeLoading, showLoading, wallet.address]);
+  }, [closeLoading, showLoading, wallet?.address]);
 
   const hasHistoryData = useMemo(() => {
     return initData && initData?.length > 0;

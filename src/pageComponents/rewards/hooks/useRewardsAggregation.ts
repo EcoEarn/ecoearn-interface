@@ -86,7 +86,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
       needLoading && showLoading();
       try {
         const data = await getPoolRewards({
-          address: wallet.address || '',
+          address: wallet?.address || '',
           poolType,
         });
         if (data && data?.length > 0) {
@@ -94,7 +94,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
           try {
             const earlyStakeData = await getEarlyStakeInfo({
               tokenName: '',
-              address: wallet.address || '',
+              address: wallet?.address || '',
               chainId: curChain!,
               rate: 0,
               poolType: PoolType.TOKEN,
@@ -119,7 +119,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
         needLoading && closeLoading();
       }
     },
-    [closeLoading, curChain, isLogin, poolType, showLoading, wallet.address],
+    [closeLoading, curChain, isLogin, poolType, showLoading, wallet?.address],
   );
 
   useEffect(() => {
@@ -213,7 +213,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
             const signParams: IEarlyStakeSignParams = {
               amount: Number(stakeAmount),
               poolType: data?.poolType,
-              address: wallet.address,
+              address: wallet?.address || '',
               dappId: data?.dappId || '',
               period: periodInSeconds,
               poolId: earlyStakePoolData?.poolId || '',
@@ -242,7 +242,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
                   params: {
                     stakeInput: {
                       claimIds,
-                      account: wallet.address,
+                      account: wallet?.address || '',
                       amount: stakeAmount,
                       seed,
                       poolId: earlyStakePoolData?.poolId || '',
@@ -359,7 +359,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
       const signParams: IWithdrawSignParams = {
         amount: Number(amount || 0),
         poolType: data?.poolType,
-        address: wallet.address,
+        address: wallet?.address || '',
         claimInfos: claimParams?.withdrawClaimInfos || [],
         dappId: data?.dappId || '',
         operationPoolIds: data?.poolType === PoolType.POINTS ? [] : [data?.poolId || ''],
@@ -378,7 +378,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
           methodName: 'Withdraw',
           params: {
             claimIds: claimParams?.withdrawClaimIds || [],
-            account: wallet.address,
+            account: wallet?.address || '',
             amount,
             seed,
             signature,

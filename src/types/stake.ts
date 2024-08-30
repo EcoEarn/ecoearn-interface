@@ -11,3 +11,18 @@ export enum PoolType {
   LP = 'Lp',
   ALL = 'All',
 }
+
+export enum TransactionType {
+  TokenStake = 'TokenStake',
+  TokenAddStake = 'TokenAddStake',
+  TokenStakeExtend = 'TokenStakeExtend',
+  TokenStakeRenew = 'TokenStakeRenew',
+  TokenStakeUnlock = 'TokenStakeUnlock',
+  TokenClaim = 'TokenClaim',
+  LpStake = 'LpStake',
+  LpAddStake = 'LpAddStake',
+  LpStakeExtend = 'LpStakeExtend',
+  LpStakeRenew = 'LpStakeRenew',
+  LpStakeUnlock = 'LpStakeUnlock',
+  LpClaim = 'LpClaim',
+}

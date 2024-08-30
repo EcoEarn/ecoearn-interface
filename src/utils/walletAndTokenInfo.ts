@@ -1,21 +1,24 @@
-import { SignatureData, WalletType } from 'aelf-web-login';
-import { WalletInfoType } from 'types';
+import { TWalletInfo, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
+export interface SignatureData {
+  error: number;
+  errorMessage: string;
+  signature: string;
+  from: string;
+}
 export default class WalletAndTokenInfo {
   public static signInfo: SignatureData | null;
-  public static walletType: WalletType | null;
-  public static walletInfo: WalletInfoType | null;
+  public static walletType: WalletTypeEnum | null;
+  public static walletInfo: TWalletInfo | null;
   public static getSignature: (() => Promise<string | undefined>) | null;
-  public static version: string | null;
 
   public static setSignInfo(data: SignatureData) {
     this.signInfo = data;
   }
 
-  public static setWallet(walletType: WalletType, walletInfo: WalletInfoType, version: string) {
+  public static setWallet(walletType: WalletTypeEnum, walletInfo: TWalletInfo) {
     this.walletInfo = walletInfo;
     this.walletType = walletType;
-    this.version = version;
   }
 
   public static setSignMethod(method: () => Promise<string | undefined>) {
@@ -45,7 +48,7 @@ export default class WalletAndTokenInfo {
         return resolve(accountInfo.token);
       }
 
-      if (!(this.getSignature && this.walletInfo && this.walletType && this.version)) {
+      if (!(this.getSignature && this.walletInfo && this.walletType)) {
         return reject();
       }
 
@@ -63,6 +66,5 @@ export default class WalletAndTokenInfo {
     this.walletInfo = null;
     this.walletType = null;
     this.getSignature = null;
-    this.version = null;
   }
 }

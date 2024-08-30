@@ -99,7 +99,6 @@ export const createManagerForwardCall = async ({
   caHash,
   instance,
 }: TCreateHandleManagerForwardCall) => {
-  console.log('=====res');
   const res = await handleManagerForwardCall({
     paramsOption: {
       contractAddress,
@@ -110,7 +109,6 @@ export const createManagerForwardCall = async ({
     functionName: 'ManagerForwardCall',
     instance,
   });
-  console.log('=====res111');
 
   res.args = Buffer.from(AElf.utils.uint8ArrayToHex(res.args), 'hex').toString('base64');
 
