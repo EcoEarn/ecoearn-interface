@@ -1,6 +1,5 @@
 import { useModal } from '@ebay/nice-modal-react';
 import { singleMessage } from '@portkey/did-ui-react';
-import { WebLoginEvents, useWebLoginEvent } from 'aelf-web-login';
 import { useInterval, useRequest } from 'ahooks';
 import { message } from 'antd';
 import {
@@ -61,14 +60,20 @@ export default function useLiquidityListService() {
   const { showLoading, closeLoading } = useLoading();
   const { curChain, caContractAddress, rewardsContractAddress } = useGetCmsInfo() || {};
   const config = useGetCmsInfo();
-  const { wallet, walletType } = useWalletService();
+  const { wallet, walletType, isConnectWallet } = useWalletService();
   const stakeModal = useModal(StakeModalWithConfirm);
   const router = useRouter();
   const { min } = useStakeConfig();
 
+  useEffect(() => {
+    if (!isConnectWallet) {
+      router.replace('/farms');
+    }
+  }, [isConnectWallet, router]);
+
   const { data: rewardsData } = useRequest(
     async () => {
-      if (!wallet.address) return;
+      if (!wallet?.address) return;
       try {
         const data = await getPoolRewards({
           address: wallet.address,
@@ -143,7 +148,7 @@ export default function useLiquidityListService() {
 
   const { data: earlyStakeInfos } = useRequest(
     async () => {
-      if (!wallet.address) return;
+      if (!wallet?.address) return;
       try {
         const data = Promise.all(
           getEarlyStakeInfoParams.map((item) => {
@@ -167,10 +172,6 @@ export default function useLiquidityListService() {
     },
     { pollingInterval: 10000, refreshDeps: [data] },
   );
-
-  useWebLoginEvent(WebLoginEvents.LOGOUT, () => {
-    router.replace('/farms');
-  });
 
   const totalEarlyStakeAmount = useMemo(() => {
     if (!rewardsInfoToStake) return 0;
@@ -288,7 +289,7 @@ export default function useLiquidityListService() {
     async (props?: { needLoading?: boolean }) => {
       const { needLoading = true } = props || {};
       let list: Array<ILiquidityItem>;
-      if (!wallet.address) return;
+      if (!wallet?.address) return;
       try {
         needLoading && showLoading();
         if (currentList === LiquidityListTypeEnum.My) {
@@ -304,7 +305,7 @@ export default function useLiquidityListService() {
         needLoading && closeLoading();
       }
     },
-    [closeLoading, currentList, showLoading, wallet.address],
+    [closeLoading, currentList, showLoading, wallet?.address],
   );
 
   const longestReleaseTime = useMemo(() => {

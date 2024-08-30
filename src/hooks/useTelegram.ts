@@ -3,7 +3,10 @@ import { TelegramPlatform } from '@portkey/did-ui-react';
 
 export default function useTelegram() {
   const isInTelegram = useCallback(() => {
-    return TelegramPlatform.isTelegramPlatform();
+    if (typeof window !== 'undefined') {
+      return TelegramPlatform.isTelegramPlatform();
+    }
+    return false;
   }, []);
 
   return {

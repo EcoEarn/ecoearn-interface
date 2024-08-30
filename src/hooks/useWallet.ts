@@ -1,15 +1,3 @@
-import {
-  useWebLogin,
-  WebLoginState,
-  WebLoginEvents,
-  useWebLoginEvent,
-  useLoginState,
-  WalletType,
-  useGetAccount,
-  usePortkeyLock,
-  useComponentFlex,
-  PortkeyInfo,
-} from 'aelf-web-login';
 import { message } from 'antd';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useGetToken } from './useGetToken';
@@ -28,53 +16,22 @@ import { MethodsWallet } from '@portkey/provider-types';
 import { mainChain } from 'constants/index';
 import { resetLoginStatus, setLoginStatus } from 'redux/reducer/loginStatus';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { did } from '@portkey/did-ui-react';
 
 export const useWalletInit = () => {
   const [, setLocalWalletInfo] = useLocalStorage<WalletInfoType>(storages.walletInfo);
-
   const { getToken } = useGetToken();
-  const { wallet, walletType } = useWebLogin();
-
+  const { walletInfo, walletType, isLocking, isConnected, loginError } = useConnectWallet();
   const backToHomeByRoute = useBackToHomeByRoute();
 
-  const { logout } = useWalletService();
-
-  const callBack = useCallback(
-    (state: WebLoginState) => {
-      if (state === WebLoginState.lock) {
-        console.log('WebLoginState.lock');
-        backToHomeByRoute();
-      }
-      if (state === WebLoginState.logined) {
-        const walletInfo: WalletInfoType = {
-          address: wallet?.address || '',
-          publicKey: wallet?.publicKey,
-          aelfChainAddress: '',
-        };
-        if (walletType === WalletType.elf) {
-          walletInfo.aelfChainAddress = wallet?.address || '';
-        }
-        if (walletType === WalletType.discover) {
-          walletInfo.discoverInfo = {
-            accounts: wallet.discoverInfo?.accounts || {},
-            address: wallet.discoverInfo?.address || '',
-            nickName: wallet.discoverInfo?.nickName,
-          };
-        }
-        if (walletType === WalletType.portkey) {
-          walletInfo.portkeyInfo = wallet.portkeyInfo as PortkeyInfo;
-        }
-        getToken({
-          needLoading: true,
-        });
-        dispatch(setWalletInfo(cloneDeep(walletInfo)));
-        setLocalWalletInfo(cloneDeep(walletInfo));
-      }
-    },
-    [backToHomeByRoute, wallet, walletType, getToken, setLocalWalletInfo],
-  );
-
-  useLoginState(callBack);
+  useEffect(() => {
+    if (isLocking) {
+      console.log('WebLoginState.lock');
+      backToHomeByRoute();
+    }
+  }, [backToHomeByRoute, isLocking]);
 
   const resetAccount = useCallback(() => {
     backToHomeByRoute();
@@ -89,37 +46,63 @@ export const useWalletInit = () => {
     dispatch(resetLoginStatus());
   }, [backToHomeByRoute]);
 
-  useWebLoginEvent(WebLoginEvents.LOGIN_ERROR, (error) => {
-    message.error(`${error.message || 'LOGIN_ERROR'}`);
-  });
+  useEffect(() => {
+    if (!isConnected) {
+      resetAccount();
+    }
+  }, [isConnected, resetAccount]);
 
-  useWebLoginEvent(WebLoginEvents.LOGOUT, () => {
-    // message.info('log out');
-    resetAccount();
-  });
-  useWebLoginEvent(WebLoginEvents.USER_CANCEL, () => {
-    console.log('user cancel');
-    // message.error('user cancel');
-  });
-  useWebLoginEvent(WebLoginEvents.DISCOVER_DISCONNECTED, () => {
-    logout();
-  });
+  useEffect(() => {
+    if (walletInfo) {
+      const walletInfoToLocal: WalletInfoType = {
+        address: walletInfo?.address || '',
+        publicKey: walletInfo?.extraInfo?.publicKey || '',
+        aelfChainAddress: '',
+      };
+      if (walletType === WalletTypeEnum.elf) {
+        walletInfoToLocal.aelfChainAddress = walletInfo?.address || '';
+      }
+      if (walletType === WalletTypeEnum.discover) {
+        walletInfoToLocal.discoverInfo = {
+          accounts: walletInfo?.extraInfo?.accounts || {},
+          address: walletInfo?.address || '',
+          nickName: walletInfo?.extraInfo?.nickName,
+        };
+      }
+      if (walletType === WalletTypeEnum.aa) {
+        walletInfoToLocal.portkeyInfo = walletInfo?.extraInfo?.portkeyInfo || {};
+      }
+      getToken({
+        needLoading: true,
+      });
+      dispatch(setWalletInfo(cloneDeep(walletInfo)));
+      setLocalWalletInfo(cloneDeep(walletInfo));
+    }
+  }, [getToken, setLocalWalletInfo, walletInfo, walletType]);
+
+  useEffect(() => {
+    if (loginError) {
+      message.error(`${loginError?.message || 'LOGIN_ERROR'}`);
+    }
+  }, [loginError]);
 };
 
 export const useWalletService = () => {
-  const { login, logout, loginState, walletType, wallet } = useWebLogin();
-  const { lock } = usePortkeyLock();
-  const isConnectWallet = loginState === WebLoginState.logined;
-  return { login, logout, isConnectWallet, walletType, lock, wallet };
+  const { isConnected, disConnectWallet, walletType, walletInfo, isLocking } = useConnectWallet();
+  return {
+    login: isConnected,
+    logout: disConnectWallet,
+    isConnectWallet: isConnected,
+    walletType,
+    lock: isLocking,
+    wallet: walletInfo,
+  };
 };
 
-// Example Query whether the synchronization of the main sidechain is successful
 export const useWalletSyncCompleted = (contractChainId = mainChain) => {
   const loading = useRef<boolean>(false);
-  const { did } = useComponentFlex();
-  const getAccountByChainId = useGetAccount(mainChain);
-  const { wallet, walletType } = useWebLogin();
-  const { walletInfo } = cloneDeep(useSelector((store: any) => store.userInfo));
+  const { getAccountByChainId, walletInfo, walletType } = useConnectWallet();
+  const { walletInfo: walletInfoStore } = cloneDeep(useSelector((store: any) => store.userInfo));
   const { discoverProvider } = useDiscoverProvider();
 
   const errorFunc = () => {
@@ -129,21 +112,21 @@ export const useWalletSyncCompleted = (contractChainId = mainChain) => {
 
   const getAccount = useCallback(async () => {
     try {
-      const aelfChainAddress = await getAccountByChainId();
+      const aelfChainAddress = await getAccountByChainId(mainChain);
 
-      walletInfo.aelfChainAddress = getOriginalAddress(aelfChainAddress);
+      walletInfoStore.aelfChainAddress = getOriginalAddress(aelfChainAddress);
 
       dispatch(setWalletInfo(walletInfo));
       loading.current = false;
       if (!aelfChainAddress) {
         return errorFunc();
       } else {
-        return walletInfo.aelfChainAddress;
+        return walletInfoStore.aelfChainAddress;
       }
     } catch (error) {
       return errorFunc();
     }
-  }, [walletInfo, getAccountByChainId]);
+  }, [getAccountByChainId, walletInfoStore, walletInfo]);
 
   const getTargetChainAddress = useCallback(async () => {
     try {
@@ -151,23 +134,23 @@ export const useWalletSyncCompleted = (contractChainId = mainChain) => {
         return await getAccount();
       } else {
         loading.current = false;
-        return wallet.address;
+        return walletInfo?.address;
       }
     } catch (error) {
       return errorFunc();
     }
-  }, [contractChainId, getAccount, wallet.address]);
+  }, [contractChainId, getAccount, walletInfo?.address]);
 
   const getAccountInfoSync = useCallback(async () => {
     if (loading.current) return '';
     let caHash;
     let address: any;
-    if (walletType === WalletType.elf) {
-      return walletInfo.aelfChainAddress;
+    if (walletType === WalletTypeEnum.elf) {
+      return walletInfoStore.aelfChainAddress;
     }
-    if (walletType === WalletType.portkey) {
+    if (walletType === WalletTypeEnum.aa) {
       loading.current = true;
-      const didWalletInfo = wallet.portkeyInfo;
+      const didWalletInfo = walletInfo?.extraInfo?.portkeyInfo;
       caHash = didWalletInfo?.caInfo?.caHash;
       address = didWalletInfo?.walletInfo?.address;
       // PortkeyOriginChainId register network address
@@ -211,11 +194,10 @@ export const useWalletSyncCompleted = (contractChainId = mainChain) => {
     }
   }, [
     walletType,
-    walletInfo.aelfChainAddress,
-    wallet.portkeyInfo,
+    walletInfoStore.aelfChainAddress,
+    walletInfo?.extraInfo?.portkeyInfo,
     contractChainId,
     getTargetChainAddress,
-    did.didWallet,
     discoverProvider,
   ]);
 
@@ -223,8 +205,8 @@ export const useWalletSyncCompleted = (contractChainId = mainChain) => {
 };
 
 export const useCheckLoginAndToken = () => {
-  const { loginState, login, logout } = useWebLogin();
-  const isConnectWallet = useMemo(() => loginState === WebLoginState.logined, [loginState]);
+  const { connectWallet, disConnectWallet, isConnected, walletInfo } = useConnectWallet();
+  const isConnectWallet = useMemo(() => isConnected, [isConnected]);
   const { getToken, checkTokenValid } = useGetToken();
   const { isLogin } = useGetLoginStatus();
   const success = useRef<<T = any>() => T | void>();
@@ -232,7 +214,7 @@ export const useCheckLoginAndToken = () => {
   const checkLogin = async (params?: { onSuccess?: <T = any>() => T | void }) => {
     const { onSuccess } = params || {};
     const accountInfo = JSON.parse(localStorage.getItem(storages.accountInfo) || '{}');
-    if (isConnectWallet) {
+    if (isConnectWallet && walletInfo) {
       console.log('getToken----isConnectWallet');
       if (accountInfo.token && checkTokenValid()) {
         store.dispatch(
@@ -250,7 +232,7 @@ export const useCheckLoginAndToken = () => {
       return;
     }
     success.current = onSuccess;
-    login();
+    connectWallet();
   };
 
   useEffect(() => {
@@ -274,7 +256,7 @@ export const useCheckLoginAndToken = () => {
 
   return {
     checkTokenValid,
-    logout,
+    logout: disConnectWallet,
     checkLogin,
   };
 };

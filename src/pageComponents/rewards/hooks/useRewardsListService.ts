@@ -24,14 +24,14 @@ export default function useRewardsListService({
       poolType,
       skipCount: page === 1 ? 0 : (page - 1) * pageSize,
       maxResultCount: pageSize,
-      address: wallet.address || '',
+      address: wallet?.address || '',
       id: rewardsTypeId || (poolType === 'All' ? 'all' : ''),
     };
     return params;
-  }, [page, pageSize, poolType, rewardsTypeId, wallet.address]);
+  }, [page, pageSize, poolType, rewardsTypeId, wallet?.address]);
 
   const fetchData = useCallback(async () => {
-    if (!wallet.address) return;
+    if (!wallet?.address) return;
     try {
       setLoading(true);
       showLoading();
@@ -47,7 +47,7 @@ export default function useRewardsListService({
       setLoading(false);
       closeLoading();
     }
-  }, [closeLoading, page, poolType, searchParams, showLoading, wallet.address]);
+  }, [closeLoading, page, poolType, searchParams, showLoading, wallet?.address]);
 
   useEffect(() => {
     fetchData();

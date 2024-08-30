@@ -84,7 +84,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
         name: '',
         skipCount: 0,
         maxResultCount: 20,
-        address: wallet.address || '',
+        address: wallet?.address || '',
         dappId: dappId,
       });
       data && setData(data);
@@ -93,7 +93,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     } finally {
       closeLoading();
     }
-  }, [closeLoading, currentList, dappId, showLoading, wallet.address]);
+  }, [closeLoading, currentList, dappId, showLoading, wallet?.address]);
 
   const onClaim = useCallback(
     async (item: IPointsPoolItem) => {
@@ -102,7 +102,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
         (await stakingClaim({
           amount,
           poolId: String(item.poolId),
-          address: wallet.address,
+          address: wallet?.address || '',
         })) || {};
       if (!signature || !seed || !expirationTime) throw Error();
       try {
@@ -117,7 +117,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
             methodName: 'Claim',
             params: {
               poolId: String(item.poolId || ''),
-              account: wallet.address,
+              account: wallet?.address || '',
               amount,
               seed,
               signature,
