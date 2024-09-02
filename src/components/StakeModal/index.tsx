@@ -672,6 +672,7 @@ function StakeModal({
       selectTokenInSymbol: 'ELF',
       selectTokenOutSymbol: stakeSymbol,
       onCancel: async () => {
+        swapModal.hide();
         const curBalance = await fetchBalance?.();
         curBalance && setBalance(curBalance);
       },

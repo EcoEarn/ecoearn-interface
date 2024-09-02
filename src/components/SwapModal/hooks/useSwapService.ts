@@ -52,7 +52,7 @@ export default function useSwapService() {
       return { contractOptions: { chainProvider }, address: caAddress };
     } else {
       const provider = await aelfReactInstanceRef.current?.activate({
-        tDVW: {
+        [curChain!]: {
           rpcUrl: (cmsInfo as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`],
           chainId: curChain!,
         },
