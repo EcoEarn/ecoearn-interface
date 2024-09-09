@@ -31,7 +31,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
   const router = useRouter();
   const { logout, wallet } = useWalletService();
   const { isLogin } = useGetLoginStatus();
-  const { explorerUrl, curChain } = useGetCmsInfo() || {};
+  const { explorerUrl, curChain, showLeaderboard } = useGetCmsInfo() || {};
   const { isInTelegram } = useTelegram();
 
   const fullAddress = useMemo(() => {
@@ -60,8 +60,15 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
         label: 'Rewards',
         href: '/rewards',
       },
-    ];
-  }, []);
+      showLeaderboard && {
+        label: 'Leaderboard',
+        href: '/leaderboard',
+      },
+    ].filter((i) => i) as Array<{
+      label: string;
+      href: string;
+    }>;
+  }, [showLeaderboard]);
 
   const addressExploreUrl = useMemo(() => {
     return `${explorerUrl}/address/${addPrefixSuffix(wallet?.address || '', curChain)}`;
@@ -98,6 +105,9 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
             gap={8}
             onClick={() => {
               logout();
+              if (pathName == '/referral') {
+                router.push('/simple');
+              }
             }}
           >
             <ExitIcon />
@@ -106,7 +116,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
         ),
       },
     ];
-  }, [addressExploreUrl, formatAddress, fullAddress, logout]);
+  }, [addressExploreUrl, formatAddress, fullAddress, logout, pathName, router]);
 
   const menu: Array<{
     label: string | ReactNode;

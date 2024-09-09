@@ -1,0 +1,132 @@
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable no-duplicate-selectors */
+.swapModalCustom {
+  margin-bottom: 24px;
+  :global {
+    .swap-token-switch-wrap{
+      @apply h-4;
+    }
+    .swap-input-wrapper .swap-input-row1 {
+      @apply text-base font-normal text-neutralSecondary;
+    }
+    .swap-input-wrapper .swap-input-row2 .swap-input-value{
+      @apply text-xl;
+    }
+    .swap-input-wrapper .swap-input-row2 .select-token-wrap {
+      @apply bg-brandBg;
+    }
+    .swap-input-wrapper .swap-input-row3 {
+      .usd-suffix-show{
+        span {
+          @apply !text-base !text-functionalError;
+        }
+      }
+      .balance-show, .value-in-usd {
+        @apply text-base text-neutralSecondary font-normal;
+      }
+    }
+    .swap-input-wrapper .swap-input-row2 .show-token-wrap {
+      span {
+        @apply text-xl text-neutralTitle;
+      }
+      .portkey-trade-ant-image{
+        @apply !w-auto !h-auto;
+        .portkey-trade-ant-image-img {
+          @apply !w-7 !h-7 !rounded-[50%];
+        }
+      }
+    }
+    .swap-input-wrapper {
+      @apply border-[1px] border-solid border-neutralDivider rounded-2xl p-6 bg-brandBg;
+    }
+    .swap-input-wrapper .swap-input-row2 {
+      .select-token-wrap,
+      .show-token-wrap {
+        @apply pointer-events-none;
+      }
+      .show-token-wrap {
+        @apply bg-brandFooterBg rounded-md;
+        .portkey-swap-common-svg {
+          @apply hidden;
+        }
+      }
+    }
+    .swap-input-wrapper .swap-input-row3 .show-max {
+      @apply border-brandDefault text-brandDefault rounded-sm px-4 py-1 text-sm font-semibold;
+    }
+    .swap-panel-wrapper .swap-token-switch-wrap .swap-token-switch-btn {
+      @apply hidden;
+    }
+    .swap-panel-wrapper .swap-btn-wrap .common-button {
+      @apply bg-brandDefault text-center text-base text-white rounded-lg;
+
+      &:hover {
+        @apply bg-brandHover text-white;
+      }
+      &.btn-tip {
+        @apply opacity-100;
+      }
+      &.btn-error, &.btn-tip{
+        @apply bg-neutralDivider text-neutralDisable;
+        &:hover {
+          @apply bg-neutralDivider text-neutralDisable;
+        }
+      }
+    }
+    .swap-price-swap{
+      @apply text-sm font-normal text-neutralTitle;
+    }
+    .portkey-swap-common-svg{
+      @apply flex;
+    }
+    .swap-panel-wrapper .swap-price-swap-info .icon-edit-icon {
+      path {
+        @apply fill-brandDefault;
+      }
+      .awk-common-tool-tip {
+        &.ant-tooltip-open {
+          .common-question {
+            @apply bg-none;
+          }
+        }
+      }
+    }
+    .swap-price-swap-info {
+      @apply gap-4;
+      .common-tooltip {
+        padding-bottom: 0;
+
+        .portkey-trade-ant-tooltip-arrow {
+          &::before {
+            @apply text-[var(--fill-mask-2)]
+          }
+        }
+        .portkey-trade-ant-tooltip-inner {
+          @apply text-[var(--fill-mask-2)]
+        }
+      }
+      .price-swap-info-item{
+        .price-swap-info-label{
+          @apply text-sm font-normal text-neutralTertiary;
+        }
+        .icon-question-icon {
+          svg {
+            path{
+              @apply stroke-neutralTertiary;
+            }
+            &:hover{
+              @apply stroke-neutralTertiary;
+            }
+          } 
+          
+        }
+        .price-swap-info-value {
+          @apply text-sm font-medium text-neutralPrimary;
+          span{
+            @apply font-medium text-neutralPrimary;
+          }
+        }
+      }
+    }
+  }
+}

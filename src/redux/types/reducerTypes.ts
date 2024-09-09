@@ -45,6 +45,7 @@ export interface ICMSInfo {
   awakenLpSwapContractAddress005: string;
   awakenLpSwapContractAddress3: string;
   awakenLpSwapContractAddress5: string;
+  awakenSwapContractAddress: string;
   awakenSGRUrl: string;
   awakenUrl: string;
   stakeNotes: string[];
@@ -62,6 +63,7 @@ export interface ICMSInfo {
     etransferAuthUrl: string;
   };
   socialList: Array<ILinkItem>;
+  showLeaderboard: boolean;
   [key: string]: any;
 }
 

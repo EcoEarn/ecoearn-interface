@@ -209,6 +209,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
           },
           onStake: async (amount, period = 0, poolId) => {
             const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+            // const periodInSeconds = 5 * 60;
             const stakeAmount = getEarlyStakeAmount(data);
             const signParams: IEarlyStakeSignParams = {
               amount: Number(stakeAmount),

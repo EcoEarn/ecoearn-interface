@@ -9,11 +9,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { AELFDProviderTheme, ANTDProviderTheme } from './config';
 import NiceModal from '@ebay/nice-modal-react';
 import dynamic from 'next/dynamic';
-import { APP_PREFIX } from 'constants/index';
+import { APP_NAME, APP_PREFIX } from 'constants/index';
 import { store } from 'redux/store';
 import { getCmsInfo } from 'api/request';
 import { setCmsInfo } from 'redux/reducer/info';
 import ETransferLayout from './ETransferLayout';
+import { AElfReactProvider } from '@aelf-react/core';
 
 const Updater = dynamic(() => import('components/Updater'), { ssr: false });
 
@@ -51,8 +52,10 @@ function Provider({ children }: { children: React.ReactNode }) {
             ) : (
               <WebLoginProvider>
                 <ETransferLayout>
-                  <Updater />
-                  <NiceModal.Provider>{children}</NiceModal.Provider>
+                  <AElfReactProvider appName={APP_NAME}>
+                    <Updater />
+                    <NiceModal.Provider>{children}</NiceModal.Provider>
+                  </AElfReactProvider>
                 </ETransferLayout>
               </WebLoginProvider>
             )}

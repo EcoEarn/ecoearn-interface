@@ -4,7 +4,7 @@ import { ReactComponent as CloseSVG } from 'assets/img/close.svg';
 import { Modal } from 'antd';
 import styles from './style.module.css';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import useResponsive from 'hooks/useResponsive';
 import clsx from 'clsx';
 import { NEED_LOGIN_PAGE } from 'constants/router';
@@ -13,14 +13,23 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { CompassLink } from './components/CompassLink';
 import { DropMenu, DropMenuTypeEnum } from './components/DropMenu';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 
-export default function Header() {
+export default function Header({
+  className,
+  isCustomBg = false,
+}: {
+  className?: string;
+  isCustomBg?: boolean;
+}) {
   const { checkLogin } = useCheckLoginAndToken();
   const { isLogin } = useGetLoginStatus();
   const { isLG } = useResponsive();
   const router = useRouter();
   const [menuModalVisibleModel, setMenuModalVisibleModel] = useState(false);
   const { isConnected } = useConnectWallet();
+  const pathName = usePathname();
+  const { showLeaderboard } = useGetCmsInfo() || {};
 
   const menuItems = useMemo(() => {
     return [
@@ -40,8 +49,15 @@ export default function Header() {
         title: 'Rewards',
         schema: '/rewards',
       },
-    ];
-  }, []);
+      showLeaderboard && {
+        title: 'Leaderboard',
+        schema: '/leaderboard',
+      },
+    ].filter((i) => i) as Array<{
+      title: string;
+      schema: string;
+    }>;
+  }, [showLeaderboard]);
 
   const onPressCompassItems = useCallback(
     (item: any) => {
@@ -69,6 +85,7 @@ export default function Header() {
   }, [isConnected]);
 
   const FunctionalArea = useMemo(() => {
+    if (pathName === '/invitee') return null;
     if (!isLG) {
       return (
         <>
@@ -98,10 +115,16 @@ export default function Header() {
         </div>
       );
     }
-  }, [isLG, menuItems, onPressCompassItems]);
+  }, [isLG, menuItems, onPressCompassItems, pathName]);
 
   return (
-    <section className={clsx('sticky top-0 left-0 z-[100] flex-shrink-0 px-4 lg:px-10 bg-brandBg')}>
+    <section
+      className={clsx(
+        'sticky top-0 left-0 z-[100] flex-shrink-0 px-4 lg:px-10',
+        !isCustomBg && 'bg-brandBg',
+        className,
+      )}
+    >
       <div className="h-[60px] lg:h-[80px] mx-auto flex justify-between items-center w-full">
         <div className="flex flex-1 overflow-hidden justify-start items-center">
           {
