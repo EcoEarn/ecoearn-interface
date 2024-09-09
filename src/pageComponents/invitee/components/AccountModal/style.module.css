@@ -1,0 +1,6 @@
+.invitee-modal {
+  @apply !text-center;
+  :global(.earn-modal-content) {
+    @apply px-8 py-10 rounded-2xl border-[1px] border-solid border-neutralDivider shadow-none;
+  }
+}

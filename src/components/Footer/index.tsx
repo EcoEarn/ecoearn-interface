@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import clsx from 'clsx';
 import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
@@ -11,7 +12,13 @@ export interface ILinkItem {
   target?: '_blank' | '_self';
 }
 
-export default function Footer() {
+export default function Footer({
+  className,
+  isCustomBg = false,
+}: {
+  className?: string;
+  isCustomBg?: boolean;
+}) {
   const { socialList } = useGetCmsInfo() || {};
 
   const linkList: Array<ILinkItem> = useMemo(() => {
@@ -72,7 +79,7 @@ export default function Footer() {
   }, [linkList, onItemClick]);
 
   return (
-    <section className="bg-brandFooterBg">
+    <section className={clsx(!isCustomBg && 'bg-brandFooterBg')}>
       <div className=" py-12 lg:py-8 mx-4 lg:mx-10">
         <div className="flex items-center">
           <img

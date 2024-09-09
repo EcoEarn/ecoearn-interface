@@ -67,7 +67,16 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
     let resMessage: string = defaultErrorTip;
     let showInModal = false;
 
-    if (message.includes('Signature expired.')) {
+    if (
+      message.includes('Operation canceled.') ||
+      message.includes('You closed the prompt without any action.')
+    ) {
+      resMessage = 'Request rejected. EcoEarn needs your permission to continue.';
+      showInModal = false;
+    } else if (message.includes('Pre-Error: Transaction fee not enough')) {
+      resMessage = 'Insufficient ELF transaction fees.';
+      showInModal = false;
+    } else if (message.includes('Signature expired.')) {
       resMessage = 'Signature expired, please initiate the transaction again.';
       showInModal = true;
     } else if (message.includes('Signature used.')) {

@@ -116,3 +116,11 @@ export type Inputs = {
 export type Tokens = {
   [key: string]: any;
 };
+
+export enum DeviceTypeEnum {
+  iOS = 'ios',
+  Android = 'android',
+  Windows = 'windows',
+  Macos = 'macos',
+  Web = 'web',
+}

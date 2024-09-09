@@ -1,0 +1,7 @@
+.joinModalCustom {
+  :global {
+    .earn-modal-title {
+      @apply text-center w-full;
+    }
+  }
+}

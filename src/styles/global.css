@@ -1,10 +1,14 @@
 @tailwind components;
 @tailwind utilities;
+html{
+	font-size: 16px !important; 
+}
 html,
 body {
 	overflow-x: hidden;
 	overflow-y: auto;
 }
+
 body {
 	margin: 0;
 	font-size: 16px;
@@ -59,6 +63,57 @@ code {
 	z-index: 10000 !important;
 	.etransfer-ui-common-svg {
 		display:  inline-flex !important;
+	}
+}
+
+.portkey-trade-ant-tooltip {
+	@apply rounded-lg;
+}
+
+.transactions-settings-modal.portkey-trade-ant-modal{
+	.portkey-trade-ant-modal-content {
+		@apply rounded-2xl overflow-hidden;
+	}
+	.confirm-modal-btnWrap .portkey-trade-ant-btn{
+		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none !rounded-lg;
+	}
+	.fee-item{
+		@apply border-brandDisable;
+	}
+	.fee-item-ative {
+		@apply border-brandDefault text-brandDefault;
+	}
+	.portkey-trade-ant-input-affix-wrapper.fee-input{
+		@apply hover:border-brandHover active:border-brandPressed;
+	}
+}
+
+.swap-confirm-modal.portkey-trade-ant-modal{
+	.swap-confirm-modal-btn{
+		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none !rounded-lg;
+	}
+}
+
+.portkey-trade-ant-drawer-content-wrapper {
+	.portkey-trade-ant-btn.swap-confirm-modal-btn{
+		@apply !rounded-lg;
+	}
+}
+
+.swap-order-route-info {
+	@apply !bg-neutralDefaultBg;
+}
+
+.portkey-trade-ant-drawer-content.swap-confirm-modal {
+	.portkey-trade-ant-btn.swap-confirm-modal-btn{
+		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none;
+	}
+
+}
+
+.tips-modal-m.portkey-trade-ant-modal{
+	.tips-content .ok-btn{
+		@apply !bg-brandDefault hover:bg-brandHover active:bg-brandPressed border-none !text-white;
 	}
 }
 
