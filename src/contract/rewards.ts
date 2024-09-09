@@ -10,7 +10,6 @@ import {
 import { store } from 'redux/store';
 import { getTxResultRetry } from 'utils/getTxResult';
 import { sleep } from '@portkey/utils';
-import { IGetRewardResult } from './type';
 
 const rewardsContractRequest = async <T, R>(
   method: string,
@@ -119,3 +118,26 @@ export const StakeLiquidity = async (
   },
   options?: IContractOptions,
 ): Promise<ISendResult> => await rewardsContractRequest('StakeLiquidity', params, options);
+
+export const Join = async (options?: IContractOptions): Promise<IContractError> => {
+  try {
+    const res = (await rewardsContractRequest('Join', '', options)) as IContractError;
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const AcceptReferral = async (
+  params: {
+    referrer: string;
+  },
+  options?: IContractOptions,
+): Promise<IContractError> => {
+  try {
+    const res = (await rewardsContractRequest('AcceptReferral', params, options)) as IContractError;
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};

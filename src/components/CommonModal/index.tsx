@@ -36,7 +36,7 @@ function CommonModal(props: ModalProps) {
       wrapClassName={`${styles['modal-wrap']} ${wrapClassName}`}
       title={
         <div>
-          <div className="pr-8 break-words">{title}</div>
+          <div className="break-words">{title}</div>
           {subTitle && <div className="mt-2">{subTitle}</div>}
         </div>
       }

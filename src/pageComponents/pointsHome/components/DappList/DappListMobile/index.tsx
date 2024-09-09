@@ -94,7 +94,7 @@ export default function DappListMobile({
                   Gain points
                 </span>
                 <RightOutlined
-                  className={clsx('w-5 h-5ml-2', item.isOpenStake && 'text-brandDefault')}
+                  className={clsx('w-5 h-5ml-2', item.isOpenStake && '!text-brandDefault')}
                   width={20}
                   height={20}
                 />

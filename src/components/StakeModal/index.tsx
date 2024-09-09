@@ -29,6 +29,10 @@ import useStakeConfig from 'hooks/useStakeConfig';
 import { useModal } from '@ebay/nice-modal-react';
 import DepositModal from 'components/DepositModal';
 import { useETransferAuthToken } from 'hooks/useETransferAuthToken';
+import SwapModal from 'components/SwapModal';
+import { GetBalance } from 'contract/multiToken';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import useLoading from 'hooks/useLoading';
 
 const FormItem = Form.Item;
 const { Title, Text } = Typography;
@@ -120,6 +124,35 @@ function StakeModal({
   const [amountValid, setAmountValid] = useState(typeIsExtend || isFreezeAmount);
   const [periodValid, setPeriodValid] = useState(typeIsAdd || typeIsRenew);
   const depositModal = useModal(DepositModal);
+  const swapModal = useModal(SwapModal);
+  const [elfBalance, setElfBalance] = useState<number | string>('0');
+  const { walletInfo } = useConnectWallet();
+  const { showLoading, closeLoading } = useLoading();
+
+  console.log('===elfBalance', elfBalance);
+
+  const canSwapToken = useMemo(() => {
+    return ['SGR-1', 'ACORNS'].includes(stakeSymbol || '');
+  }, [stakeSymbol]);
+
+  const fetchElfBalance = useCallback(async () => {
+    if (!walletInfo?.address || !canSwapToken) return;
+    try {
+      showLoading();
+      const elfBalance = await GetBalance({
+        symbol: 'ELF',
+        owner: walletInfo?.address,
+      });
+      elfBalance && setElfBalance(elfBalance?.balance);
+      closeLoading;
+    } finally {
+      closeLoading();
+    }
+  }, [canSwapToken, closeLoading, showLoading, walletInfo?.address]);
+
+  useEffect(() => {
+    fetchElfBalance();
+  }, [fetchElfBalance]);
 
   const boostedAmountTotal = useMemo(() => {
     let amount = ZERO;
@@ -609,7 +642,7 @@ function StakeModal({
     return !!gainUrl || needTransfer;
   }, [gainUrl, needTransfer]);
 
-  const jumpUrl = useCallback(async () => {
+  const onGetToken = useCallback(async () => {
     if (needTransfer) {
       try {
         await getETransferAuthToken();
@@ -629,6 +662,22 @@ function StakeModal({
       window.open(gainUrl, '_blank');
     }
   }, [depositModal, fetchBalance, gainUrl, getETransferAuthToken, needTransfer, stakeSymbol]);
+
+  const displaySwapToken = useMemo(() => {
+    return canSwapToken && !BigNumber(elfBalance || 0).isZero();
+  }, [canSwapToken, elfBalance]);
+
+  const onSwap = useCallback(() => {
+    swapModal.show({
+      selectTokenInSymbol: 'ELF',
+      selectTokenOutSymbol: stakeSymbol,
+      onCancel: async () => {
+        swapModal.hide();
+        const curBalance = await fetchBalance?.();
+        curBalance && setBalance(curBalance);
+      },
+    });
+  }, [fetchBalance, stakeSymbol, swapModal]);
 
   const getTotalStaked = useCallback(async () => {
     try {
@@ -1053,14 +1102,30 @@ function StakeModal({
             />
           </FormItem>
         )}
-        {!typeIsExtend && !isFreezeAmount && displayGainToken && (
-          <div className="flex justify-end items-center mb-4">
-            <div onClick={jumpUrl} className="cursor-pointer w-fit">
-              <span className="text-brandDefault hover:text-brandHover text-sm">
-                Get {formatTokenSymbol(stakeSymbol || '')}
-              </span>
-              <RightOutlined className={'w-4 h-4 text-brandDefault ml-1'} width={20} height={20} />
-            </div>
+        {!typeIsExtend && !isFreezeAmount && (displayGainToken || displaySwapToken) && (
+          <div className="flex justify-end items-center mb-4 gap-8">
+            {displayGainToken && (
+              <div onClick={onGetToken} className="cursor-pointer w-fit">
+                <span className="text-brandDefault hover:text-brandHover text-sm">
+                  Get {formatTokenSymbol(stakeSymbol || '')}
+                </span>
+                <RightOutlined
+                  className={'w-4 h-4 !text-brandDefault ml-1'}
+                  width={20}
+                  height={20}
+                />
+              </div>
+            )}
+            {displaySwapToken && (
+              <div onClick={onSwap} className="cursor-pointer w-fit">
+                <span className="text-brandDefault hover:text-brandHover text-sm">Swap</span>
+                <RightOutlined
+                  className={'w-4 h-4 !text-brandDefault ml-1'}
+                  width={20}
+                  height={20}
+                />
+              </div>
+            )}
           </div>
         )}
         {isFreezePeriod ? (

@@ -15,8 +15,10 @@ import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import WalletAndTokenInfo from 'utils/walletAndTokenInfo';
 import { useGetToken } from 'hooks/useGetToken';
+import useResponsive from 'utils/useResponsive';
 import VConsole from 'vconsole';
-import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+
+const needCustomBackgroundPath = ['/referral', '/invitee'];
 
 const Layout = dynamic(
   async () => {
@@ -29,10 +31,31 @@ const Layout = dynamic(
       const { getToken } = useGetToken();
       const pathname = usePathname();
       const { callSendMethod, callViewMethod } = useConnectWallet();
+      const path = usePathname();
+      const { isMin } = useResponsive();
+
+      const backgroundStyle: Record<string, string> = useMemo(() => {
+        return {
+          '/invitee': isMin
+            ? `bg-[url(../assets/img/referral/smallBg.jpeg)]`
+            : `bg-[url(../assets/img/referral/bigBg.jpeg)]`,
+          '/referral': isMin
+            ? `bg-[url(../assets/img/referral/smallBg.jpeg)]`
+            : `bg-[url(../assets/img/referral/bigBg.jpeg)]`,
+        };
+      }, [isMin]);
+
+      const isCustomBackgroundPage = useMemo(() => {
+        return needCustomBackgroundPath.includes(path);
+      }, [path]);
+
+      const customBackgroundClassName = useMemo(() => {
+        return isCustomBackgroundPage ? backgroundStyle?.[path] : undefined;
+      }, [backgroundStyle, isCustomBackgroundPage, path]);
 
       useEffect(() => {
         if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') {
-          // new VConsole();
+          new VConsole();
         }
       }, []);
 
@@ -97,24 +120,33 @@ const Layout = dynamic(
           {!isHiddenLayout ? (
             <AntdLayout
               id="pageContainer"
-              className={clsx('h-full flex flex-col overflow-scroll min-w-[360px] !bg-brandBg')}
+              className={clsx(
+                'h-full flex flex-col overflow-scroll min-w-[360px] !bg-brandBg bg-no-repeat bg-cover bg-center',
+                isCustomBackgroundPage && customBackgroundClassName,
+              )}
             >
-              <Header />
+              <Header isCustomBg={isCustomBackgroundPage} />
               <div className="flex-1">
                 <AntdLayout.Content
                   className={clsx(
-                    'pb-[72px] w-full max-w-[1280px] mx-auto px-4 lg:px-10',
+                    'pb-[72px] w-full max-w-[1280px] mx-auto px-4 lg:px-10 h-full',
                     widthLayout && 'max-w-[1440px]',
                   )}
                 >
                   {children}
                 </AntdLayout.Content>
               </div>
-              <Footer />
+              <Footer isCustomBg={isCustomBackgroundPage} />
             </AntdLayout>
           ) : (
             <>{children}</>
           )}
+          <div
+            className={clsx(
+              'w-[100vw] h-[100vh] absolute top-0 left-0 !bg-cover bg-center bg-no-repeat z-[-1000] invisible',
+              backgroundStyle.invitee,
+            )}
+          ></div>
         </>
       );
     };

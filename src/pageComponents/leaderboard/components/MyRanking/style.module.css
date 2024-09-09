@@ -1,0 +1,9 @@
+.myRanking {
+  :global{
+    .common-copy-icon {
+      path {
+        @apply fill-brandDefault
+      }
+    }
+  }
+}

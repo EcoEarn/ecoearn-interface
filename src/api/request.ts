@@ -171,3 +171,13 @@ export const getRewardsType = async (): Promise<any> => {
 export const saveTransaction = async (data: ISaveTransactionParams): Promise<any> => {
   return request.post('/app/rewards/transaction/record', data);
 };
+
+export const getLeaderboardInfo = async (
+  data: ILeaderBoardParams,
+): Promise<ILeaderBoardListData> => {
+  return request.post('/app/ranking/list', data);
+};
+
+export const checkJoinStatus = async (params: IUseJoin): Promise<any> => {
+  return request.get('/app/ranking/join/check', { params: params });
+};

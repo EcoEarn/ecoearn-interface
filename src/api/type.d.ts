@@ -359,3 +359,34 @@ interface ISaveTransactionParams {
   transactionType: string;
   amount: string;
 }
+
+interface ILeaderBoardParams {
+  address: string;
+  skipCount: number;
+  maxResultCount: number;
+}
+
+interface ILeaderBoardListData {
+  ownerPointsInfo: IRankingOwnerInfo;
+  rankingInfo: {
+    totalRecord: number;
+    list: Array<IRankingItem>;
+  };
+}
+
+interface IRankingItem {
+  address: string;
+  points: string;
+  isOwner: boolean;
+}
+
+interface IRankingOwnerInfo {
+  address: string;
+  points: string;
+  ranking: number;
+}
+
+interface IUseJoin {
+  address: string | undefined;
+  ChainId: string | undefined;
+}

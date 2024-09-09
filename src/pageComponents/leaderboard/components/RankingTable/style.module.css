@@ -1,0 +1,24 @@
+/* stylelint-disable no-descending-specificity */
+.rankingTable{
+  :global{
+    .earn-table-thead .earn-table-cell {
+      @apply text-xs md:text-base text-neutralTertiary font-medium !px-3 md:!px-4 !py-4 md:!py-6;
+      &:first-child {
+        @apply !pl-4 md:!pl-8;
+      }
+      &:last-child {
+        @apply !pr-4 md:!pr-8;
+      }
+    }
+
+    .earn-table-tbody .earn-table-cell {
+      @apply !py-5 md:!py-6 !px-3 md:!px-4;
+      &:first-child {
+        @apply !pl-4 md:!pl-8;
+      }
+      &:last-child {
+        @apply !pr-4 md:!pr-8;
+      }
+    }
+  }
+}
