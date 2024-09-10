@@ -29,80 +29,79 @@ export default function DappListMobile({
   }, [closeLoading, loading, showLoading]);
 
   return (
-    <Flex vertical gap={16}>
+    <div className="grid grid-cols-1 gap-[16px] lg:grid-cols-3">
       {items?.map((item, index) => {
         return (
           <Flex
-            className="px-4 py-6 rounded-lg border-solid border-[1px] border-neutralBorder bg-neutralWhiteBg"
+            className="rounded-xl border-solid border-[1px] border-neutralBorder bg-neutralWhiteBg lg:p-[32px] p-[16px] relative transition-all ease-in-out duration-300 hover:shadow-xl hover:-translate-y-1 hover:transition-all hover:ease hover:duration-300 group"
             key={index}
             vertical
           >
             <Flex gap={16} align="center">
               {!item.icon ? null : (
                 <img
-                  className="w-12 h-12 rounded-sm"
-                  width={48}
-                  height={48}
+                  className="lg:w-[64px] lg:h-[64px] w-[46px] h-[46px] rounded-sm"
                   alt="logo"
                   src={item.icon}
                 />
               )}
-              <span className="text-2xl font-semibold text-neutralPrimary">{item.dappName}</span>
+              <span className="text-[20px] font-[600]">{item.dappName}</span>
             </Flex>
-            <Flex className="mt-8" justify="space-between">
-              <Flex align="center" gap={8} className="text-base font-medium">
-                <span className="text-neutralDisable">Points</span>
-                <CommonTooltip title="Total number of points Staked by all users" />
+            <div className="lg:mt-[64px] mt-[32px] flex items-start gap-[20px]">
+              <Flex vertical>
+                <Flex align="center" gap={3}>
+                  <span className="text-neutralDisable">Monthly rewards (Points)</span>
+                  <CommonTooltip title="Total number of points Staked by all users" />
+                </Flex>
+                <span className="text-[18px] font-[600]">
+                  {item.tvl ? formatNumber(item.tvl) : '--'}
+                </span>
+                <span className="text-neutralDisable">per 10k points</span>
               </Flex>
-              <span className="text-neutralPrimary font-semibold text-base">
-                {item.tvl ? formatNumber(item.tvl) : '--'}
-              </span>
-            </Flex>
-            <Flex className="mt-6" justify="space-between">
-              <Flex align="center" gap={8} className="text-base font-medium">
-                <span className="text-neutralDisable">Staking Address</span>
-              </Flex>
-              <span className="text-neutralPrimary font-semibold text-base">
-                {item.stakingAddress ? formatNumber(item.stakingAddress) : '--'}
-              </span>
-            </Flex>
-            <Flex gap={8} vertical>
+              <div className="">
+                <Flex align="center" gap={8} className="">
+                  <span className="text-neutralDisable">Addresses</span>
+                </Flex>
+                <span className="text-[18px] font-[600]">
+                  {item.stakingAddress ? formatNumber(item.stakingAddress) : '--'}
+                </span>
+              </div>
+            </div>
+            <Flex
+              gap={8}
+              className="mt-[34px] absolute -bottom-[20px] w-full lg:p-[32px] p-[16px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-[16px] group-hover:transition-all group-hover:ease-in-out	 group-hover:duration-300"
+            >
               <Link
-                className="mt-[34px]"
+                className="w-1/2"
                 href={`/points/${encodeURI(item.dappName)}`}
                 onClick={(e) => {
                   e.preventDefault();
                   handleStake(item);
                 }}
               >
-                <Button type="primary" block disabled={!item.isOpenStake} size="large">
+                <Button className="" type="primary" block disabled={!item.isOpenStake} size="large">
                   {item.isOpenStake ? 'Stake' : 'Coming Soon'}
                 </Button>
               </Link>
               <Button
-                type="link"
                 disabled={!item.isOpenStake}
+                className="w-1/2"
                 size="large"
-                block
                 onClick={() => {
                   handleGainPoints(item);
                 }}
               >
-                <span
-                  className={clsx('text-base font-medium', item.isOpenStake && 'text-brandDefault')}
-                >
-                  Gain points
-                </span>
-                <RightOutlined
+                Gain points
+                {/* <RightOutlined
                   className={clsx('w-5 h-5ml-2', item.isOpenStake && '!text-brandDefault')}
                   width={20}
                   height={20}
-                />
+                /> */}
               </Button>
             </Flex>
           </Flex>
         );
       })}
-    </Flex>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import { memo, ReactNode } from 'react';
 import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
+import useResponsive from 'utils/useResponsive';
 
 interface ITextProps {
   className?: string;
@@ -12,33 +13,51 @@ interface ITextProps {
   icon?: ReactNode;
 }
 
+const getActualWidthOfChars = (text: string, options = {}) => {
+  const { size = 14, family = 'Poppins' } = options;
+  const canvas = document.createElement('canvas');
+  const ctx: any = canvas.getContext('2d');
+  ctx.font = `${size}px ${family}`;
+  const metrics = ctx.measureText(text);
+  return Math.abs(metrics.actualBoundingBoxLeft) + Math.abs(metrics.actualBoundingBoxRight);
+};
+
 const Description = memo(
   ({ className, label, value, tip, extra, icon, valueTextAlign = 'left' }: ITextProps) => {
+    const { isLG } = useResponsive();
     return (
       <div
         className={clsx(
-          'flex justify-between text-neutralTitle text-lg font-medium lg:flex-col lg:justify-start gap-2',
+          'text-neutralTitle text-lg font-medium lg:flex-col lg:justify-start gap-2',
           className,
         )}
       >
         <div
           className={clsx(
-            'flex gap-2 text-base  md:text-lg items-center font-medium text-neutralTertiary',
+            'flex gap-1 text-base  md:text-lg items-center font-medium text-neutralTertiary',
           )}
         >
-          <span>{label}</span>
+          <span className="text-[14px] font-[500]">{label}</span>
           {tip && <CommonTooltip title={tip} />}
         </div>
         <div
           className={clsx(
-            'text-base md:text-lg flex flex-col',
+            'text-[16px] flex flex-col',
             valueTextAlign === 'left' ? 'items-start' : 'items-end',
           )}
         >
           <div
             className={clsx('flex font-semibold gap-2 text-neutralTitle items-center break-all')}
           >
-            <span>{value}</span>
+            {!isLG ? (
+              <span className={`${getActualWidthOfChars(value) > 135 && 'text-[10px]'}`}>
+                {value}
+              </span>
+            ) : (
+              <span className={`${getActualWidthOfChars(value) > 120 && 'text-[10px]'}`}>
+                {value}
+              </span>
+            )}
             {icon}
           </div>
           {extra && (

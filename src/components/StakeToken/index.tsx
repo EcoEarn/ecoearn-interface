@@ -86,7 +86,7 @@ const StakeToken = memo(
     return (
       <div
         className={clsx(
-          'flex items-center lg:items-start',
+          'flex items-center',
           tokenName && (size === 'large' ? 'gap-4' : 'gap-2'),
           `${className}`,
         )}
@@ -130,10 +130,10 @@ const StakeToken = memo(
             })}
           </Flex>
         )}
-        <div className="flex flex-col w-fit min-w-0">
+        <div className="">
           <div
             className={clsx(
-              'flex items-center lg:justify-start gap-4 text-xl font-semibold text-neutralTitle',
+              'flex items-center text-[20px] font-semibold text-neutralTitle ',
               tokenSymbolClassName,
             )}
           >
@@ -142,9 +142,9 @@ const StakeToken = memo(
             </ToolTip>
             {!!rate && <RateTag value={Number(rate) * 100} className={tagClassName} />}
           </div>
-          {projectName && (
+          {/* {projectName && (
             <div className="text-base font-medium text-neutralTertiary">{projectName}</div>
-          )}
+          )} */}
         </div>
       </div>
     );

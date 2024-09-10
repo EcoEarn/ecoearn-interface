@@ -80,9 +80,10 @@ export default function StakeCard({
 
   const aprRange = useMemo(() => {
     if (!aprMin || !aprMax) return '--';
-    return `${formatNumberWithDecimalPlaces(
-      ZERO.plus(aprMin).times(100),
-    )}% ~ ${formatNumberWithDecimalPlaces(ZERO.plus(aprMax).times(100))}%`;
+    // return `${formatNumberWithDecimalPlaces(
+    //   ZERO.plus(aprMin).times(100),
+    // )}% ~ ${formatNumberWithDecimalPlaces(ZERO.plus(aprMax).times(100))}%`;
+    return `Up to ${formatNumberWithDecimalPlaces(ZERO.plus(aprMax).times(100))}%`;
   }, [aprMax, aprMin]);
 
   const isClaimed = useMemo(() => {
@@ -134,10 +135,9 @@ export default function StakeCard({
   }, [earnedSymbol]);
 
   return (
-    <div className="stake-card flex flex-col gap-6 px-4 py-6 md:gap-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <div className="stake-card lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg transition-all ease-in-out duration-300 hover:shadow-xl hover:-translate-y-1 hover:transition-all hover:ease hover:duration-300 group">
+      <div className="flex flex-col lg:flex-row lg:items-start">
         <StakeToken
-          className="w-full lg:w-[350px]"
           type={type}
           icons={icons}
           rate={rate}
@@ -145,39 +145,39 @@ export default function StakeCard({
           projectName={projectOwner || '--'}
           symbolDigs={12}
         />
-        <Description
-          className="w-full lg:w-[274px]"
-          label="APR"
-          value={aprRange}
-          tip="It indicates APR range obtained based on the different staking cycles. A longer cycle will bring a higher APR."
-        />
-        <Description
-          label="Earn"
-          value={displayEarnSymbol || '--'}
-          className="w-full lg:w-[140px]"
-        />
-        <Description
-          className="w-full lg:w-[300px] items-start lg:items-end"
-          label="Total Staked"
-          valueTextAlign="right"
-          value={formatNumberWithDecimalPlaces(divDecimals(totalStake, decimal))}
-          extra={`${formatUSDPrice(divDecimals(totalStakeInUsd || 0, decimal))}`}
-        />
+      </div>
+      <div className="relative">
+        <div className="flex items-center gap-[20px] transition-all ease-in-out duration-300 opacity-1 group-hover:opacity-0 ">
+          <Description
+            className="text-[12px] border-solid border-r border-y-0 border-l-0 border-neutralDivider pr-[20px]"
+            label="APR"
+            value={aprRange}
+            tip="It indicates APR range obtained based on the different staking cycles. A longer cycle will bring a higher APR."
+          />
+          <Description
+            className="border-solid border-r border-y-0 border-l-0 border-neutralDivider pr-[20px]"
+            label="Staked (TVL)"
+            // value={formatNumberWithDecimalPlaces(divDecimals(totalStake, decimal))}
+            value={`${formatUSDPrice(divDecimals(totalStakeInUsd || 0, decimal))}`}
+          />
+          <Description label="Earn" value={displayEarnSymbol || '--'} className="" />
+        </div>
+        {!showStakeInfo && (
+          <div className="w-full absolute -bottom-[20px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
+            <Button
+              className="lg:w-[200px] lg:self-center !rounded-lg m-auto"
+              type="primary"
+              onClick={() => {
+                onStake?.(data);
+              }}
+            >
+              {'Stake'}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {!showStakeInfo && (
-        <Button
-          className="lg:w-[200px] lg:self-center !rounded-lg"
-          type="primary"
-          onClick={() => {
-            onStake?.(data);
-          }}
-        >
-          {'Stake'}
-        </Button>
-      )}
-
-      {showStakeInfo && isUnLocked !== null && (
+      {/* {showStakeInfo && isUnLocked !== null && (
         <div className="relative flex flex-col px-4 pt-10 pb-6 gap-6 md:flex-row md:justify-between bg-brandFooterBg md:px-8 md:py-8 lg:gap-8 rounded-xl">
           <ToolTip title="APR from Staking">
             <div className={styles['apr-tag']}>
@@ -311,7 +311,7 @@ export default function StakeCard({
             )}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

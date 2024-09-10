@@ -38,7 +38,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const claimModal = useModal(ClaimModal);
   const unlockModal = useModal(UnlockModal);
   const { wallet } = useWalletService();
-  const { showLoading, closeLoading } = useLoading();
+  const { showLoading, closeLoading, visible } = useLoading();
   const router = useRouter();
   const { curChain, tokensContractAddress } = useGetCmsInfo() || {};
   const { stake: earlyStake } = useEarlyStake();
