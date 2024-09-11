@@ -50,17 +50,16 @@ export default function DappListMobile({
             <div className="lg:mt-[64px] mt-[32px] flex items-start gap-[20px]">
               <Flex vertical>
                 <Flex align="center" gap={3}>
-                  <span className="text-neutralDisable">Monthly rewards (Points)</span>
-                  <CommonTooltip title="Total number of points Staked by all users" />
+                  <span className="text-neutralDisable">Points</span>
+                  {/* <CommonTooltip title="Total number of points Staked by all users" /> */}
                 </Flex>
                 <span className="text-[18px] font-[600]">
                   {item.tvl ? formatNumber(item.tvl) : '--'}
                 </span>
-                <span className="text-neutralDisable">per 10k points</span>
               </Flex>
               <div className="">
                 <Flex align="center" gap={8} className="">
-                  <span className="text-neutralDisable">Addresses</span>
+                  <span className="text-neutralDisable">Staking Addresses</span>
                 </Flex>
                 <span className="text-[18px] font-[600]">
                   {item.stakingAddress ? formatNumber(item.stakingAddress) : '--'}
@@ -69,7 +68,7 @@ export default function DappListMobile({
             </div>
             <Flex
               gap={8}
-              className="mt-[34px] absolute -bottom-[20px] w-full lg:p-[32px] p-[16px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-[16px] group-hover:transition-all group-hover:ease-in-out	 group-hover:duration-300"
+              className="mt-[34px] absolute -bottom-[20px] w-full lg:p-[32px] p-[16px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-[10px] group-hover:transition-all group-hover:ease-in-out	 group-hover:duration-300"
             >
               <Link
                 className="w-1/2"

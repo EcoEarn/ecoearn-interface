@@ -38,7 +38,7 @@ const Description = memo(
           )}
         >
           <span className="text-[14px] font-[500]">{label}</span>
-          {tip && <CommonTooltip title={tip} />}
+          {/* {tip && <CommonTooltip title={tip} />} */}
         </div>
         <div
           className={clsx(
