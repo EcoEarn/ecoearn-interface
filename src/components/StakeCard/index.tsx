@@ -165,7 +165,7 @@ export default function StakeCard({
         {!showStakeInfo && (
           <div className="w-full absolute -bottom-[20px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
             <Button
-              className="lg:w-[200px] lg:self-center !rounded-lg m-auto"
+              className="w-full !h-[40px] lg:self-center !rounded-lg m-auto"
               type="primary"
               onClick={() => {
                 onStake?.(data);
