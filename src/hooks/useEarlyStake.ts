@@ -165,7 +165,7 @@ export default function useEarlyStake() {
                     walletType,
                     caContractAddress: caContractAddress || '',
                     contractAddress: rewardsContractAddress || '',
-                    methodName: 'EarlyStake',
+                    methodName: 'StakeRewards',
                     params: {
                       stakeInput: {
                         claimIds,

@@ -6,6 +6,7 @@ import RenewalModal from 'components/RenewalModal';
 import { useCountDown } from 'ahooks';
 import { Flex } from 'antd';
 import { useMemo } from 'react';
+import { DEFAULT_DATE_FORMAT } from 'constants/index';
 
 interface IRenewalProps {
   unlockTimeStamp: number | string;
@@ -41,7 +42,7 @@ export default function Renewal({
         <span className="text-neutralTitle">
           {dayjs(unlockTimeStamp)
             .add(Number(unlockWindowDuration || 0), 'second')
-            .format('YYYY-MM-DD HH:mm')}
+            .format(DEFAULT_DATE_FORMAT)}
           ;
         </span>{' '}
         otherwise, the assets will be{' '}

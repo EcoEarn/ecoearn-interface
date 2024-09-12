@@ -64,6 +64,14 @@ export interface ICMSInfo {
   };
   socialList: Array<ILinkItem>;
   showLeaderboard: boolean;
+  stakeFaqList: Array<{
+    title: string;
+    content: string;
+  }>;
+  rewardsFaqList: Array<{
+    title: string;
+    content: string;
+  }>;
   [key: string]: any;
 }
 
