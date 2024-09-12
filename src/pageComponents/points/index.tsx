@@ -17,7 +17,7 @@ export default function StakePage() {
   }, [dappName]);
 
   const onBack = useCallback(() => {
-    router.replace('/points');
+    router.back();
   }, [router]);
 
   return (

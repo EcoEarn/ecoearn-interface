@@ -44,17 +44,21 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
 
   const menuItems = useMemo(() => {
     return [
+      // {
+      //   label: 'Points Staking',
+      //   href: '/points',
+      // },
+      // {
+      //   label: 'Simple Staking',
+      //   href: '/simple',
+      // },
+      // {
+      //   label: 'Farms',
+      //   href: '/farms',
+      // },
       {
-        label: 'Points Staking',
-        href: '/points',
-      },
-      {
-        label: 'Simple Staking',
-        href: '/simple',
-      },
-      {
-        label: 'Farms',
-        href: '/farms',
+        label: 'Staking',
+        href: '/staking',
       },
       {
         label: 'Rewards',
@@ -160,10 +164,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
     return menu.map((ele, idx) => (
       <div
         key={idx}
-        className={clsx(
-          'font-medium text-base px-4 py-5',
-          pathName === ele.href && '!text-brandDefault',
-        )}
+        className={clsx('text-base px-4 py-5', pathName === ele.href && '!text-brandDefault')}
         onClick={() => {
           onClickHandler(ele);
         }}
