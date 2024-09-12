@@ -1,11 +1,11 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 
-import { Modal } from 'antd';
-import styles from './style.module.css';
+// import { Modal } from 'antd';
+// import styles from './style.module.css';
 import { useMount } from 'ahooks';
 import { useState } from 'react';
-import { ReactComponent as Close } from 'assets/img/modal-close.svg';
-import Loading from 'components/Loading';
+// import { ReactComponent as Close } from 'assets/img/modal-close.svg';
+import Loading from 'components/Loading/index';
 
 export interface ILoadingProps {
   visible?: boolean;
