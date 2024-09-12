@@ -614,8 +614,10 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
       router.push('/');
     } else if (poolType === PoolType.LP) {
       router.push('/farms');
-    } else {
+    } else if (poolType == PoolType.TOKEN) {
       router.push('/simple');
+    } else {
+      router.push('/');
     }
   }, [poolType, router]);
 
