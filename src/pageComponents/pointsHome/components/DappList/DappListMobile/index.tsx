@@ -91,8 +91,7 @@ export default function DappListMobile({
                 type="primary"
                 disabled={!item.isOpenStake}
                 onClick={() => {
-                  // router.push(`/pool-detail?poolId=${item.dappId}&poolType=${PoolType['LP']}`);
-                  router.push('/liquidity');
+                  router.push(`/pool-detail?poolId=${item.dappId}&poolType=${PoolType['LP']}`);
                 }}
                 size="large"
               >
