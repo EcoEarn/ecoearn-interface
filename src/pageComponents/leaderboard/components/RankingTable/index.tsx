@@ -50,7 +50,7 @@ export default function RankingTable({ className }: { className?: string }) {
         render: (rank, record, index) => (
           <div
             className={clsx(
-              'text-sm md:text-xl font-semibold text-neutralTitle w-6 md:w-10 h-6 md:h-10 flex items-center justify-center',
+              'text-sm md:text-xl font-[600] text-neutralTitle w-6 md:w-10 h-6 md:h-10 flex items-center justify-center',
               record?.isOwner && '!text-brandDefault',
             )}
           >
@@ -79,7 +79,7 @@ export default function RankingTable({ className }: { className?: string }) {
                 toCopy={fullAddress}
                 size={isMD ? 'small' : 'large'}
                 className={clsx(
-                  'text-xs md:text-lg font-medium text-neutralTitle',
+                  'text-xs md:text-lg font-[500] text-neutralTitle',
                   record?.isOwner && '!text-brandDefault',
                 )}
               >
@@ -97,7 +97,7 @@ export default function RankingTable({ className }: { className?: string }) {
         render: (points, record, index) => (
           <div
             className={clsx(
-              'text-xs md:text-lg font-medium text-neutralTitle flex h-full items-center justify-end',
+              'text-xs md:text-lg font-[500] text-neutralTitle flex h-full items-center justify-end',
               record?.isOwner && '!text-brandDefault',
             )}
           >

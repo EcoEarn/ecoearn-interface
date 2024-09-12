@@ -103,7 +103,7 @@ export default function Rewards() {
         />
       ) : (
         <Select
-          className={clsx(styles.select, 'mt-8')}
+          className={clsx(styles.select, 'mt-8 min-w-[164px]')}
           popupClassName={styles.selectOverlay}
           value={currentType}
           onChange={handleChange}

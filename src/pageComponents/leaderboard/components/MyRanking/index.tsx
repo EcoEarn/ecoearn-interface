@@ -46,7 +46,7 @@ export default function MyRanking(props: IMyRankingProps) {
       )}
     >
       <Flex
-        className="flex-shrink-0 flex-1 text-brandDefault font-semibold"
+        className="flex-shrink-0 flex-1 text-brandDefault font-[600]"
         align="center"
         gap={isMD ? 8 : 16}
       >

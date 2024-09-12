@@ -19,7 +19,7 @@ export const CompassText = (props: { title?: string; schema?: string }) => {
         styles['header-menu'],
         `!rounded-[12px] text-base ${
           isCurrent ? '!text-brandDefault' : ''
-        } hover:text-brandHover cursor-pointer font-medium`,
+        } hover:text-brandHover cursor-pointer font-[600]`,
       )}
     >
       {props.title}
