@@ -78,10 +78,8 @@ export default function Rewards() {
 
   return (
     <>
-      <h2 className="text-4xl lg:text-5xl font-semibold text-neutralTitle pt-8 lg:pt-10">
-        Rewards
-      </h2>
-      <div className="text-base text-neutralPrimary font-medium flex flex-col gap-1 mt-2 lg:mt-4">
+      <h2 className="text-4xl lg:text-5xl font-[600] text-neutralTitle pt-8 lg:pt-10">Rewards</h2>
+      <div className="text-base text-neutralPrimary flex flex-col gap-1 mt-2 lg:mt-4">
         <p>
           There is a 90-day release period for your claimed rewards, and they can only be withdrawn
           after the release period expires.

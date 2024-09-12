@@ -73,20 +73,31 @@ export default function DappListMobile({
               gap={8}
               className="mt-[34px] absolute -bottom-[20px] w-full lg:p-[32px] p-[16px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-[10px] group-hover:transition-all group-hover:ease-in-out	 group-hover:duration-300"
             >
-              <Link
+              {/* <Link
                 className="w-1/2"
                 href={`/points/${encodeURI(item.dappName)}`}
                 onClick={(e) => {
                   e.preventDefault();
                   // handleStake(item);
                   console.log('item', item);
-                  router.push(`/pool-detail?poolId=${item.dappId}&poolType=${PoolType['POINTS']}`);
                 }}
               >
-                <Button className="" type="primary" block disabled={!item.isOpenStake} size="large">
+                
                   {item.isOpenStake ? 'Stake' : 'Coming Soon'}
                 </Button>
-              </Link>
+              </Link> */}
+              <Button
+                className="w-1/2"
+                type="primary"
+                disabled={!item.isOpenStake}
+                onClick={() => {
+                  // router.push(`/pool-detail?poolId=${item.dappId}&poolType=${PoolType['LP']}`);
+                  router.push('/liquidity');
+                }}
+                size="large"
+              >
+                {item.isOpenStake ? 'Stake' : 'Coming Soon'}
+              </Button>
               <Button
                 disabled={!item.isOpenStake}
                 className="w-1/2"

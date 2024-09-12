@@ -164,20 +164,18 @@ export default function StakeCard({
           />
           <Description label="Earn" value={displayEarnSymbol || '--'} className="" />
         </div>
-        {!showStakeInfo && (
-          <div className="w-full absolute -bottom-[20px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
-            <Button
-              className="w-full !h-[40px] lg:self-center !rounded-lg m-auto"
-              type="primary"
-              onClick={() => {
-                console.log('data', data);
-                router.push(`/pool-detail?poolId=${data.poolId}&poolType=${type}`);
-              }}
-            >
-              {'Stake'}
-            </Button>
-          </div>
-        )}
+        <div className="w-full absolute -bottom-[20px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
+          <Button
+            className="w-full !h-[40px] lg:self-center !rounded-lg m-auto"
+            type="primary"
+            onClick={() => {
+              console.log('data', data);
+              router.push(`/pool-detail?poolId=${data.poolId}&poolType=${type}`);
+            }}
+          >
+            {'Stake'}
+          </Button>
+        </div>
       </div>
       {/* {showStakeInfo && isUnLocked ? '111' : '222'} */}
 
