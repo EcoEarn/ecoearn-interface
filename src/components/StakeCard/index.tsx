@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Button, ToolTip } from 'aelf-design';
 import Description from 'components/StakeCardDescription';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType } from 'components/StakeToken';
 import { ZERO } from 'constants/index';
 import {
   formatNumber,
@@ -18,9 +18,10 @@ import { MAX_STAKE_PERIOD } from 'constants/stake';
 import Renewal from 'components/Renewal';
 import useUnlockCount from './hooks/useUnlockCount';
 import TextEllipsis from 'components/TextEllipsis';
+import { useRouter } from 'next/navigation';
 
 interface IStakeCardProps {
-  type: PoolTypeEnum;
+  type: PoolType;
   data: IStakePoolData;
   renewText: Array<IRenewText>;
   isLogin: boolean;
@@ -72,6 +73,8 @@ export default function StakeCard({
     stakingPeriod: stakingPeriod || 0,
     lastOperationTime: lastOperationTime || 0,
   });
+
+  const router = useRouter();
 
   const showStakeInfo = useMemo(
     () => !BigNumber(data?.staked || '').isZero() && isLogin,
@@ -168,7 +171,8 @@ export default function StakeCard({
               className="w-full !h-[40px] lg:self-center !rounded-lg m-auto"
               type="primary"
               onClick={() => {
-                onStake?.(data);
+                console.log('data', data);
+                router.push(`/pool-detail?poolId=${data.poolId}&poolType=${type}`);
               }}
             >
               {'Stake'}
@@ -176,6 +180,7 @@ export default function StakeCard({
           </div>
         )}
       </div>
+      {/* {showStakeInfo && isUnLocked ? '111' : '222'} */}
 
       {/* {showStakeInfo && isUnLocked !== null && (
         <div className="relative flex flex-col px-4 pt-10 pb-6 gap-6 md:flex-row md:justify-between bg-brandFooterBg md:px-8 md:py-8 lg:gap-8 rounded-xl">

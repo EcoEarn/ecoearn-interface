@@ -1,6 +1,6 @@
 import StakeCard from 'components/StakeCard';
 import useSimpleStakeListService from './hooks/useSimpleStakeListService';
-import { PoolTypeEnum } from 'components/StakeToken';
+import { PoolType } from 'components/StakeToken';
 import clsx from 'clsx';
 import { RightOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
@@ -54,7 +54,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
         {stakeData.map((item, index) => {
           return (
             <StakeCard
-              type={poolType === 'Lp' ? PoolTypeEnum.Lp : PoolTypeEnum.Token}
+              type={poolType === 'Lp' ? PoolType['LP'] : PoolType['TOKEN']}
               key={index}
               data={item}
               isLogin={isLogin}

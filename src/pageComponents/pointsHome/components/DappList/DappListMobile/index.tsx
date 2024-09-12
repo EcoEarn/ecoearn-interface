@@ -6,6 +6,8 @@ import { RightOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import useLoading from 'hooks/useLoading';
 import CommonTooltip from 'components/CommonTooltip';
+import { useRouter } from 'next/navigation';
+import { PoolType } from 'components/StakeToken';
 
 export default function DappListMobile({
   items,
@@ -19,6 +21,7 @@ export default function DappListMobile({
   loading: boolean;
 }) {
   const { showLoading, closeLoading } = useLoading();
+  const router = useRouter();
 
   useEffect(() => {
     if (loading) {
@@ -75,7 +78,9 @@ export default function DappListMobile({
                 href={`/points/${encodeURI(item.dappName)}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  handleStake(item);
+                  // handleStake(item);
+                  console.log('item', item);
+                  router.push(`/pool-detail?poolId=${item.dappId}&poolType=${PoolType['POINTS']}`);
                 }}
               >
                 <Button className="" type="primary" block disabled={!item.isOpenStake} size="large">

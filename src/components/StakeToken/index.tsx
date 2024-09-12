@@ -14,6 +14,13 @@ import BigNumber from 'bignumber.js';
 import useResponsive from 'utils/useResponsive';
 import { ToolTip } from 'aelf-design';
 
+export enum PoolType {
+  POINTS = 'Points',
+  TOKEN = 'Token',
+  LP = 'Lp',
+  ALL = 'All',
+}
+
 export enum PoolTypeEnum {
   Points = 0,
   Token = 1,
@@ -22,7 +29,7 @@ export enum PoolTypeEnum {
 
 export interface IStakeTokenProps {
   className?: string;
-  type?: PoolTypeEnum;
+  type?: PoolType;
   icons?: Array<string>;
   rate?: string | number;
   tokenName?: string;
@@ -36,7 +43,7 @@ export interface IStakeTokenProps {
 const StakeToken = memo(
   ({
     className,
-    type = PoolTypeEnum.Token,
+    type = PoolType['TOKEN'],
     icons = [],
     rate,
     tokenName,
@@ -49,7 +56,7 @@ const StakeToken = memo(
     const { isLG } = useResponsive();
 
     const symbolTextList = useMemo(() => {
-      if (type === PoolTypeEnum.Lp) {
+      if (type === PoolType['LP']) {
         const splitSymbol = tokenName?.split(' ');
         if (splitSymbol && splitSymbol?.length > 1 && splitSymbol?.[0] === 'ALP') {
           const pair = splitSymbol[1];
