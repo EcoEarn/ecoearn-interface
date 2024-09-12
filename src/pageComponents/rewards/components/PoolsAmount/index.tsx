@@ -41,8 +41,6 @@ export default forwardRef(function PoolsAmount({ currentType }: { currentType: R
     );
   }, [onClickEmptyBtn]);
 
-  console.log('currentType', currentType);
-
   return (
     <>
       {['farms', 'points'].includes(currentType) ? (

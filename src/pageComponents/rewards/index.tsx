@@ -114,7 +114,7 @@ export default function Rewards() {
       </div>
       {isLogin && hasHistoryData && !['points', 'farms'].includes(currentType) && (
         <div className="mt-6">
-          <div className="mb-4 text-base font-[600] text-neutralTitle">Claim Record</div>
+          <div className="mb-4 text-base font-[600] text-neutralTitle">Claim History</div>
           {isMD ? (
             <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
           ) : (
