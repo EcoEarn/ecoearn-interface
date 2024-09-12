@@ -239,7 +239,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
                   walletType,
                   caContractAddress: caContractAddress || '',
                   contractAddress: rewardsContractAddress || '',
-                  methodName: 'EarlyStake',
+                  methodName: 'StakeRewards',
                   params: {
                     stakeInput: {
                       claimIds,

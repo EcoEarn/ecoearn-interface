@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
+import { DEFAULT_DATE_FORMAT } from 'constants/index';
 
 export default function ItemCard({
   item,
@@ -66,7 +67,7 @@ export default function ItemCard({
           <CommonTooltip title="time for rewards claim" className="ml-2" />
         </Flex>
         <span className="text-neutralPrimary text-base font-semibold">
-          {dayjs(Number(item.date)).format('YYYY.MM.DD HH:mm')}
+          {dayjs(Number(item.date)).format(DEFAULT_DATE_FORMAT)}
         </span>
       </Flex>
       {/* <Flex className="text-base" justify="space-between" align="start">

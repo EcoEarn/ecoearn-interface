@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import CommonModal from 'components/CommonModal';
 import CommonTooltip from 'components/CommonTooltip';
 import RewardCard from 'components/RewardCard';
+import { DEFAULT_DATE_FORMAT } from 'constants/index';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
@@ -73,7 +74,7 @@ export default NiceModal.create(function MiningRewardsModal({
   }, [decimal, isLogin, nextReleaseAmount, rewardsSymbol]);
 
   const releaseTime = useMemo(() => {
-    return !isLogin || !nextReleaseTime ? '--' : dayjs(nextReleaseTime).format('YYYY.MM.DD HH:mm');
+    return !isLogin || !nextReleaseTime ? '--' : dayjs(nextReleaseTime).format(DEFAULT_DATE_FORMAT);
   }, [isLogin, nextReleaseTime]);
 
   const showLastReleaseModule = useMemo(() => {

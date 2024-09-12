@@ -2,11 +2,10 @@ import { useMemo } from 'react';
 import { Button, ToolTip } from 'aelf-design';
 import Description from 'components/StakeCardDescription';
 import StakeToken, { PoolType } from 'components/StakeToken';
-import { ZERO } from 'constants/index';
+import { ZERO, DEFAULT_DATE_FORMAT } from 'constants/index';
 import {
   formatNumber,
   formatNumberWithDecimalPlaces,
-  formatTokenAmount,
   formatTokenSymbol,
   formatUSDPrice,
 } from 'utils/format';
@@ -293,7 +292,7 @@ export default function StakeCard({
                     </div>
                     {!!targetUnlockTimeStamp && (
                       <div className="text-sm font-medium text-neutralDisable">
-                        Unlock on {dayjs(targetUnlockTimeStamp).format('YYYY-MM-DD HH:mm')}
+                        Unlock on {dayjs(targetUnlockTimeStamp).format(DEFAULT_DATE_FORMAT)}
                       </div>
                     )}
                   </div>

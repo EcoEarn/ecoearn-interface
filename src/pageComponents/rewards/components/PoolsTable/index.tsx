@@ -11,7 +11,7 @@ import { AELFDProviderTheme } from 'provider/config';
 import CommonTooltip from 'components/CommonTooltip';
 import { DownOutlined } from '@ant-design/icons';
 import CommonTable from 'components/CommonTable';
-import { APP_PREFIX } from 'constants/index';
+import { APP_PREFIX, DEFAULT_DATE_FORMAT } from 'constants/index';
 import { ColumnsType } from 'antd/es/table';
 
 export default function PoolsTable({
@@ -104,7 +104,7 @@ export default function PoolsTable({
         render: (text, item) => {
           return (
             <span className="text-neutralPrimary text-base font-medium">
-              {dayjs(Number(text)).format('YYYY.MM.DD HH:mm')}
+              {dayjs(Number(text)).format(DEFAULT_DATE_FORMAT)}
             </span>
           );
         },
