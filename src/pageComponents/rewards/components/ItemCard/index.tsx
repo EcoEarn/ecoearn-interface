@@ -9,7 +9,7 @@ import {
 } from 'utils/format';
 import CountDownLock from '../CountDownLock';
 import { useMemo } from 'react';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType, PoolTypeEnum } from 'components/StakeToken';
 import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
 import { DEFAULT_DATE_FORMAT } from 'constants/index';
@@ -27,7 +27,7 @@ export default function ItemCard({
     const { tokenIcon, tokenName, projectOwner } = item;
     return (
       <StakeToken
-        type={item.poolType as unknown as PoolTypeEnum}
+        type={item.poolType as unknown as PoolType}
         icons={tokenIcon}
         tokenName={tokenName}
         projectName={projectOwner}

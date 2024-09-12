@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { formatNumber, formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import { LiquidityListTypeEnum } from '../hooks/useLiquidityListService';
 import { Button, ToolTip } from 'aelf-design';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType, PoolTypeEnum } from 'components/StakeToken';
 import RateTag from 'components/RateTag';
 
 export default function ItemCard({
@@ -81,7 +81,7 @@ export default function ItemCard({
         <StakeToken
           icons={icons}
           tokenName={lpSymbol}
-          type={PoolTypeEnum.Lp}
+          type={PoolType.LP}
           className="lg:!items-center max-w-[200px]"
           tokenSymbolClassName="!text-base"
           size="middle"

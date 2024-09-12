@@ -5,7 +5,7 @@ import useLiquidityListService, { LiquidityListTypeEnum } from './hooks/useLiqui
 import styles from './style.module.css';
 import CommonTable from 'components/CommonTable';
 import { useMemo } from 'react';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType, PoolTypeEnum } from 'components/StakeToken';
 import { AELFDProvider, Button, ToolTip } from 'aelf-design';
 import { formatNumber, formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import CommonTooltip from 'components/CommonTooltip';
@@ -49,7 +49,7 @@ export default function LiquidityList() {
               size="middle"
               tokenName={text}
               rate={item.rate}
-              type={PoolTypeEnum.Lp}
+              type={PoolType.LP}
               symbolDigs={12}
               className="lg:!items-center !w-[270px]"
               tokenSymbolClassName="!text-base"

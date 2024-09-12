@@ -3,7 +3,7 @@ import { Flex } from 'antd';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { formatTokenPrice, formatTokenSymbol, formatUSDPrice } from 'utils/format';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType, PoolTypeEnum } from 'components/StakeToken';
 import { divDecimals } from 'utils/calculate';
 import { AELFDProvider } from 'aelf-design';
 import { theme } from './config';
@@ -56,7 +56,7 @@ export default function PoolsTable({
           const { tokenIcon, tokenName, projectOwner } = item;
           return (
             <StakeToken
-              type={item.poolType as unknown as PoolTypeEnum}
+              type={item.poolType as unknown as PoolType}
               icons={tokenIcon}
               tokenName={tokenName}
               projectName={projectOwner}

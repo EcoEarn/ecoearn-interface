@@ -13,7 +13,7 @@ interface ITextProps {
   icon?: ReactNode;
 }
 
-const getActualWidthOfChars = (text: string, options = {}) => {
+const getActualWidthOfChars = (text: string, options: any = {}) => {
   const { size = 14, family = 'Poppins' } = options;
   const canvas = document.createElement('canvas');
   const ctx: any = canvas.getContext('2d');
