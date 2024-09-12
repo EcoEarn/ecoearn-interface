@@ -12,7 +12,7 @@ export default function LiquidityPage() {
   const { isLogin } = useGetLoginStatus();
 
   const onBack = useCallback(() => {
-    router.replace('/farms');
+    router.back();
   }, [router]);
 
   useTimeout(() => {
