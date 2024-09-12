@@ -7,7 +7,7 @@
     max-width: calc(100vw - 32px);
     @apply overflow-hidden;
     :global(.earn-modal-content) {
-      @apply py-0 px-0 rounded-2xl max-h-[90vh] h-auto flex flex-col overflow-hidden bg-neutralWhiteBg;
+      @apply py-0 px-0 rounded-2xl max-h-[90vh] h-auto flex flex-col overflow-hidden;
 
       :global(.earn-modal-body) {
         @apply pb-0 px-8 pb-8 box-border border-0 flex-1 overflow-y-auto pt-0;

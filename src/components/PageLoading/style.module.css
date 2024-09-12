@@ -3,7 +3,7 @@
 
   :global {
     .earn-modal-content {
-      @apply !w-[240px] !h-[106px] mx-auto !p-[16px];
+      @apply !w-[240px] !h-[106px] mx-auto !p-[16px] bg-transparent shadow-none;
     }
   }
 }

@@ -150,7 +150,7 @@ export default function StakeCard({
           projectName={projectOwner || '--'}
           symbolDigs={12}
         />
-        {staked && isLogin && (
+        {showStakeInfo && (
           <>
             {!isUnLocked ? (
               <div className="rounded-xl bg-brandDefaultOpacity text-brandDefault px-[8px] py-[2px] flex items-center justify-center text-[13px]">
@@ -158,7 +158,7 @@ export default function StakeCard({
                 <span className="pl-[4px]">{`${formatNumberWithDecimalPlaces(
                   divDecimals(staked, decimal),
                 )}`}</span>
-                <span className="pl-[4px]">{stakeSymbol}</span>
+                <span className="pl-[4px]">{`${formatTokenSymbol(stakeSymbol || '')}`}</span>
               </div>
             ) : (
               <div className="rounded-xl bg-brandDefaultGreenOpacity text-brandDefaultGreen px-[8px] py-[2px] flex items-center text-[13px]">
@@ -166,7 +166,7 @@ export default function StakeCard({
                 <span className="pl-[4px]">{`${formatNumberWithDecimalPlaces(
                   divDecimals(staked, decimal),
                 )}`}</span>
-                <span className="pl-[4px]">{stakeSymbol}</span>
+                <span className="pl-[4px]">{`${formatTokenSymbol(stakeSymbol || '')}`}</span>
               </div>
             )}
           </>
@@ -199,7 +199,7 @@ export default function StakeCard({
               router.push(`/pool-detail?poolId=${data.poolId}&poolType=${type}`);
             }}
           >
-            {!staked ? 'Stake' : 'View details'}
+            {!showStakeInfo ? 'Stake' : 'View details'}
           </Button>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { PoolType } from 'components/StakeToken';
 import clsx from 'clsx';
 import { RightOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import { Skeleton } from 'antd';
+import { Skeleton, Space } from 'antd';
 
 export interface IStakeListProps {
   title: string;
@@ -51,23 +51,37 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
         </div>
       </div>
       <div className="w-full grid grid-cols-1 gap-[16px] auto-cols-auto lg:grid-cols-3">
-        {stakeData.map((item, index) => {
-          return (
-            <StakeCard
-              type={poolType === 'Lp' ? PoolType['LP'] : PoolType['TOKEN']}
-              key={index}
-              data={item}
-              isLogin={isLogin}
-              onStake={onStake}
-              onClaim={onClaim}
-              onAdd={onAdd}
-              onUnlock={onUnlock}
-              onExtend={onExtend}
-              onRenewal={onRenewal}
-              renewText={renewText || []}
-            />
-          );
-        })}
+        {stakeData.length > 0 ? (
+          <>
+            {stakeData.map((item, index) => {
+              return (
+                <StakeCard
+                  type={poolType === 'Lp' ? PoolType['LP'] : PoolType['TOKEN']}
+                  key={index}
+                  data={item}
+                  isLogin={isLogin}
+                  onStake={onStake}
+                  onClaim={onClaim}
+                  onAdd={onAdd}
+                  onUnlock={onUnlock}
+                  onExtend={onExtend}
+                  onRenewal={onRenewal}
+                  renewText={renewText || []}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <>
+            {[1, 2].map((list, index) => {
+              return (
+                <div className="stake-card h-[156px] lg:h-[230px] lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg ">
+                  <Skeleton avatar active paragraph={{ rows: 2 }} round />
+                </div>
+              );
+            })}
+          </>
+        )}
       </div>
     </>
   );
