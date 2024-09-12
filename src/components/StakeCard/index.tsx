@@ -160,7 +160,9 @@ export default function StakeCard({
             className="border-solid border-r border-y-0 border-l-0 border-neutralDivider pr-[20px]"
             label="Staked (TVL)"
             // value={formatNumberWithDecimalPlaces(divDecimals(totalStake, decimal))}
-            value={`${formatUSDPrice(divDecimals(totalStakeInUsd || 0, decimal))}`}
+            value={`${formatUSDPrice(divDecimals(totalStakeInUsd || 0, decimal), {
+              decimalPlaces: 0,
+            })}`}
           />
           <Description label="Earn" value={displayEarnSymbol || '--'} className="" />
         </div>
@@ -173,12 +175,10 @@ export default function StakeCard({
               router.push(`/pool-detail?poolId=${data.poolId}&poolType=${type}`);
             }}
           >
-            {'Stake'}
+            {!data.staked ? 'Stake' : 'View details'}
           </Button>
         </div>
       </div>
-      {/* {showStakeInfo && isUnLocked ? '111' : '222'} */}
-
       {/* {showStakeInfo && isUnLocked !== null && (
         <div className="relative flex flex-col px-4 pt-10 pb-6 gap-6 md:flex-row md:justify-between bg-brandFooterBg md:px-8 md:py-8 lg:gap-8 rounded-xl">
           <ToolTip title="APR from Staking">
