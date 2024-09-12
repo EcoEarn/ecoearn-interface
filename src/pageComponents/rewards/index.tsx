@@ -11,6 +11,7 @@ import styles from './styles.module.css';
 import { getRewardsList, getRewardsType } from 'api/request';
 import { useWalletService } from 'hooks/useWallet';
 import useLoading from 'hooks/useLoading';
+import ComingSoon from './components/ComingSoon';
 
 export enum RewardsTypeEnum {
   'All' = 'all',
@@ -110,11 +111,15 @@ export default function Rewards() {
         />
       )}
       <div className="mt-6">
-        <PoolsAmount currentType={currentType} />
+        {!['points', 'farms'].includes(currentType) ? (
+          <PoolsAmount currentType={currentType} />
+        ) : (
+          <ComingSoon />
+        )}
       </div>
       {isLogin && hasHistoryData && !['points', 'farms'].includes(currentType) && (
         <div className="mt-6">
-          <div className="mb-4 text-base font-[600] text-neutralTitle">Claim Record</div>
+          <div className="mb-4 text-base font-[600] text-neutralTitle">Claim History</div>
           {isMD ? (
             <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
           ) : (

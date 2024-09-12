@@ -15,6 +15,9 @@ module.exports = {
     extend: {
       colors: {
         brandDefault: 'var(--brand-default)',
+        brandDefaultOpacity: 'var(--brand-default-opacity)',
+        brandDefaultGreen: 'var(--brand-default-green)',
+        brandDefaultGreenOpacity: 'var(--brand-default-green-opacity)',
         brandHover: 'var(--brand-hover)',
         brandPressed: 'var(--brand-pressed)',
         brandDisable: 'var(--brand-disable)',
