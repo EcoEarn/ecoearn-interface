@@ -51,7 +51,7 @@ export default function PoolDetailPage() {
               Connect Wallet
             </Button>
           </>
-        ) : isFirstStake ? (
+        ) : isFirstStake && poolInfo ? (
           <StakeWithConfirm {...stakeProps} />
         ) : null}
       </div>
