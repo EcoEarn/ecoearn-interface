@@ -3,8 +3,7 @@ import useSimpleStakeListService from './hooks/useSimpleStakeListService';
 import { PoolType } from 'components/StakeToken';
 import clsx from 'clsx';
 import { RightOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
-import { Skeleton, Space } from 'antd';
+import { Skeleton } from 'antd';
 
 export interface IStakeListProps {
   title: string;
@@ -75,7 +74,10 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
           <>
             {[1, 2].map((list, index) => {
               return (
-                <div className="stake-card h-[156px] lg:h-[230px] lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg ">
+                <div
+                  key={index}
+                  className="stake-card h-[156px] lg:h-[230px] lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg "
+                >
                   <Skeleton avatar active paragraph={{ rows: 2 }} round />
                 </div>
               );
