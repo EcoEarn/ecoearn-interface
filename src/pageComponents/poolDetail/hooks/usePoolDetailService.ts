@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import useLoading from 'hooks/useLoading';
 import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
@@ -31,10 +31,16 @@ interface IFetchDataProps {
 }
 
 export default function usePoolDetailService() {
-  const { poolId, poolType } = useParams() as {
-    poolId: string;
-    poolType: string;
-  };
+  const searchParams = useSearchParams();
+
+  const poolId = useMemo(() => {
+    return searchParams.get('poolId') || '';
+  }, [searchParams]);
+
+  const poolType = useMemo(() => {
+    return searchParams.get('poolType') || '';
+  }, [searchParams]);
+
   const { showLoading, closeLoading } = useLoading();
   const { wallet } = useWalletService();
   const { checkLogin } = useCheckLoginAndToken();
@@ -57,7 +63,7 @@ export default function usePoolDetailService() {
   const initPoolData = useCallback(
     async (props?: IFetchDataProps) => {
       const { withLoading = true } = props || {};
-      if (!curChain || !poolId || !poolType) {
+      if (!curChain || !poolId || !poolType || poolType !== PoolType.TOKEN) {
         return;
       }
       try {
@@ -104,7 +110,7 @@ export default function usePoolDetailService() {
   }, [initPoolData]);
 
   useEffect(() => {
-    if (!poolId || !poolType) {
+    if (!poolId || !poolType || poolType !== PoolType.TOKEN) {
       goStakingPage();
     }
   }, [goStakingPage, poolId, poolType]);
@@ -230,7 +236,8 @@ export default function usePoolDetailService() {
           decimal: poolInfo?.decimal || 8,
         }),
       onStake: async (amount: number | string, period: number | string) => {
-        const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
+        // const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
+        const periodInSeconds = 120;
         await checkApproveParams(poolInfo?.rate as TFeeType);
         let checked = false;
         try {
