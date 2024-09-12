@@ -13,7 +13,7 @@ export default function Farm() {
         Farms
       </div>
       <ComingSoon
-        name="Coming Soon"
+        name="Coming soon"
         desc="Stake your liquidity pool tokens and unlock high-yield rewards!"
       />
     </>
