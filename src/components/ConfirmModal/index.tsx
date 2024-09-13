@@ -182,7 +182,7 @@ function ConfirmModal(props: IConfirmModalProps) {
             className="!rounded-lg !min-w-[200px]"
             type="primary"
             onClick={() => {
-              // onEarlyStake?.();
+              onEarlyStake?.();
             }}
           >
             Stake Rewards
@@ -190,7 +190,7 @@ function ConfirmModal(props: IConfirmModalProps) {
         )}
       </Flex>
     );
-  }, [content?.supportEarlyStake, isXS, onGoRewards]);
+  }, [content?.supportEarlyStake, isXS, onEarlyStake, onGoRewards]);
 
   const renderContent = useMemo(() => {
     if (status !== 'normal') {

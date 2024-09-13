@@ -42,7 +42,7 @@ const noStakeAmountTip =
 const withdrawDisabledTip = 'No withdrawable rewards. You can view "Details" for more information.';
 
 export interface IRewardsListDataSource extends IPoolRewardsItem {
-  tokenIcon: any;
+  tokenIcon?: any;
   earlyStakeDisabled: boolean;
   earlyStakeTip: string;
   withdrawDisabled: boolean;

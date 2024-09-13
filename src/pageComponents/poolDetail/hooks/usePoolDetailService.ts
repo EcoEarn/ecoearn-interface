@@ -2,7 +2,12 @@ import { useModal } from '@ebay/nice-modal-react';
 import { singleMessage } from '@portkey/did-ui-react';
 import { useInterval } from 'ahooks';
 import { message } from 'antd';
-import { fetchStakingPoolsData, saveTransaction } from 'api/request';
+import {
+  fetchStakingPoolsData,
+  getEarlyStakeInfo,
+  getPoolRewards,
+  saveTransaction,
+} from 'api/request';
 import { GetBalance } from 'contract/multiToken';
 import { GetBalance as GetLpBalance } from 'contract/lpToken';
 import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
@@ -25,6 +30,7 @@ import ClaimModal from 'components/ClaimModal';
 import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
 import { IStakeWithConfirmProps } from 'components/StakeWithConfirm';
+import { fixEarlyStakeData } from 'utils/stake';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -41,6 +47,10 @@ export default function usePoolDetailService() {
     return searchParams.get('poolType') || '';
   }, [searchParams]);
 
+  const stakeRewards = useMemo(() => {
+    return searchParams.get('stakeRewards') || '';
+  }, [searchParams]);
+
   const { showLoading, closeLoading } = useLoading();
   const { wallet } = useWalletService();
   const { checkLogin } = useCheckLoginAndToken();
@@ -55,10 +65,66 @@ export default function usePoolDetailService() {
   const claimModal = useModal(ClaimModal);
   const unlockModal = useModal(UnlockModal);
   const [symbolBalance, setSymbolBalance] = useState('0');
+  const [earlyStakeInfo, setEarlyStakeInfo] = useState<IEarlyStakeInfo>();
+  const [rewardsInfo, setRewardsInfo] = useState<IPoolRewardsItem>();
 
   const goStakingPage = useCallback(() => {
     router.replace('/staking');
   }, [router]);
+
+  const initEarlyStakeInfo = useCallback(async () => {
+    if (!poolInfo || !wallet?.address || !curChain || !stakeRewards) return;
+    try {
+      showLoading();
+      const earlyStakeInfoList = await getEarlyStakeInfo({
+        tokenName: poolInfo?.stakeSymbol || '',
+        address: wallet?.address || '',
+        chainId: curChain,
+        poolType,
+        rate: poolInfo?.rate || 0,
+      });
+      if (earlyStakeInfoList) {
+        const fixedEarlyStakeData = (
+          fixEarlyStakeData(earlyStakeInfoList) as Array<IEarlyStakeInfo>
+        )?.[0];
+        if (fixedEarlyStakeData) setEarlyStakeInfo(fixedEarlyStakeData);
+      }
+    } catch (err) {
+      message.error((err as Error)?.message);
+      console.error(err);
+    } finally {
+      closeLoading();
+    }
+  }, [closeLoading, curChain, poolInfo, poolType, showLoading, stakeRewards, wallet?.address]);
+
+  const initRewardsData = useCallback(async () => {
+    if (!wallet?.address || !poolId || !poolType || poolType !== PoolType.TOKEN) return;
+    try {
+      showLoading();
+      const rewardsList = await getPoolRewards({
+        address: wallet?.address || '',
+        poolType: PoolType.ALL,
+      });
+      if (rewardsList && rewardsList?.length > 0) {
+        const rewardsData = rewardsList?.find(
+          (item) => item.poolId === poolId && item.poolType === poolType,
+        );
+        if (rewardsData) setRewardsInfo(rewardsData);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      closeLoading();
+    }
+  }, [closeLoading, poolId, poolType, showLoading, wallet?.address]);
+
+  useEffect(() => {
+    initEarlyStakeInfo();
+  }, [initEarlyStakeInfo]);
+
+  useEffect(() => {
+    initRewardsData();
+  }, [initRewardsData]);
 
   const initPoolData = useCallback(
     async (props?: IFetchDataProps) => {
@@ -218,15 +284,38 @@ export default function usePoolDetailService() {
     [poolType],
   );
 
+  const freeAmount = useMemo(() => {
+    const { frozen, withdrawable } = rewardsInfo?.rewardsInfo || {};
+    return ZERO.plus(frozen || 0)
+      .plus(withdrawable || 0)
+      .toString();
+  }, [rewardsInfo?.rewardsInfo]);
+
+  const longestReleaseTime = useMemo(() => {
+    const { claimInfos } = rewardsInfo?.rewardsInfo || {};
+    return claimInfos && claimInfos?.length > 0
+      ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
+      : 0;
+  }, [rewardsInfo?.rewardsInfo]);
+
   const stakeProps: IStakeWithConfirmProps = useMemo(() => {
     const symbol = formatTokenSymbol(poolInfo?.stakeSymbol || '');
     const balanceDec = getBalanceDec(symbol);
     return {
+      isStakeRewards: !!stakeRewards,
+      isEarlyStake: !!stakeRewards,
       poolType: poolType as PoolType,
-      isFreezeAmount: false,
-      freezeAmount: undefined,
+      isFreezeAmount: !!stakeRewards,
+      freezeAmount: stakeRewards ? freeAmount : undefined,
+      earlyAmount: undefined,
       type: StakeType.STAKE,
-      stakeData: poolInfo || {},
+      stakeData: stakeRewards
+        ? poolInfo || {}
+        : {
+            ...earlyStakeInfo,
+            stakeInfos: earlyStakeInfo?.subStakeInfos,
+            longestReleaseTime: longestReleaseTime || 0,
+          },
       balanceDec,
       balance: symbolBalance,
       fetchBalance: async () =>
@@ -236,7 +325,9 @@ export default function usePoolDetailService() {
           decimal: poolInfo?.decimal || 8,
         }),
       onStake: async (amount: number | string, period: number | string) => {
-        const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
+        const periodInSeconds = stakeRewards
+          ? 5 * 60
+          : dayjs.duration(Number(period || 0), 'day').asSeconds();
         await checkApproveParams(poolInfo?.rate as TFeeType);
         let checked = false;
         try {
@@ -285,13 +376,17 @@ export default function usePoolDetailService() {
   }, [
     checkApproveParams,
     curChain,
+    earlyStakeInfo,
+    freeAmount,
     getBalanceDec,
     getLpTokenContractAddress,
     getSymbolBalance,
     initBalance,
     initPoolData,
+    longestReleaseTime,
     poolInfo,
     poolType,
+    stakeRewards,
     symbolBalance,
     tokensContractAddress,
     wallet?.address,
@@ -462,8 +557,12 @@ export default function usePoolDetailService() {
           earlyStake({
             poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
             rewardsTokenName: earnedSymbol,
+            beforeLeave: () => {
+              claimModal.remove();
+            },
             onSuccess: () => {
               claimModal.remove();
+              initPoolData();
             },
           });
         },
@@ -532,8 +631,12 @@ export default function usePoolDetailService() {
             earlyStake({
               poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
               rewardsTokenName: earnedSymbol,
+              beforeLeave: () => {
+                claimModal.remove();
+              },
               onSuccess: () => {
                 unlockModal.remove();
+                initPoolData();
               },
             });
           },
@@ -548,7 +651,16 @@ export default function usePoolDetailService() {
         closeLoading();
       }
     },
-    [closeLoading, earlyStake, initPoolData, poolType, showLoading, unlockModal, wallet?.address],
+    [
+      claimModal,
+      closeLoading,
+      earlyStake,
+      initPoolData,
+      poolType,
+      showLoading,
+      unlockModal,
+      wallet?.address,
+    ],
   );
 
   const onAdd = useCallback(
@@ -596,5 +708,6 @@ export default function usePoolDetailService() {
     onClaim,
     onUnlock,
     stakeProps,
+    stakeRewards,
   };
 }
