@@ -44,18 +44,6 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
 
   const menuItems = useMemo(() => {
     return [
-      // {
-      //   label: 'Points Staking',
-      //   href: '/points',
-      // },
-      // {
-      //   label: 'Simple Staking',
-      //   href: '/simple',
-      // },
-      // {
-      //   label: 'Farms',
-      //   href: '/farms',
-      // },
       {
         label: 'Staking',
         href: '/staking',
@@ -198,6 +186,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
       itemsForPhone={itemsForPhone}
       targetNode={
         <div
+          className="flex items-center justify-center "
           onClick={() => {
             setShowDropMenu(true);
           }}
@@ -207,6 +196,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
       }
       onCloseHandler={() => setShowDropMenu(false)}
       titleTxt={title}
+      placement="bottomRight"
     ></DropMenuBase>
   );
 }
