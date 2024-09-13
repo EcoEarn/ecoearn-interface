@@ -192,7 +192,7 @@ function StakeModal({
           <StakeTitle text={`Add Staking ${formatTokenSymbol(stakeSymbol || '')}`} rate={rate} />
         );
       case StakeType.EXTEND:
-        return <StakeTitle text="Extend Lock-up Period" rate={rate} />;
+        return <StakeTitle text="Extend stake duration" rate={rate} />;
       case StakeType.RENEW:
         return <StakeTitle text="Renew" rate={rate} />;
       default:
@@ -435,30 +435,17 @@ function StakeModal({
     ) : (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
-        <span
-          className={clsx(
-            'text-neutralTertiary font-normal',
-            (typeIsExtend || isFreezeAmount) && 'text-neutralTitle mb-6',
-          )}
-        >
-          {!typeIsExtend && !isFreezeAmount ? 'Balance: ' : ''}
-          <ToolTip title={balanceTipText} placement="topRight">
-            <span
-              className={clsx(
-                'text-neutralPrimary font-semibold',
-                balanceTipText &&
-                  'decoration-dashed underline-offset-2 decoration-1 underline cursor-pointer',
-              )}
-            >
+        {!typeIsExtend && !isFreezeAmount ? null : (
+          <span className={clsx('text-neutralTertiary font-normal mb-6')}>
+            <span className={clsx('text-neutralPrimary font-semibold')}>
               {formatNumberWithDecimalPlaces(_balance || '0')}
             </span>
-          </ToolTip>
-        </span>
+          </span>
+        )}
       </div>
     );
   }, [
     balance,
-    balanceTipText,
     customAmountModule,
     decimal,
     freezeAmount,
@@ -470,7 +457,7 @@ function StakeModal({
   const periodLabel = useMemo(() => {
     return (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
-        <span>Lock duration</span>
+        <span>Stake duration</span>
         <span className={clsx('font-normal text-neutralTitle mb-6')}>
           <span className=" text-neutralPrimary font-semibold">{curStakingPeriod.toFixed(1)}</span>
         </span>
@@ -479,8 +466,8 @@ function StakeModal({
   }, [curStakingPeriod]);
 
   const durationLabel = useMemo(() => {
-    return <>{typeIsExtend ? 'Extend Lock-up Period' : 'Lock-up Period'}</>;
-  }, [typeIsExtend]);
+    return <>{typeIsExtend || typeIsAdd ? 'Extend stake duration by' : 'Stake duration'}</>;
+  }, [typeIsAdd, typeIsExtend]);
 
   const onStake = useCallback(async () => form.submit(), [form]);
 
@@ -1066,6 +1053,32 @@ function StakeModal({
     return hasLastPeriod && !typeIsStake && !typeIsRenew && !!period;
   }, [hasLastPeriod, period, typeIsRenew, typeIsStake]);
 
+  const balanceLabel = useMemo(() => {
+    const _balance = typeIsExtend
+      ? stakedAmount
+      : isFreezeAmount
+      ? divDecimals(freezeAmount, decimal).toFixed(2, BigNumber.ROUND_DOWN)
+      : balance;
+    return customAmountModule ? (
+      customAmountModule
+    ) : (
+      <div className="flex gap-2 flex-1 text-base font-normal">
+        <span className="text-neutralTertiary">Balance:</span>
+        <span className="text-neutralPrimary font-semibold">
+          {formatNumberWithDecimalPlaces(_balance || '0')}
+        </span>
+      </div>
+    );
+  }, [
+    balance,
+    customAmountModule,
+    decimal,
+    freezeAmount,
+    isFreezeAmount,
+    stakedAmount,
+    typeIsExtend,
+  ]);
+
   return (
     <CommonModal
       className={style['stake-modal']}
@@ -1102,28 +1115,23 @@ function StakeModal({
             />
           </FormItem>
         )}
-        {!typeIsExtend && !isFreezeAmount && (displayGainToken || displaySwapToken) && (
-          <div className="flex justify-end items-center mb-4 gap-8">
-            {displayGainToken && (
-              <div onClick={onGetToken} className="cursor-pointer w-fit">
-                <span className="text-brandDefault hover:text-brandHover text-sm">
-                  Get {formatTokenSymbol(stakeSymbol || '')}
-                </span>
-                <RightOutlined
-                  className={'w-4 h-4 !text-brandDefault ml-1'}
-                  width={20}
-                  height={20}
-                />
-              </div>
-            )}
-            {displaySwapToken && (
-              <div onClick={onSwap} className="cursor-pointer w-fit">
-                <span className="text-brandDefault hover:text-brandHover text-sm">Swap</span>
-                <RightOutlined
-                  className={'w-4 h-4 !text-brandDefault ml-1'}
-                  width={20}
-                  height={20}
-                />
+        {!typeIsExtend && !isFreezeAmount && (
+          <div className="flex items-center justify-between mb-4">
+            {balanceLabel}
+            {!typeIsExtend && !isFreezeAmount && (displayGainToken || displaySwapToken) && (
+              <div className="flex justify-end items-center gap-6">
+                {displayGainToken && (
+                  <div onClick={onGetToken} className="cursor-pointer w-fit">
+                    <span className="text-brandDefault hover:text-brandHover text-sm">
+                      Get {formatTokenSymbol(stakeSymbol || '')}
+                    </span>
+                  </div>
+                )}
+                {displaySwapToken && (
+                  <div onClick={onSwap} className="cursor-pointer w-fit">
+                    <span className="text-brandDefault hover:text-brandHover text-sm">Swap</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1144,18 +1152,23 @@ function StakeModal({
             <DaysSelect current={period} onSelect={onSelectDays} />
           </FormItem>
         ) : null}
-        <FormItem
-          label="Fixed Staking Overview"
-          className={clsx('font-medium', style['item-overview'])}
-        >
+        <FormItem label="Staking overview" className={clsx('font-medium', style['item-overview'])}>
           <div className="flex flex-col gap-4 p-4 bg-brandBg rounded-lg font-normal">
-            <ViewItem label="Amount" text={amountStr} originText={originAmountStr} />
+            <ViewItem label="Staking amount" text={amountStr} originText={originAmountStr} />
             <ViewItem
-              label="Lock-up Period"
+              label="Stake duration"
               text={periodStr}
               originText={period ? originPeriodStr : ''}
             />
-            <ViewItem label="APR" text={aprText} originText={originAprText} />
+            <ViewItem
+              label="APR"
+              text={aprText}
+              originText={originAprText}
+              labelTip={
+                'Annual percentage rate (or APR) shows the rate of return you earn over a year. Users who lock their tokens in the longer period pools will receive higher APR.'
+              }
+              valueTip={'Longer staking period increases the multiplier (x), boosting the APR.'}
+            />
             {displayNewPeriod && (
               <ViewItem label="Unlock on (current)" text={originReleaseDateStr}></ViewItem>
             )}

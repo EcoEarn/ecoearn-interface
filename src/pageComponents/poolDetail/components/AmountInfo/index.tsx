@@ -2,7 +2,7 @@ import { Flex } from 'antd';
 import { ZERO } from 'constants/index';
 import { useMemo } from 'react';
 import { divDecimals } from 'utils/calculate';
-import { formatNumber } from 'utils/format';
+import { formatNumber, formatTokenSymbol } from 'utils/format';
 
 export default function AmountInfo({ poolInfo }: { poolInfo: IStakePoolData }) {
   const totalStakedValueText = useMemo(() => {
@@ -10,6 +10,10 @@ export default function AmountInfo({ poolInfo }: { poolInfo: IStakePoolData }) {
       decimalPlaces: 0,
     });
   }, [poolInfo?.decimal, poolInfo?.totalStake]);
+
+  const marketCapText = useMemo(() => {
+    return `${formatTokenSymbol(poolInfo?.stakeSymbol || '')} Market Cap`;
+  }, [poolInfo?.stakeSymbol]);
 
   const marketCapValueText = useMemo(() => {
     return `$ ${formatNumber(poolInfo?.marketCap || 0, { decimalPlaces: 0 })}`;
@@ -35,7 +39,7 @@ export default function AmountInfo({ poolInfo }: { poolInfo: IStakePoolData }) {
       </Flex>
       <Flex vertical align="center" gap={4} justify="center">
         <span className="text-xs leading-[16px] md:text-sm md:leading-[18px] font-normal text-neutralTertiary">
-          SGR Market Cap
+          {marketCapText}
         </span>
         <span className="text-base leading-[22px] font-semibold text-neutralPrimary">
           {marketCapValueText}

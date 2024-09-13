@@ -1,0 +1,12 @@
+/* stylelint-disable alpha-value-notation */
+/* stylelint-disable color-function-notation */
+/* stylelint-disable declaration-empty-line-before */
+.lockLabel {
+  @apply rounded-[20px] h-6 px-2 text-[13px] leading-[20px] font-normal text-[#7D48E8] flex items-center justify-between;
+  background-color: rgba(125, 72, 232, 0.15)
+}
+
+.unlockLabel {
+  @apply text-[#00822C];
+  background-color: rgba(0, 183, 62, 0.15);
+}
