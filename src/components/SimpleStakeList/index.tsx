@@ -49,7 +49,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
           )}
         </div>
       </div>
-      <div className="w-full grid grid-cols-1 gap-[16px] auto-cols-auto lg:grid-cols-3">
+      <div className="w-full grid grid-cols-1 gap-[16px] auto-cols-auto md:grid-cols-2 lg:grid-cols-3">
         {stakeData.length > 0 ? (
           <>
             {stakeData.map((item, index) => {

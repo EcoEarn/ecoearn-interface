@@ -44,17 +44,17 @@ export default function ItemCard({
       )}
     >
       <div>{renderSymbol}</div>
-      <Flex className="text-base" justify="space-between" align="start">
+      <Flex className="text-base mt-[32px]" justify="space-between" align="start">
         <Flex align="center">
-          <span className="font-medium text-neutralSecondary">Rewards</span>
+          <span className="text-neutralSecondary">Claimed rewards</span>
           <CommonTooltip title="Claimed rewards" className="ml-2" />
         </Flex>
         <Flex vertical align="end" className="text-base">
-          <span className="text-neutralPrimary font-semibold">{`${formatTokenPrice(
+          <span className="text-neutralPrimary font-[600]">{`${formatTokenPrice(
             divDecimals(item.rewards, item.rewardsTokenDecimal || 8),
             { decimalPlaces: 2 },
           )} ${formatTokenSymbol(item.rewardsToken)}`}</span>
-          <span className="text-neutralSecondary mt-1 font-medium">
+          <span className="text-neutralSecondary mt-1">
             {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
               decimalPlaces: 2,
             })}
@@ -63,10 +63,10 @@ export default function ItemCard({
       </Flex>
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
-          <span className="font-medium text-neutralSecondary">Date</span>
+          <span className="text-neutralSecondary">Claimed at</span>
           <CommonTooltip title="time for rewards claim" className="ml-2" />
         </Flex>
-        <span className="text-neutralPrimary text-base font-semibold">
+        <span className="text-neutralPrimary text-base font-[600]">
           {dayjs(Number(item.date)).format(DEFAULT_DATE_FORMAT)}
         </span>
       </Flex>

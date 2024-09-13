@@ -9,7 +9,6 @@ export default function RewardListPC({
 }) {
   const { page, pageSize, dataList, loading, totalCount, onPaginationChange, onChange } =
     useRewardsListService({ rewardsTypeList });
-
   return (
     <PoolsTable
       rewardsTypeList={rewardsTypeList}
