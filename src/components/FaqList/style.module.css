@@ -4,10 +4,10 @@
       @apply border-[1px] border-x-0 border-t-0 border-solid border-neutralBorder;
     }
     .earn-collapse-header {
-      @apply !py-4 !px-0 text-sm leading-[18px] font-semibold text-neutralTitle;
+      @apply !py-4  !px-0 text-sm leading-[18px] font-semibold text-neutralTitle;
     }
     .earn-collapse-content-box {
-      @apply !px-0;
+      @apply !px-0 !pt-0 !pb-4 font-normal text-sm text-[#808080];
     }
   }
 }

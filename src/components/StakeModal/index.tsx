@@ -189,7 +189,10 @@ function StakeModal({
         return <StakeTitle text={`Stake ${formatTokenSymbol(stakeSymbol || '')}`} rate={rate} />;
       case StakeType.ADD:
         return (
-          <StakeTitle text={`Add Staking ${formatTokenSymbol(stakeSymbol || '')}`} rate={rate} />
+          <StakeTitle
+            text={`Add ${formatTokenSymbol(stakeSymbol || '')} ${isStakeRewards ? 'Rewards' : ''}`}
+            rate={rate}
+          />
         );
       case StakeType.EXTEND:
         return <StakeTitle text="Extend stake duration" rate={rate} />;
@@ -198,7 +201,7 @@ function StakeModal({
       default:
         return '';
     }
-  }, [modalTitle, rate, stakeSymbol, type]);
+  }, [isStakeRewards, modalTitle, rate, stakeSymbol, type]);
 
   const amountStr = useMemo(() => {
     let _amount;

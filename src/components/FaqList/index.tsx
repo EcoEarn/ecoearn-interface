@@ -3,7 +3,7 @@ import { CollapseProps } from 'antd';
 import clsx from 'clsx';
 import styles from './style.module.css';
 import { ReactComponent as PlusIcon } from 'assets/img/plus.svg';
-import { MinusOutlined } from '@ant-design/icons';
+import { ReactComponent as RemoveIcon } from 'assets/img/remove.svg';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { useMemo } from 'react';
 
@@ -30,7 +30,7 @@ export default function FaqList(props?: IFaqListProps) {
       <p className="text-center text-2xl font-semibold text-neutralTitle">FAQ</p>
       <Collapse
         ghost
-        expandIcon={({ isActive }) => (isActive ? <MinusOutlined /> : <PlusIcon />)}
+        expandIcon={({ isActive }) => (isActive ? <RemoveIcon /> : <PlusIcon />)}
         items={items}
         className={clsx('mt-4', styles.collapseCustom)}
         expandIconPosition="end"
