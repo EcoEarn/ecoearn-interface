@@ -84,9 +84,8 @@ export default function StakeDetail(props: IStakeDetailProps) {
           {dayjs(targetUnlockTimeStamp)
             .add(Number(unlockWindowDuration || 0), 'second')
             .format(DEFAULT_DATE_FORMAT)}
-          ;
         </span>
-        <span>After this time, assets will be</span>{' '}
+        <span>. After this time, assets will be</span>{' '}
         <span
           className="cursor-pointer text-[#7D48E8]"
           onClick={() => {
