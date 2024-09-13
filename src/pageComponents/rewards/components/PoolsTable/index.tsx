@@ -55,13 +55,13 @@ export default function PoolsTable({
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
           return (
-            <StakeToken
-              type={item.poolType as unknown as PoolType}
-              icons={tokenIcon}
-              tokenName={tokenName}
-              projectName={projectOwner}
-              rate={item?.rate}
-            />
+            <div className="flex items-center gap-4">
+              {tokenIcon && <img className="w-[48px] h-[48px]" src={tokenIcon[0]} alt="" />}
+              <div>
+                <div className="text-[20px] text-neutralTitle font-[600]">{tokenName}</div>
+                <div className="text-[16px] text-neutralSecondary">{projectOwner}</div>
+              </div>
+            </div>
           );
         },
       },
