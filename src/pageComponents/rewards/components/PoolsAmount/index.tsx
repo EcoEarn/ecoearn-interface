@@ -137,7 +137,7 @@ export default forwardRef(function PoolsAmount({ currentType }: { currentType: R
                       type="primary"
                       onClick={() => {
                         router.push(
-                          `/pool-detail?poolId=${rewardItem.poolId}&poolType=${rewardItem.poolType}`,
+                          `/rewards-detail?poolId=${rewardItem.poolId}&poolType=${rewardItem.poolType}`,
                         );
                       }}
                     >
