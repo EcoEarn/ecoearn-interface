@@ -47,7 +47,7 @@ export default function StakeDetail(props: IStakeDetailProps) {
   const lockLabel = useMemo(() => {
     return (
       <div className={clsx('flex gap-1', styles.lockLabel, isUnLocked && styles.unlockLabel)}>
-        {isUnLocked ? <UnLockIcon /> : <LockIcon />}
+        {isUnLocked ? <UnLockIcon width={12} height={12} /> : <LockIcon width={12} height={12} />}
         <span>{isUnLocked ? 'Unlocked' : 'Locked'}</span>
       </div>
     );
