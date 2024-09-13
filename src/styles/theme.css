@@ -28,6 +28,9 @@
     --fill-mask-3: rgb(67 67 67 / 30%);
     --fill-mask-4: rgb(0 0 0 / 50%);
     --fill-mask-5: rgb(0 0 0 / 85%);
+    --brand-default-opacity: rgba(125, 72, 232, 0.15);
+    --brand-default-green: #00822C;
+    --brand-default-green-opacity:  rgba(0, 183, 62, 0.15);
   }
   
   .dark-theme {

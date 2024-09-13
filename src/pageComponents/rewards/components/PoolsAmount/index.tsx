@@ -9,6 +9,7 @@ import Empty from 'components/Empty';
 import { RewardsTypeEnum } from 'pageComponents/rewards';
 import { formatTokenSymbol } from 'utils/format';
 import RateTag from 'components/RateTag';
+import ComingSoon from '../ComingSoon';
 
 export default forwardRef(function PoolsAmount({ currentType }: { currentType: RewardsTypeEnum }) {
   const {

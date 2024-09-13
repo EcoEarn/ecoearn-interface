@@ -11,6 +11,7 @@ import styles from './styles.module.css';
 import { getRewardsList, getRewardsType } from 'api/request';
 import { useWalletService } from 'hooks/useWallet';
 import useLoading from 'hooks/useLoading';
+import ComingSoon from './components/ComingSoon';
 
 export enum RewardsTypeEnum {
   'All' = 'all',
@@ -67,8 +68,8 @@ export default function Rewards() {
 
   const options: Array<{ label: ReactNode; value: string }> = [
     { label: 'All', value: RewardsTypeEnum.All },
-    { label: 'Points Staking', value: RewardsTypeEnum.Points },
     { label: 'Simple Staking', value: RewardsTypeEnum.Simple },
+    { label: 'Points Staking', value: RewardsTypeEnum.Points },
     { label: 'Farms', value: RewardsTypeEnum.Farms },
   ];
 
@@ -79,7 +80,8 @@ export default function Rewards() {
   return (
     <>
       <h2 className="text-4xl lg:text-5xl font-[600] text-neutralTitle pt-8 lg:pt-10">Rewards</h2>
-      <div className="text-base text-neutralPrimary flex flex-col gap-1 mt-2 lg:mt-4">
+      <div className="text-[16px] font-[600] mt-[48px]">My Rewards</div>
+      {/* <div className="text-base text-neutralPrimary flex flex-col gap-1 mt-2 lg:mt-4">
         <p>
           There is a 90-day release period for your claimed rewards, and they can only be withdrawn
           after the release period expires.
@@ -89,10 +91,10 @@ export default function Rewards() {
           them early to the Farms through adding liquidity. Rewards that can be staked early include
           frozen and withdrawable amounts.
         </p>
-      </div>
+      </div> */}
       {!isMD ? (
         <Segmented
-          className={clsx('mt-8 lg:mt-12', styles.segmented)}
+          className={clsx('mt-8 lg:mt-[24px]', styles.segmented)}
           size="large"
           value={currentType}
           defaultValue={RewardsTypeEnum.All}
@@ -101,7 +103,7 @@ export default function Rewards() {
         />
       ) : (
         <Select
-          className={clsx(styles.select, 'mt-8 min-w-[164px]')}
+          className={clsx(styles.select, 'mt-[24px] min-w-[164px]')}
           popupClassName={styles.selectOverlay}
           value={currentType}
           onChange={handleChange}
@@ -109,11 +111,15 @@ export default function Rewards() {
         />
       )}
       <div className="mt-6">
-        <PoolsAmount currentType={currentType} />
+        {!['points', 'farms'].includes(currentType) ? (
+          <PoolsAmount currentType={currentType} />
+        ) : (
+          <ComingSoon />
+        )}
       </div>
-      {isLogin && hasHistoryData && (
+      {isLogin && hasHistoryData && !['points', 'farms'].includes(currentType) && (
         <div className="mt-6">
-          <div className="mb-4 text-base font-semibold text-neutralTitle">Claim Record</div>
+          <div className="mb-4 text-base font-[600] text-neutralTitle">Claim History</div>
           {isMD ? (
             <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
           ) : (
