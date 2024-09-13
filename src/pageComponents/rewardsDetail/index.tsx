@@ -7,19 +7,21 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import RewardsTotalItem from './components/RewardsTotalItem';
 import { Button, ToolTip } from 'aelf-design';
 import RewardsSingleItem from './components/RewardsSingleItem';
+import { earlyStake as earlyStakeApi } from 'api/request';
 import {
   cancelSign,
+  earlyStakeSign,
   fetchStakingPoolsData,
   getEarlyStakeInfo,
   getPoolRewards,
   withdraw,
   withdrawSign,
 } from 'api/request';
-import { PoolType } from 'types/stake';
+import { PoolType, StakeType } from 'types/stake';
 import useLoading from 'hooks/useLoading';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { divDecimals, getTargetUnlockTimeStamp } from 'utils/calculate';
-import { fixEarlyStakeData } from 'utils/stake';
+import getBalanceTip, { fixEarlyStakeData } from 'utils/stake';
 import { formatTokenPrice, formatTokenSymbol } from 'utils/format';
 import BigNumber from 'bignumber.js';
 import { DEFAULT_DATE_FORMAT, ZERO } from 'constants/index';
@@ -32,6 +34,10 @@ import { getRawTransaction } from 'utils/getRawTransaction';
 import { getTxResult } from 'utils/aelfUtils';
 import { matchErrorMsg } from 'utils/formatError';
 import useResponsive from 'utils/useResponsive';
+import qs from 'qs';
+import { useModal } from '@ebay/nice-modal-react';
+import StakeModal from 'components/StakeModalWithConfirm';
+import { ISendResult } from 'types';
 
 export default function RewardsDetailPage() {
   const router = useRouter();
@@ -44,6 +50,7 @@ export default function RewardsDetailPage() {
   const config = useGetCmsInfo();
   const [earlyStakeInfo, setEarlyStakeInfo] = useState<IEarlyStakeInfo>();
   const { min } = useStakeConfig();
+  const stakeModal = useModal(StakeModal);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [confirmModalLoading, setConfirmModalLoading] = useState(false);
   const [confirmModalContent, setConfirmModalContent] = useState<IWithDrawContent>();
@@ -263,7 +270,7 @@ export default function RewardsDetailPage() {
     return !isConnected || withdrawAmountNotEnough;
   }, [isConnected, withdrawAmountNotEnough]);
 
-  const claimInfos = useMemo(() => {
+  const claimInfosData = useMemo(() => {
     const { claimInfos, withdrawableClaimInfos } = rewardsData || {};
     const claimIds = (claimInfos || [])?.map((item) => {
       return item.claimId;
@@ -369,7 +376,7 @@ export default function RewardsDetailPage() {
     try {
       setConfirmModalLoading(true);
       showLoading();
-      const claimParams = claimInfos;
+      const claimParams = claimInfosData;
       const signParams: IWithdrawSignParams = {
         amount: Number(amount || 0),
         poolType: data?.poolType,
@@ -445,7 +452,7 @@ export default function RewardsDetailPage() {
     }
   }, [
     caContractAddress,
-    claimInfos,
+    claimInfosData,
     closeLoading,
     config,
     curChain,
@@ -464,6 +471,178 @@ export default function RewardsDetailPage() {
     },
     [onWithDrawConfirm],
   );
+
+  const freeAmount = useMemo(() => {
+    const { frozen, withdrawable } = rewardsData || {};
+    return ZERO.plus(frozen || 0)
+      .plus(withdrawable || 0)
+      .toString();
+  }, [rewardsData]);
+
+  const longestReleaseTime = useMemo(() => {
+    const { claimInfos } = rewardsData || {};
+    return claimInfos && claimInfos?.length > 0
+      ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
+      : 0;
+  }, [rewardsData]);
+
+  const toPoolDetail = useCallback(
+    ({ type = 'normal' }: { type: 'normal' | 'stake' }) => {
+      const params: any = {
+        poolId,
+        poolType,
+      };
+      if (type === 'stake') {
+        params.stakeRewards = true;
+      }
+      const fixedParams = qs.stringify(params);
+      router.push(`/pool-detail?${fixedParams}`);
+    },
+    [poolId, poolType, router],
+  );
+
+  const earlyStake = useCallback(async () => {
+    try {
+      const { claimIds, claimInfos } = claimInfosData;
+      const hasHistoryStake = !BigNumber(earlyStakeInfo?.staked || 0).isZero();
+      console.log('earlyStakeData', earlyStakeInfo);
+      stakeModal.show({
+        isStakeRewards: true,
+        isFreezeAmount: true,
+        isEarlyStake: true,
+        type: hasHistoryStake ? StakeType.ADD : StakeType.STAKE,
+        balanceDec: getBalanceTip(poolType as PoolType),
+        freezeAmount: freeAmount,
+        earlyAmount: hasHistoryStake
+          ? BigNumber(earlyStakeInfo?.staked || 0).toNumber()
+          : undefined,
+        stakeData: {
+          ...earlyStakeInfo,
+          stakeInfos: earlyStakeInfo?.subStakeInfos,
+          longestReleaseTime: longestReleaseTime || 0,
+        },
+        onStake: async (amount, period = 0, poolId) => {
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 5 * 60;
+          const stakeAmount = freeAmount;
+          const signParams: IEarlyStakeSignParams = {
+            amount: Number(stakeAmount),
+            poolType: poolType as PoolType,
+            address: walletInfo?.address || '',
+            dappId: rewardsInfo?.dappId || '',
+            period: periodInSeconds,
+            poolId: earlyStakeInfo?.poolId || '',
+            claimInfos: claimInfos || [],
+            operationPoolIds: poolType === PoolType.POINTS ? [] : [earlyStakeInfo?.poolId || ''],
+            operationDappIds: poolType === PoolType.POINTS ? [rewardsInfo?.dappId || ''] : [],
+          };
+          const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
+          if (!signature || !seed || !expirationTime) throw Error();
+          try {
+            const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
+            const longestReleaseTime =
+              claimInfos && claimInfos?.length > 0
+                ? claimInfos?.[claimInfos?.length - 1]?.releaseTime
+                : 0;
+            let rawTransaction = null;
+            try {
+              rawTransaction = await getRawTransaction({
+                walletInfo,
+                walletType,
+                caContractAddress: caContractAddress || '',
+                contractAddress: rewardsContractAddress || '',
+                methodName: 'StakeRewards',
+                params: {
+                  stakeInput: {
+                    claimIds,
+                    account: walletInfo?.address || '',
+                    amount: stakeAmount,
+                    seed,
+                    poolId: earlyStakeInfo?.poolId || '',
+                    expirationTime,
+                    period: periodInSeconds,
+                    dappId: rewardsInfo?.dappId || '',
+                    longestReleaseTime: BigNumber(longestReleaseTime).div(1000).dp(0).toNumber(),
+                  },
+                  signature,
+                },
+                rpcUrl: (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`],
+                chainId: curChain!,
+              });
+            } catch (error) {
+              await cancelSign(signParams);
+              throw Error();
+            }
+            console.log('rawTransaction', rawTransaction);
+            if (!rawTransaction) {
+              await cancelSign(signParams);
+              throw Error();
+            }
+            const { data: TransactionId, message: errorMessage } = await earlyStakeApi({
+              chainId: curChain!,
+              rawTransaction: rawTransaction || '',
+            });
+            console.log('====TransactionId', TransactionId);
+            if (TransactionId) {
+              const { TransactionId: resultTransactionId } = await getTxResult(
+                TransactionId,
+                rpcUrl,
+                curChain!,
+              );
+              if (resultTransactionId) {
+                return { TransactionId: resultTransactionId } as ISendResult;
+              } else {
+                throw Error();
+              }
+            } else {
+              const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'EarlyStake');
+              if (!showInModal) message.error(matchedErrorMsg);
+              throw Error(showInModal ? matchedErrorMsg : '');
+            }
+          } catch (error) {
+            throw Error((error as Error).message);
+          }
+        },
+        onSuccess: () => {
+          initRewardsData();
+          initEarlyStakeInfo();
+          initPoolData();
+          toPoolDetail({ type: 'normal' });
+        },
+      });
+    } catch (error) {
+      console.error('earlyStake error', error);
+    } finally {
+      closeLoading();
+    }
+  }, [
+    caContractAddress,
+    claimInfosData,
+    closeLoading,
+    config,
+    curChain,
+    earlyStakeInfo,
+    freeAmount,
+    initEarlyStakeInfo,
+    initPoolData,
+    initRewardsData,
+    longestReleaseTime,
+    poolType,
+    rewardsContractAddress,
+    rewardsInfo?.dappId,
+    stakeModal,
+    toPoolDetail,
+    walletInfo,
+    walletType,
+  ]);
+
+  const handleEarlyStake = useCallback(() => {
+    if (BigNumber(earlyStakeInfo?.staked || 0).isZero()) {
+      toPoolDetail({ type: 'stake' });
+    } else {
+      earlyStake();
+    }
+  }, [earlyStake, earlyStakeInfo?.staked, toPoolDetail]);
 
   return (
     <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
@@ -492,18 +671,23 @@ export default function RewardsDetailPage() {
           />
         </Flex>
         <Flex gap={isMD ? 8 : 24}>
-          {/* {poolInfo?.supportEarlyStake && (
+          {poolInfo?.supportEarlyStake && (
             <ToolTip title={stakeEarlyTip}>
-              <Button type="primary" className="!rounded-lg flex-1" disabled={stakeEarlyDisabled}>
+              <Button
+                type="primary"
+                onClick={handleEarlyStake}
+                className="!rounded-lg flex-1"
+                disabled={stakeEarlyDisabled}
+              >
                 Stake Rewards
               </Button>
             </ToolTip>
-          )} */}
+          )}
           <ToolTip title={withdrawTip}>
             <Button
               onClick={onWithdraw}
               type="primary"
-              ghost={poolInfo?.supportEarlyStake}
+              ghost={poolInfo?.supportEarlyStake && !withdrawDisabled}
               className="!rounded-lg flex-1"
               disabled={withdrawDisabled}
             >

@@ -182,7 +182,7 @@ export default function StakeWithConfirm({
   }, [onClose]);
 
   return (
-    <>
+    <div>
       <Stake
         isFreezeAmount={isFreezeAmount}
         isFreezePeriod={isFreezePeriod}
@@ -217,6 +217,6 @@ export default function StakeWithConfirm({
           router.push('/rewards');
         }}
       />
-    </>
+    </div>
   );
 }

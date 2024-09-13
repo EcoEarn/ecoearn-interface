@@ -338,18 +338,20 @@ function Stake({
   );
 
   const amountLabel = useMemo(() => {
+    const _balance = typeIsExtend ? stakedAmount : isFreezeAmount ? freezeAmount : balance;
     return (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
-        <span
-          className={clsx(
-            'text-neutralTertiary font-normal',
-            (typeIsExtend || isFreezeAmount) && 'text-neutralTitle mb-6',
-          )}
-        ></span>
+        {!typeIsExtend && !isFreezeAmount ? null : (
+          <span className={clsx('text-neutralTertiary font-normal mb-6')}>
+            <span className={clsx('text-neutralPrimary font-semibold')}>
+              {formatNumberWithDecimalPlaces(_balance || '0')}
+            </span>
+          </span>
+        )}
       </div>
     );
-  }, [isFreezeAmount, typeIsExtend]);
+  }, [balance, freezeAmount, isFreezeAmount, stakedAmount, typeIsExtend]);
 
   const periodLabel = useMemo(() => {
     return (
@@ -1001,25 +1003,27 @@ function Stake({
             />
           </FormItem>
         )}
-        <div className="flex items-center justify-between mb-4">
-          {balanceLabel}
-          {!typeIsExtend && !isFreezeAmount && (displayGainToken || displaySwapToken) && (
-            <div className="flex justify-end items-center gap-6">
-              {displayGainToken && (
-                <div onClick={onGetToken} className="cursor-pointer w-fit">
-                  <span className="text-brandDefault hover:text-brandHover text-sm">
-                    Get {formatTokenSymbol(stakeSymbol || '')}
-                  </span>
-                </div>
-              )}
-              {displaySwapToken && (
-                <div onClick={onSwap} className="cursor-pointer w-fit">
-                  <span className="text-brandDefault hover:text-brandHover text-sm">Swap</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        {!typeIsExtend && !isFreezeAmount && (
+          <div className="flex items-center justify-between mb-4">
+            {balanceLabel}
+            {!typeIsExtend && !isFreezeAmount && (displayGainToken || displaySwapToken) && (
+              <div className="flex justify-end items-center gap-6">
+                {displayGainToken && (
+                  <div onClick={onGetToken} className="cursor-pointer w-fit">
+                    <span className="text-brandDefault hover:text-brandHover text-sm">
+                      Get {formatTokenSymbol(stakeSymbol || '')}
+                    </span>
+                  </div>
+                )}
+                {displaySwapToken && (
+                  <div onClick={onSwap} className="cursor-pointer w-fit">
+                    <span className="text-brandDefault hover:text-brandHover text-sm">Swap</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {isFreezePeriod ? (
           <>{periodLabel}</>

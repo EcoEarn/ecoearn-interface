@@ -20,6 +20,8 @@ import { getTxResult } from 'utils/aelfUtils';
 import { matchErrorMsg } from 'utils/formatError';
 import useStakeConfig from './useStakeConfig';
 import { formatTokenSymbol } from 'utils/format';
+import qs from 'qs';
+import { useRouter } from 'next/navigation';
 
 const noAmountErrorTip = 'No amount available for staking. Please try again later.';
 const poolIsUnlockedError =
@@ -28,6 +30,7 @@ const poolIsUnlockedError =
 export interface IEarlyStakeProps {
   onOpen?: () => void;
   onSuccess?: () => void;
+  beforeLeave?: () => void;
   poolType: PoolType;
   rate?: string | number;
   rewardsTokenName?: string;
@@ -40,6 +43,7 @@ export default function useEarlyStake() {
   const config = useGetCmsInfo();
   const stakeModal = useModal(StakeModalWithConfirm);
   const { min } = useStakeConfig();
+  const router = useRouter();
 
   const getAmountNotEnoughErrorTip = useCallback(
     (tokenName: string) => {
@@ -89,7 +93,7 @@ export default function useEarlyStake() {
 
   const stake = useCallback(
     async (params: IEarlyStakeProps) => {
-      const { onOpen, poolType, rate = 0, onSuccess, rewardsTokenName } = params || {};
+      const { onOpen, poolType, rate = 0, onSuccess, rewardsTokenName, beforeLeave } = params || {};
       try {
         showLoading();
         const {
@@ -118,6 +122,17 @@ export default function useEarlyStake() {
             throw Error(poolIsUnlockedError);
           }
           const hasHistoryStake = !BigNumber(fixedEarlyStakeData?.staked || 0).isZero();
+          if (!hasHistoryStake) {
+            const params = {
+              poolType,
+              poolId: fixedEarlyStakeData?.poolId || '',
+              stakeRewards: true,
+            };
+            const fixedParams = qs.stringify(params);
+            beforeLeave?.();
+            router.push(`/pool-detail?${fixedParams}`);
+            return;
+          }
           stakeModal.show({
             isStakeRewards: true,
             isFreezeAmount: true,
@@ -134,8 +149,8 @@ export default function useEarlyStake() {
             },
             balanceDec: getBalanceTip(poolType),
             onStake: async (amount, period = 0, poolId) => {
-              const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-              // const periodInSeconds = 5 * 60;
+              // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+              const periodInSeconds = 5 * 60;
               const signParams: IEarlyStakeSignParams = {
                 amount: Number(earlyStakeAmount),
                 poolType,
@@ -243,6 +258,7 @@ export default function useEarlyStake() {
       config,
       curChain,
       rewardsContractAddress,
+      router,
       showLoading,
       stakeModal,
       wallet,
