@@ -140,7 +140,7 @@ export default function StakeCard({
   }, [earnedSymbol]);
 
   return (
-    <div className="stake-card lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg transition-all ease-in-out duration-300 hover:shadow-xl hover:ease hover:duration-300 group">
+    <div className="stake-card lg:w-[443px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg transition-all ease-in-out duration-300 hover:shadow-xl hover:ease hover:duration-300 group">
       <div className="flex !items-center justify-between lg:flex-row lg:items-start">
         <StakeToken
           type={type}
@@ -173,7 +173,7 @@ export default function StakeCard({
         )}
       </div>
 
-      <div className="relative">
+      <div className="relative mt-[64px]">
         <div className="flex items-center gap-[20px] transition-all ease-in-out duration-300 opacity-1 group-hover:opacity-0 ">
           <Description
             className="text-[12px] border-solid border-r border-y-0 border-l-0 border-neutralDivider pr-[20px]"

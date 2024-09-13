@@ -149,9 +149,7 @@ const StakeToken = memo(
             </ToolTip>
             {!!rate && <RateTag value={Number(rate) * 100} className={tagClassName} />}
           </div>
-          {/* {projectName && (
-            <div className="text-base font-medium text-neutralTertiary">{projectName}</div>
-          )} */}
+          {/* {projectName && <div className="text-base text-neutralTertiary">{projectName}</div>} */}
         </div>
       </div>
     );

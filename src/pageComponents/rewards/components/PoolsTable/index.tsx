@@ -55,13 +55,13 @@ export default function PoolsTable({
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
           return (
-            <StakeToken
-              type={item.poolType as unknown as PoolType}
-              icons={tokenIcon}
-              tokenName={tokenName}
-              projectName={projectOwner}
-              rate={item?.rate}
-            />
+            <div className="flex items-center gap-4">
+              {tokenIcon && <img className="w-[48px] h-[48px]" src={tokenIcon[0]} alt="" />}
+              <div>
+                <div className="text-[20px] text-neutralTitle font-[600]">{tokenName}</div>
+                <div className="text-[16px] text-neutralSecondary">{projectOwner}</div>
+              </div>
+            </div>
           );
         },
       },
@@ -71,18 +71,22 @@ export default function PoolsTable({
         width: 280,
         title: (
           <div className="flex items-center">
-            <span>Rewards</span>
+            <span>Claimed rewards</span>
             <CommonTooltip title="Claimed Rewards" className="ml-1" />
           </div>
         ),
         render: (text, item) => {
           return (
             <Flex vertical>
-              <span className="text-base text-neutralPrimary font-semibold">{`${formatTokenPrice(
-                divDecimals(text, item.rewardsTokenDecimal || 8),
-                { decimalPlaces: 2 },
-              )} ${formatTokenSymbol(item.rewardsToken)}`}</span>
-              <span className="text-sm text-neutralSecondary mt-2 font-medium">
+              <span className="text-[16px] text-neutralPrimary font-[600]">
+                {`${formatTokenPrice(divDecimals(text, item.rewardsTokenDecimal || 8), {
+                  decimalPlaces: 2,
+                })}`}
+                <span className="text-[16px] font-[500] ml-[4px]">{`${formatTokenSymbol(
+                  item.rewardsToken,
+                )}`}</span>
+              </span>
+              <span className="text-[14px] text-neutralSecondary mt-2">
                 {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
                   decimalPlaces: 2,
                 })}
@@ -97,13 +101,13 @@ export default function PoolsTable({
         align: 'right',
         title: (
           <div className="flex items-center justify-end">
-            <span>Date</span>
+            <span>Claimed at</span>
             <CommonTooltip title="Time of claiming rewards" className="ml-1" />
           </div>
         ),
         render: (text, item) => {
           return (
-            <span className="text-neutralPrimary text-base font-medium">
+            <span className="text-neutralPrimary text-base font-[500]">
               {dayjs(Number(text)).format(DEFAULT_DATE_FORMAT)}
             </span>
           );
