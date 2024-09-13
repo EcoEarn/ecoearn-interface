@@ -236,8 +236,7 @@ export default function usePoolDetailService() {
           decimal: poolInfo?.decimal || 8,
         }),
       onStake: async (amount: number | string, period: number | string) => {
-        // const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
-        const periodInSeconds = 120;
+        const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
         await checkApproveParams(poolInfo?.rate as TFeeType);
         let checked = false;
         try {

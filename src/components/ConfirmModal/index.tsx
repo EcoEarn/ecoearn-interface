@@ -132,9 +132,9 @@ function ConfirmModal(props: IConfirmModalProps) {
       return 'Extended lock-up';
     } else if (type === ConfirmModalTypeEnum.UnLock) {
       if (BigNumber(content?.autoClaimAmount || 0).gt(ZERO)) {
-        return 'Unlock and Claim';
+        return 'Unstake and Claim';
       } else {
-        return 'Unlock';
+        return 'Unstake';
       }
     } else if (type === ConfirmModalTypeEnum.WithDraw) {
       return 'Withdraw';
@@ -182,15 +182,15 @@ function ConfirmModal(props: IConfirmModalProps) {
             className="!rounded-lg !min-w-[200px]"
             type="primary"
             onClick={() => {
-              onEarlyStake?.();
+              // onEarlyStake?.();
             }}
           >
-            Stake to earn more
+            Stake Rewards
           </Button>
         )}
       </Flex>
     );
-  }, [content?.supportEarlyStake, isXS, onEarlyStake, onGoRewards]);
+  }, [content?.supportEarlyStake, isXS, onGoRewards]);
 
   const renderContent = useMemo(() => {
     if (status !== 'normal') {
@@ -309,7 +309,7 @@ function ConfirmModal(props: IConfirmModalProps) {
     } else if (type === ConfirmModalTypeEnum.UnLock) {
       return (
         <Flex className="text-center" gap={16} vertical>
-          <div className="text-xl font-medium text-neutralTitle">You will unlock</div>
+          <div className="text-xl font-medium text-neutralTitle">You will unstake</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
             {formatTokenPrice(BigNumber(content?.amount || 0))}{' '}
             {formatTokenSymbol(content?.tokenSymbol || '')}

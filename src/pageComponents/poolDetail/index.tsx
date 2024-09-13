@@ -10,9 +10,11 @@ import { Button } from 'aelf-design';
 import { useCheckLoginAndToken } from 'hooks/useWallet';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import TokenTextIcon from 'components/TokenTextIcon';
+import StakeDetail from './components/StakeDetail';
 
 export default function PoolDetailPage() {
-  const { poolInfo, stakeProps, isFirstStake } = usePoolDetailService();
+  const { poolInfo, stakeProps, isFirstStake, onAdd, onClaim, onExtend, onRenewal, onUnlock } =
+    usePoolDetailService();
   const { checkLogin } = useCheckLoginAndToken();
   const { isLogin } = useGetLoginStatus();
 
@@ -51,8 +53,19 @@ export default function PoolDetailPage() {
               Connect Wallet
             </Button>
           </>
-        ) : isFirstStake && poolInfo ? (
-          <StakeWithConfirm {...stakeProps} />
+        ) : poolInfo ? (
+          isFirstStake ? (
+            <StakeWithConfirm {...stakeProps} />
+          ) : (
+            <StakeDetail
+              poolInfo={poolInfo}
+              onAdd={onAdd}
+              onClaim={onClaim}
+              onExtend={onExtend}
+              onRenewal={onRenewal}
+              onUnlock={onUnlock}
+            />
+          )
         ) : null}
       </div>
       <AmountInfo poolInfo={poolInfo || {}} />
