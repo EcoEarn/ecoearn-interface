@@ -32,7 +32,7 @@ function ViewItem({
         <div className="flex flex-col gap-3 items-start text-sm text-neutralPrimary font-medium">
           {originText ? (
             <div className="flex items-center">
-              <div className="flex flex-col items-start">
+              <div className="flex flex-col items-start line-through">
                 <span>{originText}</span>
                 <span>{extra}</span>
               </div>
