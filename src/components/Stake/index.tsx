@@ -338,7 +338,11 @@ function Stake({
   );
 
   const amountLabel = useMemo(() => {
-    const _balance = typeIsExtend ? stakedAmount : isFreezeAmount ? freezeAmount : balance;
+    const _balance = typeIsExtend
+      ? stakedAmount
+      : isFreezeAmount
+      ? divDecimals(freezeAmount, decimal).toFixed(2, BigNumber.ROUND_DOWN)
+      : balance;
     return (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
@@ -351,7 +355,7 @@ function Stake({
         )}
       </div>
     );
-  }, [balance, freezeAmount, isFreezeAmount, stakedAmount, typeIsExtend]);
+  }, [balance, decimal, freezeAmount, isFreezeAmount, stakedAmount, typeIsExtend]);
 
   const periodLabel = useMemo(() => {
     return (

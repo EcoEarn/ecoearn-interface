@@ -309,7 +309,7 @@ export default function usePoolDetailService() {
       freezeAmount: stakeRewards ? freeAmount : undefined,
       earlyAmount: undefined,
       type: StakeType.STAKE,
-      stakeData: stakeRewards
+      stakeData: !stakeRewards
         ? poolInfo || {}
         : {
             ...earlyStakeInfo,
