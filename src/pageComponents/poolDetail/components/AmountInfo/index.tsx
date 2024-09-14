@@ -6,10 +6,10 @@ import { formatNumber, formatTokenSymbol } from 'utils/format';
 
 export default function AmountInfo({ poolInfo }: { poolInfo: IStakePoolData }) {
   const totalStakedValueText = useMemo(() => {
-    return formatNumber(divDecimals(poolInfo?.totalStake || 0, poolInfo?.decimal || 8), {
+    return `${formatNumber(divDecimals(poolInfo?.totalStake || 0, poolInfo?.decimal || 8), {
       decimalPlaces: 0,
-    });
-  }, [poolInfo?.decimal, poolInfo?.totalStake]);
+    })} ${formatTokenSymbol(poolInfo?.stakeSymbol || '')}`;
+  }, [poolInfo?.decimal, poolInfo?.stakeSymbol, poolInfo?.totalStake]);
 
   const marketCapText = useMemo(() => {
     return `${formatTokenSymbol(poolInfo?.stakeSymbol || '')} Market Cap`;

@@ -133,6 +133,10 @@ function Stake({
     return ['SGR-1', 'ACORNS'].includes(stakeSymbol || '');
   }, [stakeSymbol]);
 
+  const formattedStakeSymbol = useMemo(() => {
+    return formatTokenSymbol(stakeSymbol || '');
+  }, [stakeSymbol]);
+
   const fetchElfBalance = useCallback(async () => {
     if (!walletInfo?.address || !canSwapToken) return;
     try {
@@ -195,11 +199,14 @@ function Stake({
       _amount = stakedAmount;
     }
 
-    return ZERO.plus(_amount).gt(ZERO) ? formatNumberWithDecimalPlaces(_amount) : '--';
+    return ZERO.plus(_amount).gt(ZERO)
+      ? `${formatNumberWithDecimalPlaces(_amount)} ${formattedStakeSymbol}`
+      : '--';
   }, [
     amount,
     decimal,
     earlyAmount,
+    formattedStakeSymbol,
     freezeAmount,
     isFreezeAmount,
     stakedAmount,
@@ -965,7 +972,7 @@ function Stake({
       <div className="flex gap-2 flex-1 text-base font-normal">
         <span className="text-neutralTertiary">Balance:</span>
         <span className="text-neutralPrimary font-semibold">
-          {formatNumberWithDecimalPlaces(_balance || '0')}
+          {`${formatNumberWithDecimalPlaces(_balance || '0')} ${formattedStakeSymbol}`}
         </span>
       </div>
     );
@@ -973,6 +980,7 @@ function Stake({
     balance,
     customAmountModule,
     decimal,
+    formattedStakeSymbol,
     freezeAmount,
     isFreezeAmount,
     stakedAmount,
