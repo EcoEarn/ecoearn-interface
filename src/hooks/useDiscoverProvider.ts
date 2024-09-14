@@ -3,8 +3,25 @@ import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
 import elliptic from 'elliptic';
 import { useCallback } from 'react';
 import { zeroFill } from 'utils/calculate';
+import AElf from 'aelf-sdk';
 
 const ec = new elliptic.ec('secp256k1');
+
+export const recoverPubKeyBySignature = (msg: any, signature: string) => {
+  const signatureObj = {
+    r: signature.slice(0, 64),
+    s: signature.slice(64, 128),
+    recoveryParam: Number(signature.slice(128, 130)),
+  };
+
+  const hexMsg = AElf.utils.sha256(msg);
+  const publicKey = AElf.wallet.ellipticEc
+    .recoverPubKey(Buffer.from(hexMsg, 'hex'), signatureObj, signatureObj.recoveryParam)
+    .encode('hex', false);
+
+  console.log('=====recoverPubKeyBySignature', publicKey);
+  return publicKey;
+};
 
 export default function useDiscoverProvider() {
   const { walletInfo } = useConnectWallet();
@@ -21,27 +38,24 @@ export default function useDiscoverProvider() {
   }, [walletInfo?.extraInfo?.provider]);
 
   const getSignatureAndPublicKey = useCallback(
-    async (data: string) => {
+    async (data: string, hexData: string, signInfo: string) => {
       const provider = await discoverProvider();
       if (!provider || !provider?.request) throw new Error('Discover not connected');
+      const isSupportManagerSignature = (provider as any).methodCheck('wallet_getManagerSignature');
       const signature = await provider.request({
-        method: MethodsWallet.GET_WALLET_SIGNATURE,
-        payload: { data },
+        method: isSupportManagerSignature
+          ? 'wallet_getManagerSignature'
+          : MethodsWallet.GET_WALLET_SIGNATURE,
+        payload: isSupportManagerSignature ? { hexData: data } : { data },
       });
       if (!signature || signature.recoveryParam == null) return {};
       const signatureStr = [
-        zeroFill(signature.r),
-        zeroFill(signature.s),
+        signature.r.toString(16, 64),
+        signature.s.toString(16, 64),
         `0${signature.recoveryParam.toString()}`,
       ].join('');
 
-      // recover pubkey by signature
-      const publicKey = ec.recoverPubKey(
-        Buffer.from(data.slice(0, 64), 'hex'),
-        signature,
-        signature.recoveryParam,
-      );
-      const pubKey = ec.keyFromPublic(publicKey).getPublic('hex');
+      const pubKey = recoverPubKeyBySignature(signInfo, signatureStr) + '';
 
       return { pubKey, signatureStr };
     },
