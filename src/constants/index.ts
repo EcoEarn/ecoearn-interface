@@ -13,7 +13,7 @@ export enum NetworkType {
 
 export const SECONDS_60 = 60000;
 
-export const DEFAULT_DATE_FORMAT = 'DD MMM YYYY, HH:mm';
+export const DEFAULT_DATE_FORMAT = 'DD MMM YYYY HH:mm';
 
 export const ZERO = new BigNumber(0);
 

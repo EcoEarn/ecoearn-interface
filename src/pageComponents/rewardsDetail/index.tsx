@@ -667,7 +667,7 @@ export default function RewardsDetailPage() {
           />
           <RewardsTotalItem
             label="Withdrawn"
-            tip="Rewards that have reached the release point."
+            tip="Rewards already withdrawn to the wallet."
             amount={rewardsData?.withdrawn || '0'}
             amountUsd={rewardsData?.withdrawnInUsd || '0'}
             decimal={Number(rewardsData?.decimal || 8)}
