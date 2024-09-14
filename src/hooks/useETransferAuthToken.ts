@@ -34,9 +34,11 @@ export function useETransferAuthToken() {
   const getDiscoverSignature = useCallback(
     async (params: TSignatureParams) => {
       const provider = await discoverProvider();
+      if (!provider) return;
+      const checkMethod = (provider as any)?.methodCheck('wallet_getManagerSignature');
       const signInfo = params.signInfo;
       const signedMsgObject = await provider?.request({
-        method: 'wallet_getSignature',
+        method: checkMethod ? 'wallet_getManagerSignature' : 'wallet_getSignature',
         payload: {
           data: signInfo || params.hexToBeSign,
         },
@@ -81,7 +83,14 @@ export function useETransferAuthToken() {
     let address: string;
     if (walletType === WalletTypeEnum.discover) {
       // discover
-      signInfo = AElf.utils.sha256(plainText);
+      const discoverProvider = walletInfo?.extraInfo?.provider;
+      if (!discoverProvider) return;
+      const checkMethod = (discoverProvider as any).methodCheck('wallet_getManagerSignature');
+      if (checkMethod) {
+        signInfo = Buffer.from(plainTextOrigin).toString('hex');
+      } else {
+        signInfo = AElf.utils.sha256(plainText);
+      }
       getSignature = getDiscoverSignature;
       address = walletInfo?.address || '';
     } else if (walletType === WalletTypeEnum.elf) {
@@ -103,17 +112,24 @@ export function useETransferAuthToken() {
     if (result?.error) throw result.errorMessage;
 
     return { signature: result?.signature || '', plainText };
-  }, [getDiscoverSignature, getPortKeySignature, getSignatureWeb, walletInfo?.address, walletType]);
+  }, [
+    getDiscoverSignature,
+    getPortKeySignature,
+    getSignatureWeb,
+    walletInfo?.address,
+    walletInfo?.extraInfo?.provider,
+    walletType,
+  ]);
 
   const getUserInfo = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
       const signatureResult = await handleGetSignature();
       const pubkey =
-        recoverPubKeyBySignature(signatureResult.plainText, signatureResult.signature) + '';
+        recoverPubKeyBySignature(signatureResult?.plainText, signatureResult?.signature || '') + '';
       return {
         pubkey,
-        signature: signatureResult.signature,
-        plainText: signatureResult.plainText,
+        signature: signatureResult?.signature,
+        plainText: signatureResult?.plainText,
         managerAddress: managerAddress,
       };
     },
@@ -163,7 +179,7 @@ export function useETransferAuthToken() {
         const recaptchaToken = await handleReCaptcha();
         const params = {
           pubkey,
-          signature,
+          signature: signature || '',
           plainText,
           managerAddress: walletInfo?.address,
           version: PortkeyVersion.v2,
@@ -204,7 +220,7 @@ export function useETransferAuthToken() {
         const { pubkey, signature, plainText } = await getUserInfo({ managerAddress });
         const params = {
           pubkey,
-          signature,
+          signature: signature || '',
           plainText,
           caHash,
           chainId: originChainId,
