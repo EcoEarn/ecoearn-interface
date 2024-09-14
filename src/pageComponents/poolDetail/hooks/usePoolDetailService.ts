@@ -61,7 +61,7 @@ export default function usePoolDetailService() {
   const stakeModal = useModal(StakeModalWithConfirm);
   const operationAmount = useRef('0');
   const { getAddress } = useGetAwakenContract();
-  const { stake: earlyStake } = useEarlyStake();
+  const { stake: earlyStake, earlyStakeFn } = useEarlyStake();
   const claimModal = useModal(ClaimModal);
   const unlockModal = useModal(UnlockModal);
   const [symbolBalance, setSymbolBalance] = useState('0');
@@ -325,6 +325,19 @@ export default function usePoolDetailService() {
           decimal: poolInfo?.decimal || 8,
         }),
       onStake: async (amount: number | string, period: number | string) => {
+        if (stakeRewards) {
+          if (!rewardsInfo || !earlyStakeInfo) {
+            singleMessage.error('missing params');
+            return;
+          }
+          await earlyStakeFn({
+            rewardsInfo: rewardsInfo,
+            poolType: poolType as PoolType,
+            earlyStakeInfo,
+            period,
+          });
+          return;
+        }
         const periodInSeconds = stakeRewards
           ? 5 * 60
           : dayjs.duration(Number(period || 0), 'day').asSeconds();
@@ -376,6 +389,7 @@ export default function usePoolDetailService() {
   }, [
     checkApproveParams,
     curChain,
+    earlyStakeFn,
     earlyStakeInfo,
     freeAmount,
     getBalanceDec,
@@ -386,6 +400,7 @@ export default function usePoolDetailService() {
     longestReleaseTime,
     poolInfo,
     poolType,
+    rewardsInfo,
     stakeRewards,
     symbolBalance,
     tokensContractAddress,
