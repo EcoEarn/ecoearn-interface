@@ -33,18 +33,6 @@ export default function Header({
 
   const menuItems = useMemo(() => {
     return [
-      // {
-      //   title: 'Points Staking',
-      //   schema: '/points',
-      // },
-      // {
-      //   title: 'Simple Staking',
-      //   schema: '/simple',
-      // },
-      // {
-      //   title: 'Farms',
-      //   schema: '/farms',
-      // },
       {
         title: 'Staking',
         schema: '/staking',
@@ -92,13 +80,13 @@ export default function Header({
     if (pathName === '/invitee') return null;
     if (!isLG) {
       return (
-        <div className="ml-8 xl:ml-16">
+        <div className="">
           <DropMenu isMobile={false} type={DropMenuTypeEnum.My} />
         </div>
       );
     } else {
       return (
-        <div className="flex flex-row gap-4 items-center">
+        <div className="flex flex-row items-center">
           <DropMenu isMobile={true} type={DropMenuTypeEnum.My} />
           <DropMenu isMobile={true} type={DropMenuTypeEnum.Nav} />
         </div>
