@@ -131,6 +131,10 @@ function StakeModal({
 
   console.log('===elfBalance', elfBalance);
 
+  const formattedStakeSymbol = useMemo(() => {
+    return formatTokenSymbol(stakeSymbol || '');
+  }, [stakeSymbol]);
+
   const canSwapToken = useMemo(() => {
     return ['SGR-1', 'ACORNS'].includes(stakeSymbol || '');
   }, [stakeSymbol]);
@@ -197,11 +201,11 @@ function StakeModal({
       case StakeType.EXTEND:
         return <StakeTitle text="Extend stake duration" rate={rate} />;
       case StakeType.RENEW:
-        return <StakeTitle text="Renew" rate={rate} />;
+        return <StakeTitle text={`Renew ${formattedStakeSymbol}`} rate={rate} />;
       default:
         return '';
     }
-  }, [isStakeRewards, modalTitle, rate, stakeSymbol, type]);
+  }, [formattedStakeSymbol, isStakeRewards, modalTitle, rate, stakeSymbol, type]);
 
   const amountStr = useMemo(() => {
     let _amount;
@@ -225,11 +229,14 @@ function StakeModal({
       _amount = stakedAmount;
     }
 
-    return ZERO.plus(_amount).gt(ZERO) ? formatNumberWithDecimalPlaces(_amount) : '--';
+    return ZERO.plus(_amount).gt(ZERO)
+      ? `${formatNumberWithDecimalPlaces(_amount)} ${formattedStakeSymbol}`
+      : '--';
   }, [
     amount,
     decimal,
     earlyAmount,
+    formattedStakeSymbol,
     freezeAmount,
     isFreezeAmount,
     stakedAmount,
@@ -239,18 +246,28 @@ function StakeModal({
 
   const originAmountStr = useMemo(() => {
     const amountNum = amount.replaceAll(',', '');
+    let resAmount = '';
     if (typeIsAdd && ZERO.plus(amountNum).gt(ZERO)) {
       if (isFreezeAmount)
-        return formatNumberWithDecimalPlaces(divDecimals(freezeAmount, decimal).toFixed());
-      return formatNumberWithDecimalPlaces(stakedAmount);
+        resAmount = formatNumberWithDecimalPlaces(divDecimals(freezeAmount, decimal).toFixed());
+      resAmount = formatNumberWithDecimalPlaces(stakedAmount);
     }
     if (earlyAmount) {
-      return formatNumberWithDecimalPlaces(
+      resAmount = formatNumberWithDecimalPlaces(
         divDecimals(earlyAmount, decimal).toFixed(2, BigNumber.ROUND_DOWN),
       );
     }
-    return '';
-  }, [amount, decimal, earlyAmount, freezeAmount, isFreezeAmount, stakedAmount, typeIsAdd]);
+    return resAmount ? `${resAmount} ${formattedStakeSymbol}` : '';
+  }, [
+    amount,
+    decimal,
+    earlyAmount,
+    formattedStakeSymbol,
+    freezeAmount,
+    isFreezeAmount,
+    stakedAmount,
+    typeIsAdd,
+  ]);
 
   const remainingTime = useMemo(() => {
     if (!unlockTime || typeIsStake || typeIsRenew) return '';
@@ -441,7 +458,9 @@ function StakeModal({
         {!typeIsExtend && !isFreezeAmount ? null : (
           <span className={clsx('text-neutralTertiary font-normal mb-6')}>
             <span className={clsx('text-neutralPrimary font-semibold')}>
-              {formatNumberWithDecimalPlaces(_balance || '0')}
+              {`${formatNumberWithDecimalPlaces(_balance || '0')} ${formatTokenSymbol(
+                stakeSymbol || '',
+              )}`}
             </span>
           </span>
         )}
@@ -453,6 +472,7 @@ function StakeModal({
     decimal,
     freezeAmount,
     isFreezeAmount,
+    stakeSymbol,
     stakedAmount,
     typeIsExtend,
   ]);
@@ -482,10 +502,10 @@ function StakeModal({
         type="primary"
         onClick={onStake}
       >
-        {typeIsAdd ? 'Add' : 'Stake'}
+        Confirm
       </Button>
     );
-  }, [btnDisabled, onStake, typeIsAdd]);
+  }, [btnDisabled, onStake]);
 
   const onCancel = useCallback(() => {
     onClose?.();
@@ -1172,14 +1192,10 @@ function StakeModal({
               }
               valueTip={'Longer staking period increases the multiplier (x), boosting the APR.'}
             />
-            {displayNewPeriod && (
+            {/* {displayNewPeriod && (
               <ViewItem label="Unlock on (current)" text={originReleaseDateStr}></ViewItem>
-            )}
-            <ViewItem
-              label={displayNewPeriod ? 'Unlock on (new)' : 'Unlock on'}
-              isTextBrand={displayNewPeriod}
-              text={releaseDateStr}
-            />
+            )} */}
+            <ViewItem label={'Unlock on'} isTextBrand={displayNewPeriod} text={releaseDateStr} />
             <ViewItem label="Projected Rewards" text={rewardsStr} extra={rewardsUsdStr} />
           </div>
         </FormItem>
