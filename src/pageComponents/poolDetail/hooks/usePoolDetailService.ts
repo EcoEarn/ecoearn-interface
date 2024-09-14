@@ -31,6 +31,7 @@ import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
 import { IStakeWithConfirmProps } from 'components/StakeWithConfirm';
 import { fixEarlyStakeData } from 'utils/stake';
+import qs from 'qs';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -330,13 +331,12 @@ export default function usePoolDetailService() {
             singleMessage.error('missing params');
             return;
           }
-          await earlyStakeFn({
+          return await earlyStakeFn({
             rewardsInfo: rewardsInfo,
             poolType: poolType as PoolType,
             earlyStakeInfo,
             period,
           });
-          return;
         }
         const periodInSeconds = stakeRewards
           ? 5 * 60
@@ -373,9 +373,17 @@ export default function usePoolDetailService() {
           }
         }
       },
-      onClose: () => {
+      onClose: (isSuccess) => {
         initPoolData();
         initBalance();
+        if (stakeRewards && isSuccess) {
+          const params = {
+            poolId,
+            poolType,
+          };
+          const replaceParams = qs.stringify(params);
+          router.replace(`/pool-detail?${replaceParams}`);
+        }
       },
       onSuccess: () => {
         saveTransaction({
@@ -398,9 +406,11 @@ export default function usePoolDetailService() {
     initBalance,
     initPoolData,
     longestReleaseTime,
+    poolId,
     poolInfo,
     poolType,
     rewardsInfo,
+    router,
     stakeRewards,
     symbolBalance,
     tokensContractAddress,
