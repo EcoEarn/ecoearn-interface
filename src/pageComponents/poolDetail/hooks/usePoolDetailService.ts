@@ -243,7 +243,7 @@ export default function usePoolDetailService() {
         }
         return divDecimals(balance || 0, decimal).toFixed(4);
       } catch (error) {
-        singleMessage.error('get balance error.');
+        // singleMessage.error('get balance error.');
         console.error('GetBalance error', error);
         return;
       } finally {

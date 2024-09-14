@@ -199,7 +199,7 @@ export default function RewardCard({
             <span className="text-sm text-neutralTertiary font-normal flex-shrink-0">
               Withdrawn
             </span>
-            <CommonTooltip title="Rewards that have reached the release point." />
+            <CommonTooltip title="Rewards already withdrawn to the wallet." />
           </Flex>
           <div className="mt-4 text-neutralTitle text-lg font-semibold lg:text-center text-start break-all">
             {withdrawnText}

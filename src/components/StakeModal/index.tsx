@@ -529,7 +529,7 @@ function StakeModal({
       if (ZERO.plus(balance || 0).lt(_val)) {
         return Promise.reject(`Insufficient ${formatTokenSymbol(stakeSymbol || '')} balance`);
       }
-      if (typeIsAdd && ZERO.plus(_val).lte(0)) return Promise.reject(`amount must greater than 0`);
+      if (typeIsAdd && ZERO.plus(_val).lte(0)) return Promise.reject(`Amount must greater than 0`);
       if (typeIsStake && ZERO.plus(_val).lt(min))
         return Promise.reject(
           `Please stake no less than ${min} ${formatTokenSymbol(stakeSymbol || '')}`,

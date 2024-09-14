@@ -23,13 +23,19 @@ export default function ConnectWallet() {
     return addPrefixSuffix(wallet?.address || '', curChain);
   }, [curChain, wallet?.address]);
 
-  const formatAddress = useMemo(() => {
+  const formatAddressPC = useMemo(() => {
     return getOmittedStr(fullAddress, OmittedType.ADDRESS);
+  }, [fullAddress]);
+
+  const formatAddressPhone = useMemo(() => {
+    return getOmittedStr(fullAddress, OmittedType.ADDRESS, { prevLen: 6, endLen: 7, limitLen: 13 });
   }, [fullAddress]);
 
   const isInTG = useMemo(() => {
     return isInTelegram();
   }, [isInTelegram]);
+
+  console.log('isLG', isLG);
 
   return isLogin ? (
     <div className="text-[12px] px-[8px] py-[6px] rounded-sm gap-1 lg:gap-2  lg:text-[16px] lg:px-[28px] lg:py-[12px] lg:rounded-[12px] flex hover:text-brandHover hover:border-brandHover items-center border-[1px] justify-center text-brandDefault  border-solid border-brandDefault cursor-pointer">
@@ -38,7 +44,7 @@ export default function ConnectWallet() {
       ) : (
         <PortKeySVG className="w-[16px] h-[16px] lg:w-[20px] lg:h-[20px]" />
       )}
-      <span>{formatAddress}</span>
+      {!isLG ? <span>{formatAddressPC}</span> : <span>{formatAddressPhone}</span>}
       <DropDownSVG className="w-[12px] h-[12px] lg:w-[16px] lg:h-[16px]" />
     </div>
   ) : isInTG ? null : (

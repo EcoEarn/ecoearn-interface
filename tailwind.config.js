@@ -9,6 +9,22 @@ const rotateY = plugin(function ({ addUtilities }) {
   });
 });
 
+const autoGrid = plugin(function ({ matchUtilities, theme }) {
+  matchUtilities(
+    {
+      'auto-fill': (value) => ({
+        gridTemplateColumns: `repeat(auto-fill, minmax(min(${value}, 100%), 1fr))`,
+      }),
+      'auto-fit': (value) => ({
+        gridTemplateColumns: `repeat(auto-fit, minmax(min(${value}, 100%), 1fr))`,
+      }),
+    },
+    {
+      values: theme('width', {}),
+    },
+  );
+});
+
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
@@ -81,6 +97,10 @@ module.exports = {
         xl: '16px',
         '2xl': '24px',
       },
+      gridTemplateColumns: {
+        'auto-fill-400': 'repeat(auto-fill, minmax(440px, 1fr))',
+        'auto-fit-400': 'repeat(auto-fit, minmax(440px, 1fr))',
+      },
     },
     screens: {
       xs: '532px',
@@ -93,7 +113,7 @@ module.exports = {
       main: '1440px',
     },
   },
-  plugins: [rotateY],
+  plugins: [rotateY, autoGrid],
   corePlugins: {
     preflight: false,
   },

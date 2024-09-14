@@ -78,7 +78,7 @@ export default function StakeCard({ type, data, isLogin }: IStakeCardProps) {
   }, [earnedSymbol]);
 
   return (
-    <div className="stake-card lg:min-w-[443px] md:min-w-[443px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg transition-all ease-in-out duration-300 hover:shadow-xl hover:ease hover:duration-300 group">
+    <div className="stake-card px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg transition-all ease-in-out duration-300 hover:shadow-xl hover:ease hover:duration-300 group">
       <div className="flex !items-center justify-between lg:flex-row lg:items-start">
         <StakeToken
           type={type}
@@ -88,7 +88,7 @@ export default function StakeCard({ type, data, isLogin }: IStakeCardProps) {
           projectName={projectOwner || '--'}
           symbolDigs={12}
         />
-        {showStakeInfo && (
+        {showStakeInfo && typeof isUnLocked === 'boolean' && (
           <>
             {!isUnLocked ? (
               <div className="rounded-xl bg-brandDefaultOpacity text-brandDefault px-[8px] py-[2px] flex items-center justify-center text-[13px]">
@@ -111,8 +111,8 @@ export default function StakeCard({ type, data, isLogin }: IStakeCardProps) {
         )}
       </div>
 
-      <div className="relative mt-[64px]">
-        <div className="flex items-center gap-[20px] transition-all ease-in-out duration-300 opacity-1 group-hover:opacity-0 ">
+      <div className="relative mt-[32px] lg:mt-[64px]">
+        <div className="flex items-center gap-[20px] transition-all ease-in-out duration-300 opacity-1 lg:group-hover:opacity-0 ">
           <Description
             className="text-[12px] border-solid border-r border-y-0 border-l-0 border-neutralDivider pr-[20px]"
             label="APR"
@@ -129,7 +129,7 @@ export default function StakeCard({ type, data, isLogin }: IStakeCardProps) {
           />
           <Description label="Earn" value={displayEarnSymbol || '--'} className="" />
         </div>
-        <div className="w-full absolute -bottom-[20px] left-0 opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
+        <div className="w-full mt-[20px] lg:mt-0 lg:absolute -bottom-[20px] left-0 lg:opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
           <Button
             className="w-full !h-[40px] lg:self-center !rounded-lg m-auto"
             type="primary"
