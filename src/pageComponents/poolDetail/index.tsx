@@ -7,6 +7,7 @@ import FaqList from 'components/FaqList';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import StakeDetail from './components/StakeDetail';
 import StakeTokenTitle from 'components/StakeTokenTitle';
+import BackCom from './components/BackCom';
 
 export default function PoolDetailPage() {
   const {
@@ -25,6 +26,7 @@ export default function PoolDetailPage() {
   return (
     <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
       <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
+        {stakeRewards && <BackCom />}
         <StakeTokenTitle
           img={poolInfo?.icons?.[0]}
           tokenSymbol={poolInfo?.stakeSymbol || ''}

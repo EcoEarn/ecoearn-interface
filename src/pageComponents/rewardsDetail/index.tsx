@@ -38,7 +38,6 @@ import qs from 'qs';
 import { useModal } from '@ebay/nice-modal-react';
 import StakeModal from 'components/StakeModalWithConfirm';
 import { ISendResult } from 'types';
-
 export default function RewardsDetailPage() {
   const router = useRouter();
   const { isConnected, walletInfo, walletType } = useConnectWallet();
@@ -183,11 +182,11 @@ export default function RewardsDetailPage() {
     { immediate: false },
   );
 
-  // useEffect(() => {
-  //   if (!isConnected) {
-  //     router.push('/');
-  //   }
-  // });
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+    }
+  }, [isConnected, router]);
 
   const rewardsData = useMemo(() => {
     return rewardsInfo?.rewardsInfo;
@@ -296,6 +295,11 @@ export default function RewardsDetailPage() {
       BigNumber(divDecimals(earlyStakedAmount || 0, decimal || 8)),
     ).toString()} ${formatRewardsSymbol}`;
   }, [formatRewardsSymbol, rewardsData]);
+
+  const showStakeEarlyAmount = useMemo(() => {
+    const { earlyStakedAmount } = rewardsData || {};
+    return !BigNumber(earlyStakedAmount || 0).isZero();
+  }, [rewardsData]);
 
   const isAllReleased = useMemo(() => {
     const { claimInfos } = rewardsData || {};
@@ -710,7 +714,9 @@ export default function RewardsDetailPage() {
             tip="After reaching the release point, the rewards can be withdrawn to the wallet. If you stake or add liquidity early, the amount of withdrawable rewards will be deducted accordingly."
             value={withdrawableValueText}
           />
-          <RewardsSingleItem label="Staked rewards" tip="" value={stakeEarlyAmountText} />
+          {showStakeEarlyAmount && (
+            <RewardsSingleItem label="Staked rewards" tip="" value={stakeEarlyAmountText} />
+          )}
         </Flex>
         {showLastReleaseModule && (
           <Flex
@@ -722,10 +728,12 @@ export default function RewardsDetailPage() {
               label="Next rewards release"
               value={isAllReleased ? 'All released' : releaseTime}
             />
-            <RewardsSingleItem
-              label="Next release amount"
-              value={isAllReleased ? '0' : releaseAmountText}
-            />
+            {!isAllReleased && (
+              <RewardsSingleItem
+                label="Next release amount"
+                value={isAllReleased ? '0' : releaseAmountText}
+              />
+            )}
           </Flex>
         )}
       </div>
