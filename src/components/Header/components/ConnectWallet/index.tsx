@@ -44,7 +44,7 @@ export default function ConnectWallet() {
       ) : (
         <PortKeySVG className="w-[16px] h-[16px] lg:w-[20px] lg:h-[20px]" />
       )}
-      {!isLG ? <span>{formatAddressPC}</span> : <span>{formatAddressPhone}</span>}
+      {!isLG && <span>{formatAddressPC}</span>}
       <DropDownSVG className="w-[12px] h-[12px] lg:w-[16px] lg:h-[16px]" />
     </div>
   ) : isInTG ? null : (
