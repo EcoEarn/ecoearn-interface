@@ -25,7 +25,7 @@ export default function Rewards() {
   const [initData, setInitData] = useState<Array<IRewardListItem>>();
   const { isMD } = useResponsive();
   const { wallet } = useWalletService();
-  const { showLoading, closeLoading } = useLoading();
+  const { showLoading, closeLoading, visible } = useLoading();
   const [currentType, setCurrentType] = useState<RewardsTypeEnum>(RewardsTypeEnum.All);
   const [rewardsTypeList, setRewardsTypeList] = useState<Array<IRewardsTypeItem>>();
 
@@ -77,6 +77,8 @@ export default function Rewards() {
     setCurrentType(value as RewardsTypeEnum);
   }, []);
 
+  console.log('showLoading', showLoading);
+
   return (
     <>
       <h2 className="text-4xl lg:text-5xl font-[600] text-neutralTitle pt-8 lg:pt-10">Rewards</h2>
@@ -112,7 +114,7 @@ export default function Rewards() {
       )}
       <div className="mt-6">
         {!['points', 'farms'].includes(currentType) ? (
-          <PoolsAmount currentType={currentType} />
+          <PoolsAmount currentType={currentType} visible={visible} />
         ) : (
           <ComingSoon />
         )}

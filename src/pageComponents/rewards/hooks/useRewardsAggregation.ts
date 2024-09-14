@@ -72,6 +72,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
   const { min } = useStakeConfig();
   const [curItem, setCurItem] = useState<IRewardsListDataSource>();
   const router = useRouter();
+  const [fetchDone, setFetchDone] = useState(false);
 
   const poolType = useMemo(() => {
     if (currentType === RewardsTypeEnum.Points) return PoolType.POINTS;
@@ -118,6 +119,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
         console.error('getPoolRewards error', error);
       } finally {
         needLoading && closeLoading();
+        setFetchDone(true);
       }
     },
     [closeLoading, curChain, isLogin, poolType, showLoading, wallet?.address],
@@ -634,6 +636,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
     confirmModalVisible,
     confirmModalType,
     fetchData,
+    fetchDone,
     dataSource,
     handleDetail,
     onWithdraw,

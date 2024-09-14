@@ -54,7 +54,9 @@ const Description = memo(
                 {value}
               </span>
             ) : (
-              <span className={`${getActualWidthOfChars(value) > 120 && 'text-[10px]'}`}>
+              <span
+                className={`${getActualWidthOfChars(value) > screen.width / 4 && 'text-[10px]'}`}
+              >
                 {value}
               </span>
             )}
