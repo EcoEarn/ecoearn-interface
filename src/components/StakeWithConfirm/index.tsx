@@ -39,7 +39,7 @@ export interface IStakeWithConfirmProps {
     poolId?: number | string,
   ) => Promise<ISendResult | void>;
   onSuccess: () => void;
-  onClose?: () => void;
+  onClose?: (isSuccess?: boolean) => void;
 }
 
 type TStakeExtendContent = Partial<IStakeContent> | IExtendedLockupContent;
@@ -178,8 +178,8 @@ export default function StakeWithConfirm({
   const onConfirmClose = useCallback(() => {
     setLoading(false);
     setVisible(false);
-    onClose?.();
-  }, [onClose]);
+    onClose?.(status === 'success');
+  }, [onClose, status]);
 
   return (
     <div>

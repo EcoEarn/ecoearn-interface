@@ -356,13 +356,21 @@ function Stake({
         {!typeIsExtend && !isFreezeAmount ? null : (
           <span className={clsx('text-neutralTertiary font-normal mb-6')}>
             <span className={clsx('text-neutralPrimary font-semibold')}>
-              {formatNumberWithDecimalPlaces(_balance || '0')}
+              {`${formatNumberWithDecimalPlaces(_balance || '0')} ${formattedStakeSymbol}`}
             </span>
           </span>
         )}
       </div>
     );
-  }, [balance, decimal, freezeAmount, isFreezeAmount, stakedAmount, typeIsExtend]);
+  }, [
+    balance,
+    decimal,
+    formattedStakeSymbol,
+    freezeAmount,
+    isFreezeAmount,
+    stakedAmount,
+    typeIsExtend,
+  ]);
 
   const periodLabel = useMemo(() => {
     return (
