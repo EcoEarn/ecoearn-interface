@@ -266,7 +266,109 @@ export default function useEarlyStake() {
     ],
   );
 
+  const earlyStakeFn = useCallback(
+    async ({
+      rewardsInfo,
+      period,
+      poolType,
+      earlyStakeInfo,
+    }: {
+      rewardsInfo: IPoolRewardsItem;
+      period: number | string;
+      poolType: PoolType;
+      earlyStakeInfo: IEarlyStakeInfo;
+    }) => {
+      // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+      const periodInSeconds = 5 * 60;
+      const { frozen, withdrawable, claimInfos } = rewardsInfo?.rewardsInfo || {};
+      const earlyStakeAmount = ZERO.plus(frozen || 0)
+        .plus(withdrawable || 0)
+        .toString();
+      const claimIds = (claimInfos || []).map((item) => {
+        return item.claimId;
+      });
+      const signParams: IEarlyStakeSignParams = {
+        amount: Number(earlyStakeAmount),
+        poolType,
+        address: wallet?.address || '',
+        claimInfos,
+        dappId: rewardsInfo?.dappId || '',
+        poolId: earlyStakeInfo?.poolId || '',
+        period: periodInSeconds,
+        operationPoolIds: poolType === PoolType.POINTS ? [] : [earlyStakeInfo?.poolId || ''],
+        operationDappIds: poolType === PoolType.POINTS ? [rewardsInfo?.dappId || ''] : [],
+      };
+      const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
+      if (!signature || !seed || !expirationTime) throw Error();
+      try {
+        const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
+        const longestReleaseTime =
+          claimInfos && claimInfos?.length > 0
+            ? claimInfos?.[claimInfos?.length - 1]?.releaseTime
+            : 0;
+        let rawTransaction = null;
+        try {
+          rawTransaction = await getRawTransaction({
+            walletInfo: wallet,
+            walletType,
+            caContractAddress: caContractAddress || '',
+            contractAddress: rewardsContractAddress || '',
+            methodName: 'StakeRewards',
+            params: {
+              stakeInput: {
+                claimIds,
+                account: wallet?.address,
+                amount: earlyStakeAmount,
+                seed,
+                poolId: earlyStakeInfo?.poolId || '',
+                expirationTime,
+                period: periodInSeconds,
+                dappId: rewardsInfo?.dappId || '',
+                longestReleaseTime: BigNumber(longestReleaseTime).div(1000).dp(0).toNumber(),
+              },
+              signature,
+            },
+            rpcUrl,
+            chainId: curChain!,
+          });
+        } catch (error) {
+          await cancelSign(signParams);
+          throw Error();
+        }
+        console.log('rawTransaction', rawTransaction);
+        if (!rawTransaction) {
+          await cancelSign(signParams);
+          throw Error();
+        }
+        const { data: TransactionId, message: errorMessage } = await earlyStakeApi({
+          chainId: curChain!,
+          rawTransaction: rawTransaction || '',
+        });
+        if (TransactionId) {
+          const { TransactionId: resultTransactionId } = await getTxResult(
+            TransactionId,
+            rpcUrl,
+            curChain!,
+          );
+          if (resultTransactionId) {
+            return { TransactionId: resultTransactionId } as ISendResult;
+          } else {
+            throw Error();
+          }
+        } else {
+          const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'EarlyStake');
+          if (!showInModal) message.error(matchedErrorMsg);
+          throw Error(showInModal ? matchedErrorMsg : '');
+        }
+      } catch (error) {
+        throw Error((error as Error).message);
+      }
+    },
+    [caContractAddress, config, curChain, rewardsContractAddress, wallet, walletType],
+  );
+
   return {
     stake,
+    earlyStakeFn,
   };
 }
