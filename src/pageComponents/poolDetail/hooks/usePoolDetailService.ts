@@ -569,6 +569,7 @@ export default function usePoolDetailService() {
           });
         },
         onEarlyStake: () => {
+          claimModal.hide();
           earlyStake({
             poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
             rewardsTokenName: earnedSymbol,
@@ -643,6 +644,7 @@ export default function usePoolDetailService() {
             });
           },
           onEarlyStake: () => {
+            unlockModal.hide();
             earlyStake({
               poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
               rewardsTokenName: earnedSymbol,
