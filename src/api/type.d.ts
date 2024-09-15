@@ -65,6 +65,8 @@ interface IStakePoolData {
   usdRate?: number | string;
   longestReleaseTime?: number | string;
   supportEarlyStake?: boolean;
+  marketCap?: number;
+  stakers?: number;
 }
 
 type TStakePoolDataKey = keyof IStakePoolData;

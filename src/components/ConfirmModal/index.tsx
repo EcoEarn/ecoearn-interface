@@ -2,14 +2,14 @@ import { Button } from 'aelf-design';
 import { Flex } from 'antd';
 import CommonModal from 'components/CommonModal';
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { formatTokenPrice, formatTokenSymbol } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 import { ReactComponent as SuccessIcon } from 'assets/img/result-success-icon.svg';
 import { ReactComponent as ErrorIcon } from 'assets/img/result-error-icon.svg';
 import { ExportOutlined } from '@ant-design/icons';
 import BigNumber from 'bignumber.js';
-import { ZERO } from 'constants/index';
+import { DEFAULT_DATE_FORMAT, ZERO } from 'constants/index';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
@@ -132,9 +132,9 @@ function ConfirmModal(props: IConfirmModalProps) {
       return 'Extended lock-up';
     } else if (type === ConfirmModalTypeEnum.UnLock) {
       if (BigNumber(content?.autoClaimAmount || 0).gt(ZERO)) {
-        return 'Unlock and Claim';
+        return 'Unstake and Claim';
       } else {
-        return 'Unlock';
+        return 'Unstake';
       }
     } else if (type === ConfirmModalTypeEnum.WithDraw) {
       return 'Withdraw';
@@ -185,7 +185,7 @@ function ConfirmModal(props: IConfirmModalProps) {
               onEarlyStake?.();
             }}
           >
-            Stake to earn more
+            Stake Rewards
           </Button>
         )}
       </Flex>
@@ -259,19 +259,21 @@ function ConfirmModal(props: IConfirmModalProps) {
               <Flex justify="space-between">
                 <span className="text-neutralSecondary">Unlock on</span>
                 <span>
-                  {dayjs(Number(content?.unlockDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
+                  {dayjs(Number(content?.unlockDateTimeStamp)).format(DEFAULT_DATE_FORMAT)}
                 </span>
               </Flex>
             ) : (
               <Flex vertical className="w-full gap-4">
                 <Flex justify="space-between">
                   <span className="text-neutralSecondary">{`Unlock on (current)`}</span>
-                  <span>{dayjs(Number(content?.oldDateTimeStamp)).format('YYYY.MM.DD HH:mm')}</span>
+                  <span>
+                    {dayjs(Number(content?.oldDateTimeStamp)).format(DEFAULT_DATE_FORMAT)}
+                  </span>
                 </Flex>
                 <Flex justify="space-between">
                   <span className="text-neutralSecondary">{`Unlock on (new)`}</span>
                   <span className="text-brandDefault">
-                    {dayjs(Number(content?.newDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
+                    {dayjs(Number(content?.newDateTimeStamp)).format(DEFAULT_DATE_FORMAT)}
                   </span>
                 </Flex>
               </Flex>
@@ -292,13 +294,13 @@ function ConfirmModal(props: IConfirmModalProps) {
             <Flex justify="space-between">
               <span className="text-neutralSecondary">Unlock on (current)</span>
               <span className="text-neutralPrimary">
-                {dayjs(Number(content?.oldDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
+                {dayjs(Number(content?.oldDateTimeStamp)).format(DEFAULT_DATE_FORMAT)}
               </span>
             </Flex>
             <Flex justify="space-between">
               <span className="text-neutralSecondary">Unlock on (new)</span>
               <span className="text-neutralPrimary">
-                {dayjs(Number(content?.newDateTimeStamp)).format('YYYY.MM.DD HH:mm')}
+                {dayjs(Number(content?.newDateTimeStamp)).format(DEFAULT_DATE_FORMAT)}
               </span>
             </Flex>
           </Flex>
@@ -307,7 +309,7 @@ function ConfirmModal(props: IConfirmModalProps) {
     } else if (type === ConfirmModalTypeEnum.UnLock) {
       return (
         <Flex className="text-center" gap={16} vertical>
-          <div className="text-xl font-medium text-neutralTitle">You will unlock</div>
+          <div className="text-xl font-medium text-neutralTitle">You will unstake</div>
           <div className="text-4xl font-semibold text-neutralPrimary">
             {formatTokenPrice(BigNumber(content?.amount || 0))}{' '}
             {formatTokenSymbol(content?.tokenSymbol || '')}

@@ -45,16 +45,8 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
   const menuItems = useMemo(() => {
     return [
       {
-        label: 'Points Staking',
-        href: '/points',
-      },
-      {
-        label: 'Simple Staking',
-        href: '/simple',
-      },
-      {
-        label: 'Farms',
-        href: '/farms',
+        label: 'Staking',
+        href: '/staking',
       },
       {
         label: 'Rewards',
@@ -160,10 +152,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
     return menu.map((ele, idx) => (
       <div
         key={idx}
-        className={clsx(
-          'font-medium text-base px-4 py-5',
-          pathName === ele.href && '!text-brandDefault',
-        )}
+        className={clsx('text-base px-4 py-5', pathName === ele.href && '!text-brandDefault')}
         onClick={() => {
           onClickHandler(ele);
         }}
@@ -197,6 +186,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
       itemsForPhone={itemsForPhone}
       targetNode={
         <div
+          className="flex items-center justify-center "
           onClick={() => {
             setShowDropMenu(true);
           }}
@@ -206,6 +196,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
       }
       onCloseHandler={() => setShowDropMenu(false)}
       titleTxt={title}
+      placement="bottomRight"
     ></DropMenuBase>
   );
 }

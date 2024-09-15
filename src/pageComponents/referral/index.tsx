@@ -86,9 +86,9 @@ function Referral() {
               Invite Friends to <span className="text-brandDefault">EcoEarn</span>
             </h1>
             <p className="text-sm lg:text-lg text-neutralSecondary mt-[12px] lg:mt-[24px]">
-              {`Share your referral link and invite friends to join EcoEarn and stake, you will get `}
+              {`Share your referral link to invite friends to join EcoEarn and start staking. Earn `}
               <span className="text-brandDefault">16%</span>
-              {` of your friends' points.`}
+              {` of the points your friends accumulate!`}
             </p>
           </div>
           <div
@@ -107,7 +107,7 @@ function Referral() {
         <div className="w-full xs:w-full lg:w-[452px] lg:max-w-[452px] mt-[6px] lg:mt-0 py-0 lg:py-[16px]">
           <div className="w-full rounded-lg bg-neutralWhiteBg px-[32px] py-[40px]">
             <p className="w-full text-base lg:text-xl text-neutralTitle font-semibold text-center">
-              Get 16% points of your friends
+              Earn 16% of Your Friends’ Points
             </p>
             <div className="w-full flex justify-center items-center mt-[16px] lg:mt-[32px]">
               <div className="rounded-md overflow-hidden">

@@ -14,8 +14,8 @@ export default function Intro() {
 
   return (
     <>
-      <h2 className="text-4xl lg:text-5xl font-semibold text-neutralTitle">My Liquidity</h2>
-      <div className="text-base text-neutralPrimary font-medium flex flex-col gap-1 mt-2 lg:mt-4">
+      <h2 className="text-[28px] lg:text-[36px] font-[600] text-neutralTitle">My Liquidity</h2>
+      <div className="text-base text-neutralPrimary flex flex-col gap-1 mt-2 lg:mt-4">
         <p>EcoEarn supports staking rewards early to the Farms through adding liquidity.</p>
         <p>
           For more liquidity pools, you can view

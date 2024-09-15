@@ -6,7 +6,7 @@ import { dispatch, store } from 'redux/store';
 import { setWalletInfo } from 'redux/reducer/userInfo';
 import { useLocalStorage } from 'react-use';
 import { cloneDeep } from 'lodash-es';
-import { WalletInfoType } from 'types';
+import { IContractError, WalletInfoType } from 'types';
 import { storages } from 'storages';
 import useBackToHomeByRoute from './useBackToHomeByRoute';
 import { useSelector } from 'react-redux';
@@ -19,6 +19,7 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did-ui-react';
+import { formatErrorMsg } from 'utils/formatError';
 
 export const useWalletInit = () => {
   const [, setLocalWalletInfo] = useLocalStorage<WalletInfoType>(storages.walletInfo);
@@ -82,7 +83,9 @@ export const useWalletInit = () => {
 
   useEffect(() => {
     if (loginError) {
-      message.error(`${loginError?.message || 'LOGIN_ERROR'}`);
+      const resError = loginError as IContractError;
+      const errorMessage = formatErrorMsg(resError).errorMessage.message;
+      message.error(`${errorMessage || 'LOGIN_ERROR'}`);
     }
   }, [loginError]);
 };

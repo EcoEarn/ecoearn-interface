@@ -9,9 +9,10 @@ import {
 } from 'utils/format';
 import CountDownLock from '../CountDownLock';
 import { useMemo } from 'react';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType, PoolTypeEnum } from 'components/StakeToken';
 import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
+import { DEFAULT_DATE_FORMAT } from 'constants/index';
 
 export default function ItemCard({
   item,
@@ -26,7 +27,7 @@ export default function ItemCard({
     const { tokenIcon, tokenName, projectOwner } = item;
     return (
       <StakeToken
-        type={item.poolType as unknown as PoolTypeEnum}
+        type={item.poolType as unknown as PoolType}
         icons={tokenIcon}
         tokenName={tokenName}
         projectName={projectOwner}
@@ -43,17 +44,17 @@ export default function ItemCard({
       )}
     >
       <div>{renderSymbol}</div>
-      <Flex className="text-base" justify="space-between" align="start">
+      <Flex className="text-base mt-[32px]" justify="space-between" align="start">
         <Flex align="center">
-          <span className="font-medium text-neutralSecondary">Rewards</span>
+          <span className="text-neutralSecondary">Claimed rewards</span>
           <CommonTooltip title="Claimed rewards" className="ml-2" />
         </Flex>
         <Flex vertical align="end" className="text-base">
-          <span className="text-neutralPrimary font-semibold">{`${formatTokenPrice(
+          <span className="text-neutralPrimary font-[600]">{`${formatTokenPrice(
             divDecimals(item.rewards, item.rewardsTokenDecimal || 8),
             { decimalPlaces: 2 },
           )} ${formatTokenSymbol(item.rewardsToken)}`}</span>
-          <span className="text-neutralSecondary mt-1 font-medium">
+          <span className="text-neutralSecondary mt-1">
             {formatUSDPrice(divDecimals(item.rewardsInUsd, item.rewardsTokenDecimal || 8), {
               decimalPlaces: 2,
             })}
@@ -62,11 +63,11 @@ export default function ItemCard({
       </Flex>
       <Flex className="text-base" justify="space-between" align="start">
         <Flex align="center">
-          <span className="font-medium text-neutralSecondary">Date</span>
+          <span className="text-neutralSecondary">Claimed at</span>
           <CommonTooltip title="time for rewards claim" className="ml-2" />
         </Flex>
-        <span className="text-neutralPrimary text-base font-semibold">
-          {dayjs(Number(item.date)).format('YYYY.MM.DD HH:mm')}
+        <span className="text-neutralPrimary text-base font-[600]">
+          {dayjs(Number(item.date)).format(DEFAULT_DATE_FORMAT)}
         </span>
       </Flex>
       {/* <Flex className="text-base" justify="space-between" align="start">

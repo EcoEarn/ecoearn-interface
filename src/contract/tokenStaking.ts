@@ -119,7 +119,7 @@ export const tokenClaim = async (
 export const tokenUnlock = async (
   params: string,
   options?: IContractOptions,
-): Promise<ISendResult> => await tokenStakingContractRequest('Unlock', params, options);
+): Promise<ISendResult> => await tokenStakingContractRequest('Unstake', params, options);
 
 export const tokenWithdraw = async (
   params: { claimIds: Array<number | string> },

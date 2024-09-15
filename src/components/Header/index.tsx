@@ -34,16 +34,8 @@ export default function Header({
   const menuItems = useMemo(() => {
     return [
       {
-        title: 'Points Staking',
-        schema: '/points',
-      },
-      {
-        title: 'Simple Staking',
-        schema: '/simple',
-      },
-      {
-        title: 'Farms',
-        schema: '/farms',
+        title: 'Staking',
+        schema: '/staking',
       },
       {
         title: 'Rewards',
@@ -88,28 +80,13 @@ export default function Header({
     if (pathName === '/invitee') return null;
     if (!isLG) {
       return (
-        <>
-          <span className="space-x-8 xl:space-x-16 flex flex-row items-center">
-            {menuItems.map((item) => {
-              const { title, schema } = item;
-              return (
-                <CompassLink
-                  key={title}
-                  item={item}
-                  className="text-neutralTitle font-medium text-base rounded-[12px] hover:text-brandHover"
-                  onPressCompassItems={onPressCompassItems}
-                />
-              );
-            })}
-          </span>
-          <div className="ml-8 xl:ml-16">
-            <DropMenu isMobile={false} type={DropMenuTypeEnum.My} />
-          </div>
-        </>
+        <div className="">
+          <DropMenu isMobile={false} type={DropMenuTypeEnum.My} />
+        </div>
       );
     } else {
       return (
-        <div className="flex flex-row gap-4 items-center">
+        <div className="flex flex-row items-center gap-2">
           <DropMenu isMobile={true} type={DropMenuTypeEnum.My} />
           <DropMenu isMobile={true} type={DropMenuTypeEnum.Nav} />
         </div>
@@ -136,6 +113,21 @@ export default function Header({
               onClick={() => router.replace('/')}
             />
           }
+          {!isLG && (
+            <span className="lg:space-x-[32px] flex flex-row items-center ml-[36px]">
+              {menuItems.map((item) => {
+                const { title, schema } = item;
+                return (
+                  <CompassLink
+                    key={title}
+                    item={item}
+                    className="text-neutralTitle text-base rounded-[12px] hover:text-brandHover"
+                    onPressCompassItems={onPressCompassItems}
+                  />
+                );
+              })}
+            </span>
+          )}
         </div>
         {FunctionalArea}
       </div>
