@@ -47,7 +47,7 @@ export default function StakeTokenTitle({
           <TokenTextIcon size="large" tokenName={tokenName} />
         </div>
       )}
-      <p className="text-center mt-4 text-2xl  font-semibold">{title}</p>
+      <p className="text-center mt-4 text-2xl font-semibold !font-poppinsMedium">{title}</p>
       {!isLogin && (
         <>
           <p className="mt-6 text-center">Please connect your wallet to continue</p>

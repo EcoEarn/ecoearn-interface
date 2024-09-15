@@ -226,7 +226,9 @@ export default function StakeDetail(props: IStakeDetailProps) {
   return (
     <div>
       <Flex justify="space-between" align="center">
-        <span className="text-lg font-medium text-neutralTitle">My position</span>
+        <span className="text-lg font-medium text-neutralTitle !font-poppinsMedium">
+          My position
+        </span>
         {lockLabel}
       </Flex>
       <div className="mt-4 p-6 rounded-[16px] border-[#F4F9FE] border-[1px] border-solid bg-[#F9FCFF] flex gap-6">
