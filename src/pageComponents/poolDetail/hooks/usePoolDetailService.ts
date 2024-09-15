@@ -52,7 +52,7 @@ export default function usePoolDetailService() {
     return searchParams.get('stakeRewards') || '';
   }, [searchParams]);
 
-  const { showLoading, closeLoading } = useLoading();
+  const { showLoading, closeLoading, visible } = useLoading();
   const { wallet } = useWalletService();
   const { checkLogin } = useCheckLoginAndToken();
   const { isLogin } = useGetLoginStatus();
@@ -736,5 +736,6 @@ export default function usePoolDetailService() {
     onUnlock,
     stakeProps,
     stakeRewards,
+    loading: visible,
   };
 }

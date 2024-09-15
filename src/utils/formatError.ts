@@ -69,7 +69,9 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
 
     if (
       message.includes('Operation canceled.') ||
-      message.includes('You closed the prompt without any action.')
+      message.includes('You closed the prompt without any action.') ||
+      message.includes('There is something wrong at login stage with discover') ||
+      message.includes('User denied.')
     ) {
       resMessage = 'Request rejected. EcoEarn needs your permission to continue.';
       showInModal = false;

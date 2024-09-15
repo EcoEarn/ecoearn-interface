@@ -23,7 +23,7 @@ export default function PoolDetailPage() {
   } = usePoolDetailService();
   const { isLogin } = useGetLoginStatus();
 
-  return (
+  return !poolInfo ? null : (
     <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
       <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
         {stakeRewards && <BackCom />}
