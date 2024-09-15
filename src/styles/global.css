@@ -44,6 +44,10 @@ input[type='number'] {
 	appearance: textfield;
 }
 
+input {
+	@apply !font-poppinsRegular;
+}
+
 * {
 	font-family: Poppins, sans-serif;
 	transition: background 0.3s, fill 0.3s, stork 0.3s, color 0.3s,

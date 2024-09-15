@@ -45,7 +45,7 @@ export default function LeaderboardPage() {
         <div>
           <h1 className="text-4xl md:text-5xl font-[600] text-neutralTitle">Leaderboard</h1>
           <div className="text-base mt-2 md:mt-4 text-neutralPrimary">
-            Ranking of points earned by staking in simple staking and Farms.
+            Ranked by points earned through Simple Staking and Farms.
           </div>
         </div>
         {isMD ? (
