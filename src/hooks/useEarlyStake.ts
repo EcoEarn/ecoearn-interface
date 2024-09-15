@@ -149,8 +149,8 @@ export default function useEarlyStake() {
             },
             balanceDec: getBalanceTip(poolType),
             onStake: async (amount, period = 0, poolId) => {
-              const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-              // const periodInSeconds = 5 * 60;
+              // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+              const periodInSeconds = 5 * 60;
               const signParams: IEarlyStakeSignParams = {
                 amount: Number(earlyStakeAmount),
                 poolType,
@@ -278,8 +278,8 @@ export default function useEarlyStake() {
       poolType: PoolType;
       earlyStakeInfo: IEarlyStakeInfo;
     }) => {
-      const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-      // const periodInSeconds = 5 * 60;
+      // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+      const periodInSeconds = 5 * 60;
       const { frozen, withdrawable, claimInfos } = rewardsInfo?.rewardsInfo || {};
       const earlyStakeAmount = ZERO.plus(frozen || 0)
         .plus(withdrawable || 0)
