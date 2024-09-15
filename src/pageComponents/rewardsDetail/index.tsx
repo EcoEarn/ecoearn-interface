@@ -3,7 +3,7 @@ import { Flex, message } from 'antd';
 import FaqList from 'components/FaqList';
 import StakeTokenTitle from 'components/StakeTokenTitle';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import RewardsTotalItem from './components/RewardsTotalItem';
 import { Button, ToolTip } from 'aelf-design';
 import RewardsSingleItem from './components/RewardsSingleItem';
@@ -28,7 +28,7 @@ import { DEFAULT_DATE_FORMAT, ZERO } from 'constants/index';
 import useStakeConfig from 'hooks/useStakeConfig';
 import dayjs from 'dayjs';
 import ConfirmModal, { ConfirmModalTypeEnum, IWithDrawContent } from 'components/ConfirmModal';
-import { useInterval } from 'ahooks';
+import { useInterval, useTimeout } from 'ahooks';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import { getTxResult } from 'utils/aelfUtils';
@@ -648,109 +648,121 @@ export default function RewardsDetailPage() {
     }
   }, [earlyStake, earlyStakeInfo?.staked, toPoolDetail]);
 
+  const [showInfo, setShowInfo] = useState(false);
+
+  useLayoutEffect(() => {
+    setShowInfo(false);
+  }, []);
+
+  useTimeout(() => setShowInfo(true), 600);
+
   return (
-    <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
-      <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
-        <StakeTokenTitle
-          img={poolInfo?.icons?.[0] || ''}
-          tokenSymbol={poolInfo?.stakeSymbol || ''}
-          type="rewards"
-        />
-        <Flex gap={isMD ? 8 : 24}>
-          <RewardsTotalItem
-            label="Total Rewards"
-            tip="All rewards earned by staking in this pool."
-            amount={rewardsData?.totalRewards || '0'}
-            amountUsd={rewardsData?.totalRewardsInUsd || '0'}
-            decimal={Number(rewardsData?.decimal || 8)}
-            tokenSymbol={rewardsInfo?.rewardsTokenName || ''}
-          />
-          <RewardsTotalItem
-            label="Withdrawn"
-            tip="Rewards already withdrawn to the wallet."
-            amount={rewardsData?.withdrawn || '0'}
-            amountUsd={rewardsData?.withdrawnInUsd || '0'}
-            decimal={Number(rewardsData?.decimal || 8)}
-            tokenSymbol={rewardsInfo?.rewardsTokenName || ''}
-          />
-        </Flex>
-        <Flex gap={isMD ? 8 : 24}>
-          {poolInfo?.supportEarlyStake && (
-            <ToolTip title={stakeEarlyTip}>
-              <Button
-                type="primary"
-                onClick={handleEarlyStake}
-                className="!rounded-lg flex-1"
-                disabled={stakeEarlyDisabled}
-              >
-                Stake Rewards
-              </Button>
-            </ToolTip>
-          )}
-          <ToolTip title={withdrawTip}>
-            <Button
-              onClick={onWithdraw}
-              type="primary"
-              ghost={poolInfo?.supportEarlyStake && !withdrawDisabled}
-              className="!rounded-lg flex-1"
-              disabled={withdrawDisabled}
-            >
-              Withdraw
-            </Button>
-          </ToolTip>
-        </Flex>
-        <Flex
-          className="rounded-xl p-6 bg-[#F9FCFF] border-solid border-[1px] border-[#F4F9FE]"
-          gap={16}
-          vertical
-        >
-          <RewardsSingleItem
-            label="Frozen"
-            tip="Before the release point, the rewards are frozen. If you stake or add liquidity early, the amount of frozen rewards needs to be deducted accordingly."
-            value={frozenValueText}
-          />
-          <RewardsSingleItem
-            label="Withdrawable"
-            tip="After reaching the release point, the rewards can be withdrawn to the wallet. If you stake or add liquidity early, the amount of withdrawable rewards will be deducted accordingly."
-            value={withdrawableValueText}
-          />
-          {showStakeEarlyAmount && (
-            <RewardsSingleItem label="Staked rewards" tip="" value={stakeEarlyAmountText} />
-          )}
-        </Flex>
-        {showLastReleaseModule && (
-          <Flex
-            className="rounded-xl p-6 bg-[#F9FCFF] border-solid border-[1px] border-[#F4F9FE]"
-            gap={16}
-            vertical
-          >
-            <RewardsSingleItem
-              label="Next rewards release"
-              value={isAllReleased ? 'All released' : releaseTime}
+    <>
+      {showInfo && (
+        <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
+          <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
+            <StakeTokenTitle
+              img={poolInfo?.icons?.[0] || ''}
+              tokenSymbol={poolInfo?.stakeSymbol || ''}
+              type="rewards"
             />
-            {!isAllReleased && (
-              <RewardsSingleItem
-                label="Next release amount"
-                value={isAllReleased ? '0' : releaseAmountText}
+            <Flex gap={isMD ? 8 : 24}>
+              <RewardsTotalItem
+                label="Total Rewards"
+                tip="All rewards earned by staking in this pool."
+                amount={rewardsData?.totalRewards || '0'}
+                amountUsd={rewardsData?.totalRewardsInUsd || '0'}
+                decimal={Number(rewardsData?.decimal || 8)}
+                tokenSymbol={rewardsInfo?.rewardsTokenName || ''}
               />
+              <RewardsTotalItem
+                label="Withdrawn"
+                tip="Rewards already withdrawn to the wallet."
+                amount={rewardsData?.withdrawn || '0'}
+                amountUsd={rewardsData?.withdrawnInUsd || '0'}
+                decimal={Number(rewardsData?.decimal || 8)}
+                tokenSymbol={rewardsInfo?.rewardsTokenName || ''}
+              />
+            </Flex>
+            <Flex gap={isMD ? 8 : 24}>
+              {poolInfo?.supportEarlyStake && (
+                <ToolTip title={stakeEarlyTip}>
+                  <Button
+                    type="primary"
+                    onClick={handleEarlyStake}
+                    className="!rounded-lg flex-1"
+                    disabled={stakeEarlyDisabled}
+                  >
+                    Stake Rewards
+                  </Button>
+                </ToolTip>
+              )}
+              <ToolTip title={withdrawTip}>
+                <Button
+                  onClick={onWithdraw}
+                  type="primary"
+                  ghost={poolInfo?.supportEarlyStake && !withdrawDisabled}
+                  className="!rounded-lg flex-1"
+                  disabled={withdrawDisabled}
+                >
+                  Withdraw
+                </Button>
+              </ToolTip>
+            </Flex>
+            <Flex
+              className="rounded-xl p-6 bg-[#F9FCFF] border-solid border-[1px] border-[#F4F9FE]"
+              gap={16}
+              vertical
+            >
+              <RewardsSingleItem
+                label="Frozen"
+                tip="Before the release point, the rewards are frozen. If you stake or add liquidity early, the amount of frozen rewards needs to be deducted accordingly."
+                value={frozenValueText}
+              />
+              <RewardsSingleItem
+                label="Withdrawable"
+                tip="After reaching the release point, the rewards can be withdrawn to the wallet. If you stake or add liquidity early, the amount of withdrawable rewards will be deducted accordingly."
+                value={withdrawableValueText}
+              />
+              {showStakeEarlyAmount && (
+                <RewardsSingleItem label="Staked rewards" tip="" value={stakeEarlyAmountText} />
+              )}
+            </Flex>
+            {showLastReleaseModule && (
+              <Flex
+                className="rounded-xl p-6 bg-[#F9FCFF] border-solid border-[1px] border-[#F4F9FE]"
+                gap={16}
+                vertical
+              >
+                <RewardsSingleItem
+                  label="Next rewards release"
+                  value={isAllReleased ? 'All released' : releaseTime}
+                />
+                {!isAllReleased && (
+                  <RewardsSingleItem
+                    label="Next release amount"
+                    value={isAllReleased ? '0' : releaseAmountText}
+                  />
+                )}
+              </Flex>
             )}
-          </Flex>
-        )}
-      </div>
-      <FaqList type="rewards" />
-      <ConfirmModal
-        type={confirmModalType}
-        content={confirmModalContent}
-        errorTip={confirmModalErrorTip}
-        status={confirmModalStatus}
-        loading={confirmModalLoading}
-        visible={confirmModalVisible}
-        onClose={confirmModalOnClose}
-        onConfirm={() => {
-          confirmModalOnConfirm();
-        }}
-        transactionId={confirmModalTransactionId}
-      />
-    </Flex>
+          </div>
+          <FaqList type="rewards" />
+          <ConfirmModal
+            type={confirmModalType}
+            content={confirmModalContent}
+            errorTip={confirmModalErrorTip}
+            status={confirmModalStatus}
+            loading={confirmModalLoading}
+            visible={confirmModalVisible}
+            onClose={confirmModalOnClose}
+            onConfirm={() => {
+              confirmModalOnConfirm();
+            }}
+            transactionId={confirmModalTransactionId}
+          />
+        </Flex>
+      )}
+    </>
   );
 }
