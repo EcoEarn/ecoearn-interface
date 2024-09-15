@@ -1,10 +1,10 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 
-import { Modal } from 'antd';
-import styles from './style.module.css';
+// import { Modal } from 'antd';
+// import styles from './style.module.css';
 import { useMount } from 'ahooks';
 import { useState } from 'react';
-import { ReactComponent as Close } from 'assets/img/modal-close.svg';
+// import { ReactComponent as Close } from 'assets/img/modal-close.svg';
 import Loading from 'components/Loading/index';
 
 export interface ILoadingProps {
@@ -26,33 +26,45 @@ export function NiceLoading({ showClose = false, content, onClose }: ILoadingPro
   if (!isMount) return null;
 
   return (
-    <Modal
-      zIndex={Number.MAX_SAFE_INTEGER}
-      maskClosable={false}
-      className={`${styles.loading} ${showClose && styles.loadingWithClose}`}
-      open={modal.visible}
-      footer={null}
-      onCancel={modal.hide}
-      closable={false}
-      closeIcon={null}
-      centered
-    >
-      <section className="flex flex-col justify-center items-center">
-        <Loading />
-        <span className="mt-[12px] text-[#1A1A1A] text-[14px] leading-[20px] font-normal text-center">
-          {content || 'loading...'}
-        </span>
-      </section>
-      {showClose && (
-        <Close
-          className="absolute right-[12px] top-[12px] cursor-pointer"
-          onClick={() => {
-            onClose?.();
-            modal.hide();
-          }}
-        />
+    <>
+      {modal.visible && (
+        <div className="w-full h-full fixed top-0 left-0 text-black bg-transparent z-[500] flex items-center justify-center">
+          <Loading />
+        </div>
       )}
-    </Modal>
+    </>
+
+    // <Modal
+    //   zIndex={Number.MAX_SAFE_INTEGER}
+    //   maskClosable={false}
+    //   mask={false}
+    //   className={`${styles.loading} ${showClose && styles.loadingWithClose}`}
+    //   open={modal.visible}
+    //   // open={true}
+    //   footer={null}
+    //   onCancel={modal.hide}
+    //   closable={false}
+    //   closeIcon={null}
+    //   centered
+    // >
+    //   <section className="flex justify-center items-center">
+    //     {/* <Loading />
+    //     <span className="mt-[12px] text-[#1A1A1A] text-[14px] leading-[20px] font-normal text-center">
+    //       {content || 'loading...'}
+    //     </span> */}
+    //     <Loading />
+    //   </section>
+
+    //   {showClose && (
+    //     <Close
+    //       className="absolute right-[12px] top-[12px] cursor-pointer"
+    //       onClick={() => {
+    //         onClose?.();
+    //         modal.hide();
+    //       }}
+    //     />
+    //   )}
+    // </Modal>
   );
 }
 

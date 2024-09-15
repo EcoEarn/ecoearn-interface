@@ -1,14 +1,16 @@
-import useDappList from 'hooks/useDappList';
-import DappList from './components/DappList';
+// import useDappList from 'hooks/useDappList';
+// import DappList from './components/DappList';
+import ComingSoon from './components/ComingSoon';
 
 export default function StakeHome() {
-  const { dappList, loading } = useDappList();
+  // const { dappList, loading } = useDappList();
   return (
     <div>
-      <div className="pt-[56px] pb-[24px] lg:py-[60px] lg:mt-[48px] text-center text-4xl lg:text-6xl font-semibold text-neutralTitle">
-        Participate in Points Staking for high rewards
+      <div className="pt-[24px] pb-[24px] text-[28px] lg:pt-[64px] lg:pb-[24px] lg:text-[36px] font-[600]	 text-neutralTitle">
+        Points staking
       </div>
-      <DappList items={dappList || []} loading={loading} />
+      {/* <DappList items={dappList || []} loading={loading} /> */}
+      <ComingSoon name={'Coming soon'} desc={'Stake your points to earn exclusive rewards!'} />
     </div>
   );
 }

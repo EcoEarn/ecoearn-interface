@@ -2,6 +2,7 @@ import { Skeleton } from 'antd';
 import clsx from 'clsx';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useState } from 'react';
+
 interface ISkeletonImage {
   img?: string;
   className?: string;

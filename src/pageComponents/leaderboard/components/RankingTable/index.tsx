@@ -18,6 +18,7 @@ import useResponsive from 'utils/useResponsive';
 import MyRanking from '../MyRanking';
 import { getLeaderboardInfo } from 'api/request';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
+import useLoading from 'hooks/useLoading';
 
 const pageSize = 20;
 
@@ -40,6 +41,7 @@ export default function RankingTable({ className }: { className?: string }) {
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<Array<IRankingItem>>();
   const [ownerInfo, setOwnerInfo] = useState<IRankingOwnerInfo>();
+  const { showLoading, closeLoading } = useLoading();
 
   const columns: ColumnsType<IRankingItem> = useMemo(() => {
     return [
@@ -50,7 +52,7 @@ export default function RankingTable({ className }: { className?: string }) {
         render: (rank, record, index) => (
           <div
             className={clsx(
-              'text-sm md:text-xl font-semibold text-neutralTitle w-6 md:w-10 h-6 md:h-10 flex items-center justify-center',
+              'text-sm md:text-xl font-[600] text-neutralTitle w-6 md:w-10 h-6 md:h-10 flex items-center justify-center',
               record?.isOwner && '!text-brandDefault',
             )}
           >
@@ -79,7 +81,7 @@ export default function RankingTable({ className }: { className?: string }) {
                 toCopy={fullAddress}
                 size={isMD ? 'small' : 'large'}
                 className={clsx(
-                  'text-xs md:text-lg font-medium text-neutralTitle',
+                  'text-xs md:text-lg font-[500] text-neutralTitle',
                   record?.isOwner && '!text-brandDefault',
                 )}
               >
@@ -97,7 +99,7 @@ export default function RankingTable({ className }: { className?: string }) {
         render: (points, record, index) => (
           <div
             className={clsx(
-              'text-xs md:text-lg font-medium text-neutralTitle flex h-full items-center justify-end',
+              'text-xs md:text-lg font-[500] text-neutralTitle flex h-full items-center justify-end',
               record?.isOwner && '!text-brandDefault',
             )}
           >
@@ -115,6 +117,7 @@ export default function RankingTable({ className }: { className?: string }) {
   const getList = useCallback(
     async (page = 1) => {
       setLoading(true);
+      showLoading();
       try {
         const data = await getLeaderboardInfo({
           address: wallet?.address || '',
@@ -136,6 +139,7 @@ export default function RankingTable({ className }: { className?: string }) {
         console.error(err);
       } finally {
         setLoading(false);
+        closeLoading();
       }
     },
     [wallet?.address],
@@ -169,22 +173,24 @@ export default function RankingTable({ className }: { className?: string }) {
         }}
       >
         <div className="ranking-table-container" onScrollCapture={onScrollCapture}>
-          <CommonTable
-            rowKey={(row) => row?.address}
-            loading={loading}
-            pagination={false}
-            columns={columns as any}
-            dataSource={dataSource}
-            className={clsx(styles.rankingTable, 'mt-4 md:mt-6')}
-            id="ranking-table"
-            scroll={{ x: isMD ? 343 : isLG ? 'max-content' : '100%', y: isMD ? 650 : 890 }}
-            rowClassName={(record, index) => {
-              if (record?.isOwner) {
-                return 'bg-brandFooterBg';
-              }
-              return '';
-            }}
-          />
+          {dataSource && (
+            <CommonTable
+              rowKey={(row) => row?.address}
+              // loading={loading}
+              pagination={false}
+              columns={columns as any}
+              dataSource={dataSource}
+              className={clsx(styles.rankingTable, 'mt-4 md:mt-6')}
+              id="ranking-table"
+              scroll={{ x: isMD ? 343 : isLG ? 'max-content' : '100%', y: isMD ? 650 : 890 }}
+              rowClassName={(record, index) => {
+                if (record?.isOwner) {
+                  return 'bg-brandFooterBg';
+                }
+                return '';
+              }}
+            />
+          )}
         </div>
       </AELFDProvider>
     </>

@@ -1,0 +1,14 @@
+.stake { 
+  :global(.earn-form-vertical .earn-form-item-label) {
+    label[for="stake_amount"] {
+      @apply w-full;
+    }
+  }
+  :global(.earn-form-item-label){
+    @apply !pb-0;
+  }
+}
+
+.item-overview {
+  @apply mb-2;
+}

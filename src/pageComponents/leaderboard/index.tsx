@@ -43,9 +43,9 @@ export default function LeaderboardPage() {
     <section>
       <Flex justify="space-between" align={isMD ? 'start' : 'end'} className="pt-8 md:pt-12">
         <div>
-          <h1 className="text-4xl md:text-5xl font-semibold text-neutralTitle">Leaderboard</h1>
-          <div className="text-base mt-2 md:mt-4 text-neutralPrimary font-medium">
-            Ranking of points earned by staking in simple staking and Farms.
+          <h1 className="text-4xl md:text-5xl font-[600] text-neutralTitle">Leaderboard</h1>
+          <div className="text-base mt-2 md:mt-4 text-neutralPrimary">
+            Ranked by points earned through Simple Staking and Farms.
           </div>
         </div>
         {isMD ? (

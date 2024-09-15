@@ -302,3 +302,40 @@ export function splitTokensFromPairSymbol(str: string) {
     return [];
   }
 }
+
+export function timeRemaining(timestamp: string | number) {
+  const now = dayjs();
+  const target = dayjs(timestamp);
+  const diff = target.diff(now);
+
+  if (diff <= 0) {
+    return '<1 minute';
+  }
+
+  const months = Math.floor(dayjs.duration(diff).asMonths());
+  if (months >= 1) {
+    return `${months} month${months > 1 ? 's' : ''}`;
+  }
+
+  const weeks = Math.floor(dayjs.duration(diff).asWeeks());
+  if (weeks >= 1) {
+    return `${weeks} week${weeks > 1 ? 's' : ''}`;
+  }
+
+  const days = Math.floor(dayjs.duration(diff).asDays());
+  if (days >= 1) {
+    return `${days} day${days > 1 ? 's' : ''}`;
+  }
+
+  const hours = Math.floor(dayjs.duration(diff).asHours());
+  if (hours >= 1) {
+    return `${hours} hour${hours > 1 ? 's' : ''}`;
+  }
+
+  const minutes = Math.floor(dayjs.duration(diff).asMinutes());
+  if (minutes >= 1) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  }
+
+  return '<1 minute';
+}

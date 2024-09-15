@@ -1,5 +1,5 @@
 import { Flex } from 'antd';
-import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
+import StakeToken, { PoolType, PoolTypeEnum } from 'components/StakeToken';
 import { useMemo } from 'react';
 import { divDecimals } from 'utils/calculate';
 import { formatTokenPrice } from 'utils/format';
@@ -29,7 +29,7 @@ export default function TokenBalance(props: {
           size="small"
           className="!items-center lg:!items-center"
           tokenSymbolClassName="!text-lg"
-          type={PoolTypeEnum.Token}
+          type={PoolType.TOKEN}
         />
         {fromRewards && (
           <div className="py-[2px] flex justify-center items-center font-medium text-xs text-neutralTertiary px-1 rounded-[4px] bg-neutralDefaultBg">

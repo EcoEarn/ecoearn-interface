@@ -23,8 +23,8 @@ export default function Empty({
       ) : (
         <WalletSVG className="w-[72px] h-[72px]" />
       )}
-      <span className="text-base text-neutralSecondary font-medium">
-        {isLogin ? emptyText : 'No Wallet Connected'}
+      <span className="text-base text-neutralSecondary">
+        {isLogin ? emptyText : 'Please connect your wallet to continue'}
       </span>
       <Button
         type="primary"
@@ -38,7 +38,7 @@ export default function Empty({
           onClick();
         }}
       >
-        {isLogin ? emptyBtnText : 'Log in'}
+        {isLogin ? emptyBtnText : 'Connect Wallet'}
       </Button>
     </div>
   );

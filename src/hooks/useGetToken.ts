@@ -104,16 +104,23 @@ export const useGetToken = () => {
         localStorage.removeItem(storages.accountInfo);
       }
       const timestamp = Date.now();
-
       const signInfo = AElf.utils.sha256(`${walletInfo?.address}-${timestamp}`);
+      const signInfoHex = `${walletInfo?.address}-${timestamp}`;
+      const hexData = Buffer.from(signInfoHex).toString('hex');
 
       let publicKey = '';
       let signature = '';
       let source = '';
 
+      const plainText: any = Buffer.from(signInfoHex).toString('hex').replace('0x', '');
+
       if (walletType === WalletTypeEnum.discover) {
         try {
-          const { pubKey, signatureStr } = await getSignatureAndPublicKey(signInfo);
+          const { pubKey, signatureStr } = await getSignatureAndPublicKey(
+            signInfo,
+            hexData,
+            plainText,
+          );
           publicKey = pubKey || '';
           signature = signatureStr || '';
           source = 'portkey';

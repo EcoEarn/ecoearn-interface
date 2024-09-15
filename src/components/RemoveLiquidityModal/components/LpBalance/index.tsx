@@ -1,6 +1,7 @@
 import { Flex } from 'antd';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { useMemo } from 'react';
+import { PoolType } from 'types/stake';
 import { divDecimals } from 'utils/calculate';
 import { formatTokenPrice, formatUSDPrice } from 'utils/format';
 
@@ -33,7 +34,7 @@ export default function Balance({
         tokenSymbolClassName="!text-lg"
         tokenName={symbol}
         icons={icons}
-        type={PoolTypeEnum.Lp}
+        type={PoolType.LP}
       />
       <Flex align="end" vertical>
         <span className="text-xl lg:text-2xl font-semibold text-neutralTitle">{amountText}</span>

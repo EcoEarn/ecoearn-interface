@@ -107,7 +107,7 @@ export const Claim = async (
 export const EarlyStake = async (
   params: IEarlyStakeParams,
   options?: IContractOptions,
-): Promise<ISendResult> => await pointsStakingContractRequest('EarlyStake', params, options);
+): Promise<ISendResult> => await pointsStakingContractRequest('StakeRewards', params, options);
 
 export const Withdraw = async (
   params: { claimIds: Array<number | string> },
