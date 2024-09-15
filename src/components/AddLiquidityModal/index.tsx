@@ -183,7 +183,7 @@ function AddLiquidityModal({
         <div className="flex justify-between items-center">
           <StakeToken
             className="lg:!items-center"
-            type={PoolTypeEnum.Lp}
+            type={PoolType.LP}
             tokenName={lpToken.symbol}
             rate={lpToken.rate}
             icons={lpToken.icons}

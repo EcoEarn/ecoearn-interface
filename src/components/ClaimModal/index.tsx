@@ -84,6 +84,7 @@ function ClaimModal({
       onConfirm={onConfirm}
       transactionId={transactionId}
       onEarlyStake={() => {
+        modal.hide();
         onEarlyStake?.();
       }}
       onGoRewards={() => {

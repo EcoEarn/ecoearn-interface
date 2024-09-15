@@ -1,18 +1,9 @@
-import { did } from '@portkey/did-ui-react';
-import { aelf } from '@portkey/utils';
-import { handleManagerForwardCall, getContractMethods } from '@portkey/contracts';
+import { aelf, sigObjToStr } from '@portkey/utils';
 import AElf from 'aelf-sdk';
 import deleteProvider from '@portkey/detect-provider';
-import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
-
-type TCreateHandleManagerForwardCall = {
-  caContractAddress: string;
-  contractAddress: string;
-  args: any;
-  methodName: string;
-  caHash: string;
-  instance: any;
-};
+import { MethodsWallet } from '@portkey/provider-types';
+import { createManagerForwardCall } from '@portkey/contracts';
+import { getRawParams } from './decodeTx';
 
 export type TGetRawTx = {
   blockHeightInput: string;
@@ -21,112 +12,6 @@ export type TGetRawTx = {
   address: string;
   contractAddress: string;
   functionName: string;
-};
-
-export const getRawTx = ({
-  blockHeightInput,
-  blockHashInput,
-  packedInput,
-  address,
-  contractAddress,
-  functionName,
-}: TGetRawTx) => {
-  const rawTx = AElf.pbUtils.getTransaction(address, contractAddress, functionName, packedInput);
-  rawTx.refBlockNumber = blockHeightInput;
-  const blockHash = blockHashInput.match(/^0x/) ? blockHashInput.substring(2) : blockHashInput;
-  rawTx.refBlockPrefix = Buffer.from(blockHash, 'hex').slice(0, 4);
-  return rawTx;
-};
-
-const getSignature = async ({ provider, data }: { provider: IPortkeyProvider; data: string }) => {
-  const signature = await provider.request({
-    method: MethodsWallet.GET_WALLET_SIGNATURE,
-    payload: { data },
-  });
-  if (!signature || signature.recoveryParam == null) return {}; // TODO
-  const signatureStr = [signature.r, signature.s, `0${signature.recoveryParam.toString()}`].join(
-    '',
-  );
-  return { signature, signatureStr };
-};
-
-export const handleTransaction = async ({
-  blockHeightInput,
-  blockHashInput,
-  packedInput,
-  address,
-  contractAddress,
-  functionName,
-  provider,
-}: any) => {
-  // Create transaction
-  const rawTx = getRawTx({
-    blockHeightInput,
-    blockHashInput,
-    packedInput,
-    address,
-    contractAddress,
-    functionName,
-  });
-  rawTx.params = Buffer.from(rawTx.params, 'hex');
-
-  const ser = AElf.pbUtils.Transaction.encode(rawTx).finish();
-
-  const m = AElf.utils.sha256(ser);
-  // signature
-  let signatureStr = '';
-  const signatureRes = await getSignature({ provider, data: m });
-  signatureStr = signatureRes.signatureStr || '';
-  if (!signatureStr) return;
-
-  let tx = {
-    ...rawTx,
-    signature: Buffer.from(signatureStr, 'hex'),
-  };
-
-  tx = AElf.pbUtils.Transaction.encode(tx).finish();
-  if (tx instanceof Buffer) {
-    return tx.toString('hex');
-  }
-  return AElf.utils.uint8ArrayToHex(tx); // hex params
-};
-
-export const createManagerForwardCall = async ({
-  caContractAddress,
-  contractAddress,
-  args,
-  methodName,
-  caHash,
-  instance,
-}: TCreateHandleManagerForwardCall) => {
-  const res = await handleManagerForwardCall({
-    paramsOption: {
-      contractAddress,
-      methodName,
-      args,
-      caHash,
-    },
-    functionName: 'ManagerForwardCall',
-    instance,
-  });
-
-  res.args = Buffer.from(AElf.utils.uint8ArrayToHex(res.args), 'hex').toString('base64');
-
-  const methods = await getContractMethods(instance, caContractAddress);
-
-  const protoInputType = methods['ManagerForwardCall'];
-
-  let input = AElf.utils.transform.transformMapToArray(protoInputType, res);
-
-  input = AElf.utils.transform.transform(
-    protoInputType,
-    input,
-    AElf.utils.transform.INPUT_TRANSFORMERS,
-  );
-
-  const message = protoInputType.fromObject(input);
-
-  return protoInputType.encode(message).finish();
 };
 
 export function getAElf(rpcUrl: string) {
@@ -143,42 +28,87 @@ export const getRawTransactionDiscover = async ({
 }: any) => {
   try {
     const instance = aelf.getAelfInstance(rpcUrl);
-
-    const rst = await did.services.communityRecovery.getHolderInfoByManager({
-      caAddresses: [caAddress],
-    } as any);
-
-    const caHash: string = rst[0].caHash || '';
-    const managerForwardCall = await createManagerForwardCall({
-      caContractAddress,
-      contractAddress,
-      caHash,
-      methodName,
-      args: params,
-      instance,
-    });
-
-    const transactionParams = AElf.utils.uint8ArrayToHex(managerForwardCall);
-
-    const aelfInstance = getAElf(rpcUrl);
-    const { BestChainHeight, BestChainHash } = await aelfInstance.chain.getChainStatus();
     const provider = await deleteProvider({ providerName: 'Portkey' });
+    console.log('=====provider', provider);
 
     if (!provider) return;
-    const fromManagerAddress = await provider.request({
-      method: MethodsWallet.GET_WALLET_CURRENT_MANAGER_ADDRESS,
+    const caHash = await provider.request({
+      method: 'caHash',
     });
+    const [managerForwardCall, managerAddress] = await Promise.all([
+      createManagerForwardCall({
+        instance,
+        paramsOption: {
+          contractAddress,
+          methodName,
+          args: params,
+          caHash: caHash,
+        },
+        caContractAddress,
+      }),
+      provider.request({
+        method: MethodsWallet.GET_WALLET_CURRENT_MANAGER_ADDRESS,
+      }),
+    ]);
+    const { BestChainHeight, BestChainHash } = await instance.chain.getChainStatus();
+
     const transaction = await handleTransaction({
       blockHeightInput: BestChainHeight,
       blockHashInput: BestChainHash,
-      packedInput: transactionParams,
-      address: fromManagerAddress,
+      packedInput: managerForwardCall,
+      address: managerAddress,
       contractAddress: caContractAddress,
       functionName: 'ManagerForwardCall',
       provider,
+      rpcUrl,
     });
+    console.log('=====transaction', transaction);
+
     return transaction;
   } catch (error) {
     return null;
   }
+};
+
+export const handleTransaction = async ({
+  blockHeightInput,
+  blockHashInput,
+  packedInput,
+  address,
+  contractAddress,
+  functionName,
+  provider,
+  rpcUrl,
+}: any) => {
+  // Create transaction
+  const rawTx = aelf.getRawTx({
+    blockHeightInput,
+    blockHashInput,
+    packedInput,
+    address,
+    contractAddress,
+    functionName,
+  });
+  rawTx.params = Buffer.from(rawTx.params, 'hex');
+
+  const signData = aelf.encodeTransaction(rawTx);
+
+  console.log(signData, 'signData===');
+
+  const instance1 = getAElf(rpcUrl);
+
+  const p = await getRawParams(instance1, signData);
+  console.log(p, '===getRawParams');
+
+  const sin = await provider.request({
+    method: MethodsWallet.GET_WALLET_TRANSACTION_SIGNATURE,
+    payload: { data: aelf.encodeTransaction(rawTx) },
+  });
+
+  const transaction = aelf.encodeTransaction({
+    ...rawTx,
+    signature: Buffer.from(sigObjToStr(sin as any), 'hex'),
+  });
+
+  return transaction;
 };

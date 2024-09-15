@@ -1,9 +1,9 @@
 import StakeCard from 'components/StakeCard';
 import useSimpleStakeListService from './hooks/useSimpleStakeListService';
-import { PoolTypeEnum } from 'components/StakeToken';
+import { PoolType } from 'components/StakeToken';
 import clsx from 'clsx';
 import { RightOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { Skeleton } from 'antd';
 
 export interface IStakeListProps {
   title: string;
@@ -28,16 +28,15 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
   });
 
   return (
-    <div className="flex flex-col gap-6 lg:gap-12">
-      <div className="flex flex-col gap-2 lg:gap-4">
-        <div className="pt-[32px] lg:pt-[48px] text-4xl font-semibold text-neutral-title">
+    <>
+      <div className="flex flex-col">
+        <div className="pt-[24px] pb-[24px] text-[28px] lg:pt-[64px] lg:pb-[24px] font-[600] lg:text-[36px] text-neutralTitle">
           {title}
         </div>
-        <div className="flex flex-col md:flex-row justify-between md:items-center">
-          <span className="text-neutralSecondary text-base font-medium">{description}</span>
+        <div className="md:items-center">
           {poolType === 'Lp' && (
             <span
-              className="text-sm font-medium text-brandDefault cursor-pointer"
+              className="text-sm text-brandDefault font-[600] cursor-pointer inline-block mb-[24px]"
               onClick={goLiquidity}
             >
               My Liquidity
@@ -50,25 +49,42 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-6">
-        {stakeData.map((item, index) => {
-          return (
-            <StakeCard
-              type={poolType === 'Lp' ? PoolTypeEnum.Lp : PoolTypeEnum.Token}
-              key={index}
-              data={item}
-              isLogin={isLogin}
-              onStake={onStake}
-              onClaim={onClaim}
-              onAdd={onAdd}
-              onUnlock={onUnlock}
-              onExtend={onExtend}
-              onRenewal={onRenewal}
-              renewText={renewText || []}
-            />
-          );
-        })}
+      <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-auto-fill-400">
+        {stakeData.length > 0 ? (
+          <>
+            {stakeData.map((item, index) => {
+              return (
+                <StakeCard
+                  type={poolType === 'Lp' ? PoolType['LP'] : PoolType['TOKEN']}
+                  key={index}
+                  data={item}
+                  isLogin={isLogin}
+                  onStake={onStake}
+                  onClaim={onClaim}
+                  onAdd={onAdd}
+                  onUnlock={onUnlock}
+                  onExtend={onExtend}
+                  onRenewal={onRenewal}
+                  renewText={renewText || []}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <>
+            {[1, 2].map((list, index) => {
+              return (
+                <div
+                  key={index}
+                  className="stake-card h-[156px] lg:h-[230px] lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg "
+                >
+                  <Skeleton avatar active paragraph={{ rows: 2 }} round />
+                </div>
+              );
+            })}
+          </>
+        )}
       </div>
-    </div>
+    </>
   );
 }

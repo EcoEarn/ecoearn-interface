@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 export default function CommonTooltip({
   title,
-  size = 20,
+  size = 18,
   className,
 }: {
   title?: string;

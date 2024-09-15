@@ -32,7 +32,7 @@ export default function InputNumberBase({
         onClick={onClick}
         className={clsx(
           'font-medium cursor-pointer text-base',
-          disabled ? 'text-brandDisable' : 'text-brandDefault',
+          disabled ? 'text-[#919191]' : 'text-[#919191]',
         )}
       >
         {suffixText}

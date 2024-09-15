@@ -2,6 +2,7 @@ import { Flex } from 'antd';
 import RateTag from 'components/RateTag';
 import StakeToken, { PoolTypeEnum } from 'components/StakeToken';
 import { useMemo } from 'react';
+import { PoolType } from 'types/stake';
 import { formatTokenPrice, formatTokenSymbol } from 'utils/format';
 import useResponsive from 'utils/useResponsive';
 
@@ -55,7 +56,7 @@ export default function Position(props: IPositionProps) {
           <StakeToken
             icons={icons}
             className="lg:!items-center"
-            type={PoolTypeEnum.Lp}
+            type={PoolType.LP}
             tokenName={lpSymbol}
             size="small"
             tokenSymbolClassName="!font-semibold !text-lg"

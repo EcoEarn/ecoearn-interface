@@ -60,7 +60,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const getStakeData = useCallback(
     async (props?: IFetchDataProps) => {
       const { withLoading = true } = props || {};
-      withLoading && showLoading();
+      // withLoading && showLoading();
       try {
         const { pools, textNodes } = await fetchStakingPoolsData({
           poolType,

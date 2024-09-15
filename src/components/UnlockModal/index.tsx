@@ -101,6 +101,7 @@ function UnlockModal({
       onConfirm={onConfirm}
       transactionId={TransactionId}
       onEarlyStake={() => {
+        modal.hide();
         onEarlyStake?.();
       }}
       onGoRewards={() => {

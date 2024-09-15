@@ -42,6 +42,7 @@ const noStakeAmountTip =
 const withdrawDisabledTip = 'No withdrawable rewards. You can view "Details" for more information.';
 
 export interface IRewardsListDataSource extends IPoolRewardsItem {
+  tokenIcon?: any;
   earlyStakeDisabled: boolean;
   earlyStakeTip: string;
   withdrawDisabled: boolean;
@@ -239,7 +240,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
                   walletType,
                   caContractAddress: caContractAddress || '',
                   contractAddress: rewardsContractAddress || '',
-                  methodName: 'EarlyStake',
+                  methodName: 'StakeRewards',
                   params: {
                     stakeInput: {
                       claimIds,
@@ -614,8 +615,10 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
       router.push('/');
     } else if (poolType === PoolType.LP) {
       router.push('/farms');
-    } else {
+    } else if (poolType == PoolType.TOKEN) {
       router.push('/simple');
+    } else {
+      router.push('/');
     }
   }, [poolType, router]);
 
