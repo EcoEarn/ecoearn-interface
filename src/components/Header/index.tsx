@@ -86,7 +86,7 @@ export default function Header({
       );
     } else {
       return (
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center gap-2">
           <DropMenu isMobile={true} type={DropMenuTypeEnum.My} />
           <DropMenu isMobile={true} type={DropMenuTypeEnum.Nav} />
         </div>

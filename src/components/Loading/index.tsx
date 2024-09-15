@@ -19,7 +19,7 @@ function Loading() {
   // return <Lottie {...options} className="w-[40px] h-[40px]" />;
   // eslint-disable-next-line no-inline-styles/no-inline-styles
   // return <Spin indicator={<LoadingOutlined style={{ fontSize: 40 }} spin />} />;
-  return <LoadingIcon className="animate-spin w-[36px] h-[36px] lg:w-[72px] lg:h-[72px]" />;
+  return <LoadingIcon className="animate-spin w-[36px] h-[36px] lg:w-[50px] lg:h-[50px]" />;
 }
 
 export default React.memo(Loading);
