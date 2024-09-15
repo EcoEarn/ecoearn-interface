@@ -1,4 +1,5 @@
 import { Button } from 'aelf-design';
+import SkeletonImage from 'components/SkeletonImage';
 import TokenTextIcon from 'components/TokenTextIcon';
 import { useCheckLoginAndToken } from 'hooks/useWallet';
 import { useMemo } from 'react';
@@ -34,9 +35,9 @@ export default function StakeTokenTitle({
   return (
     <div>
       {img ? (
-        <img
+        <SkeletonImage
           alt="token"
-          src={img}
+          img={img}
           width={64}
           height={64}
           className="mx-auto rounded-[50%] block object-cover"
@@ -46,7 +47,7 @@ export default function StakeTokenTitle({
           <TokenTextIcon size="large" tokenName={tokenName} />
         </div>
       )}
-      <p className="text-center mt-4 text-2xl  font-semibold">{title}</p>
+      <p className="text-center mt-4 text-2xl font-semibold !font-poppinsMedium">{title}</p>
       {!isLogin && (
         <>
           <p className="mt-6 text-center">Please connect your wallet to continue</p>

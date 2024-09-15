@@ -36,7 +36,7 @@ function ViewItem({
                 <span>{originText}</span>
                 <span>{extra}</span>
               </div>
-              <RightArrowSVG className="w-4 h-4 " />
+              <RightArrowSVG className="w-4 h-4 mx-1" />
               <span className="text-brandDefault font-semibold">{text}</span>
             </div>
           ) : (

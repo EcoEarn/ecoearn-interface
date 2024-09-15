@@ -27,7 +27,9 @@ export default function FaqList(props?: IFaqListProps) {
 
   return (
     <div className="px-4 py-6 md:p-8 border-[1px] border-solid border-neutralBorder bg-white rounded-2xl">
-      <p className="text-center text-2xl font-semibold text-neutralTitle">FAQ</p>
+      <p className="text-center text-2xl font-semibold text-neutralTitle !font-poppinsMedium">
+        FAQ
+      </p>
       <Collapse
         ghost
         expandIcon={({ isActive }) => (isActive ? <RemoveIcon /> : <PlusIcon />)}

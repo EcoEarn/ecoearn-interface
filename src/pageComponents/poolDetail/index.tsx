@@ -8,8 +8,6 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import StakeDetail from './components/StakeDetail';
 import StakeTokenTitle from 'components/StakeTokenTitle';
 import BackCom from './components/BackCom';
-import { useLayoutEffect, useState, useEffect } from 'react';
-import { useTimeout } from 'ahooks';
 
 export default function PoolDetailPage() {
   const {
@@ -25,44 +23,32 @@ export default function PoolDetailPage() {
   } = usePoolDetailService();
   const { isLogin } = useGetLoginStatus();
 
-  const [showInfo, setShowInfo] = useState(false);
-
-  useLayoutEffect(() => {
-    setShowInfo(false);
-  }, []);
-
-  useTimeout(() => setShowInfo(true), 600);
-
-  return (
-    <>
-      {showInfo && (
-        <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
-          <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
-            {stakeRewards && <BackCom />}
-            <StakeTokenTitle
-              img={poolInfo?.icons?.[0]}
-              tokenSymbol={poolInfo?.stakeSymbol || ''}
-              type={stakeRewards ? 'stakeRewards' : 'stake'}
+  return !poolInfo ? null : (
+    <Flex vertical gap={24} className="max-w-[677px] mx-auto mt-6 md:mt-[64px]">
+      <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
+        {stakeRewards && <BackCom />}
+        <StakeTokenTitle
+          img={poolInfo?.icons?.[0]}
+          tokenSymbol={poolInfo?.stakeSymbol || ''}
+          type={stakeRewards ? 'stakeRewards' : 'stake'}
+        />
+        {isLogin && poolInfo ? (
+          isFirstStake || stakeRewards ? (
+            <StakeWithConfirm {...stakeProps} />
+          ) : (
+            <StakeDetail
+              poolInfo={poolInfo}
+              onAdd={onAdd}
+              onClaim={onClaim}
+              onExtend={onExtend}
+              onRenewal={onRenewal}
+              onUnlock={onUnlock}
             />
-            {isLogin && poolInfo ? (
-              isFirstStake || stakeRewards ? (
-                <StakeWithConfirm {...stakeProps} />
-              ) : (
-                <StakeDetail
-                  poolInfo={poolInfo}
-                  onAdd={onAdd}
-                  onClaim={onClaim}
-                  onExtend={onExtend}
-                  onRenewal={onRenewal}
-                  onUnlock={onUnlock}
-                />
-              )
-            ) : null}
-          </div>
-          <AmountInfo poolInfo={poolInfo || {}} />
-          <FaqList />
-        </Flex>
-      )}
-    </>
+          )
+        ) : null}
+      </div>
+      <AmountInfo poolInfo={poolInfo || {}} />
+      <FaqList />
+    </Flex>
   );
 }

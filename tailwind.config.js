@@ -29,6 +29,10 @@ module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
+      fontFamily: {
+        poppinsMedium: ['Poppins-Medium'],
+        poppinsRegular: ['Poppins-Regular'],
+      },
       colors: {
         brandDefault: 'var(--brand-default)',
         brandDefaultOpacity: 'var(--brand-default-opacity)',
