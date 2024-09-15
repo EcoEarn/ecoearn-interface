@@ -4,6 +4,21 @@
 	font-family: Poppins;
 	src: url('../assets/fonts/Poppins-Regular.otf')
 }
+
+@font-face {
+  font-family: 'Poppins-Regular';
+  src: url('/font/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins-Medium';
+src: url('/font/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500; /* Medium */
+  font-style: normal;
+}
+
 html{
 	font-size: 16px !important; 
 }
