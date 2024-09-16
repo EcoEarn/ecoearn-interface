@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Layout as AntdLayout } from 'antd';
 import Header from 'components/Header';
 import dynamic from 'next/dynamic';
@@ -17,6 +17,8 @@ import WalletAndTokenInfo from 'utils/walletAndTokenInfo';
 import { useGetToken } from 'hooks/useGetToken';
 import useResponsive from 'utils/useResponsive';
 import VConsole from 'vconsole';
+
+import { useScroll } from 'ahooks';
 
 const needCustomBackgroundPath = ['/referral', '/invitee'];
 
@@ -115,17 +117,26 @@ const Layout = dynamic(
         return pathName.includes('/points/');
       }, [pathName]);
 
+      const ref = useRef(null);
+      const scroll: any = useScroll(ref);
+
+      console.log('scroll', scroll?.top);
+
       return (
         <>
           {!isHiddenLayout ? (
             <AntdLayout
               id="pageContainer"
+              ref={ref}
               className={clsx(
                 'h-full flex flex-col overflow-scroll min-w-[360px] !bg-brandBg bg-no-repeat bg-cover bg-center',
                 isCustomBackgroundPage && customBackgroundClassName,
               )}
             >
-              <Header isCustomBg={isCustomBackgroundPage} />
+              <Header
+                isCustomBg={isCustomBackgroundPage}
+                className={`${scroll?.top > 10 && 'bg-brandBg'}`}
+              />
               <div className="flex-1">
                 <AntdLayout.Content
                   className={clsx(
