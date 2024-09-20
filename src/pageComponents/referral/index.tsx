@@ -81,7 +81,7 @@ function Referral() {
     <div className="w-full flex flex-col items-center h-full">
       <div className="w-full max-w-[1360px] pt-[24px] lg:pt-[48px] flex flex-col lg:flex-row justify-center items-center h-full gap-10 lg:gap-[64px]">
         <div className="flex-nowrap justify-between flex w-full flex-row lg:flex-col lg:w-[502px] mb-0 relative overflow-visible">
-          <div className="min-w-[240px] flex-1">
+          <div className="lg:min-w-[240px] flex-1">
             <h1 className="text-3xl lg:text-5xl font-semibold text-neutralTitle">
               Invite Friends to <span className="text-brandDefault">EcoEarn</span>
             </h1>

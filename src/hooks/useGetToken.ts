@@ -14,6 +14,10 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
 const AElf = require('aelf-sdk');
 
+const hexDataCopywriter = `Welcome to EcoEarn! Click to connect wallet to and accept its Terms of Service and Privacy Policy. This request will not trigger a blockchain transaction or cost any gas fees.
+
+signature: `;
+
 export const useGetToken = () => {
   const { walletInfo, walletType, disConnectWallet, getSignature, isConnected } =
     useConnectWallet();
@@ -104,23 +108,18 @@ export const useGetToken = () => {
         localStorage.removeItem(storages.accountInfo);
       }
       const timestamp = Date.now();
-      const signInfo = AElf.utils.sha256(`${walletInfo?.address}-${timestamp}`);
-      const signInfoHex = `${walletInfo?.address}-${timestamp}`;
-      const hexData = Buffer.from(signInfoHex).toString('hex');
+      const signStr = `${walletInfo?.address}-${timestamp}`;
+      const hexDataStr = hexDataCopywriter + signStr;
+      const signInfo = AElf.utils.sha256(signStr);
+      const hexData = Buffer.from(hexDataStr).toString('hex');
 
       let publicKey = '';
       let signature = '';
       let source = '';
 
-      const plainText: any = Buffer.from(signInfoHex).toString('hex').replace('0x', '');
-
       if (walletType === WalletTypeEnum.discover) {
         try {
-          const { pubKey, signatureStr } = await getSignatureAndPublicKey(
-            signInfo,
-            hexData,
-            plainText,
-          );
+          const { pubKey, signatureStr } = await getSignatureAndPublicKey(signInfo, hexData);
           publicKey = pubKey || '';
           signature = signatureStr || '';
           source = 'portkey';
@@ -136,9 +135,7 @@ export const useGetToken = () => {
           appName: 'ecoearn',
           address: walletInfo?.address || '',
           signInfo:
-            walletType === WalletTypeEnum.aa
-              ? Buffer.from(`${walletInfo?.address}-${timestamp}`).toString('hex')
-              : signInfo,
+            walletType === WalletTypeEnum.aa ? Buffer.from(signStr).toString('hex') : signInfo,
         });
         if (sign?.errorMessage) {
           const errorMessage = formatErrorMsg(sign?.errorMessage as unknown as IContractError)
