@@ -25,7 +25,7 @@ export default function useAccountModal() {
             referrer: referrerAddress,
           });
           modal.hide();
-          router.push('/simple');
+          router.push('/staking');
         } catch (error) {
           const errorMessage = (error as IContractError).errorMessage?.message;
           message.error(errorMessage);
@@ -42,7 +42,7 @@ export default function useAccountModal() {
       btnText: 'View my Staking',
       onOk: () => {
         modal.hide();
-        router.push('/simple');
+        router.push('/staking');
       },
     });
   }, [modal, router]);

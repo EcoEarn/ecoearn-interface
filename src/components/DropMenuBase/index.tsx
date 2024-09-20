@@ -30,6 +30,7 @@ interface IDropMenu {
     | 'topRight'
     | 'bottomCenter'
     | 'bottomRight';
+  onOpenChange?: (isOpen: boolean) => void;
 }
 const DropMenuBase = ({
   isMobile,
@@ -43,6 +44,7 @@ const DropMenuBase = ({
   trigger = 'hover',
   placement = 'bottomLeft',
   className,
+  onOpenChange,
 }: IDropMenu) => {
   return isMobile ? (
     <>
@@ -74,6 +76,7 @@ const DropMenuBase = ({
       overlayClassName={clsx(styles.dropdownCustom, className)}
       menu={{ items, selectable: false }}
       arrow={arrow}
+      onOpenChange={onOpenChange}
       trigger={[trigger || 'hover']}
       placement={placement}
     >

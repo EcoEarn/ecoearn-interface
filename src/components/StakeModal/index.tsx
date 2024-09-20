@@ -1200,13 +1200,10 @@ function StakeModal({
             <ViewItem label="Projected Rewards" text={rewardsStr} extra={rewardsUsdStr} />
           </div>
         </FormItem>
-        <div>
-          <Title level={7} fontWeight={FontWeightEnum.Bold} className="!text-neutralSecondary">
-            Notes:
-          </Title>
+        <div className="pt-2">
           {notesList.map((note: string, index: number) => (
             <div key={index}>
-              <Text className="!text-neutralSecondary">· {note}</Text>
+              <Text className="!text-neutralSecondary !text-sm !font-normal">{note}</Text>
             </div>
           ))}
         </div>

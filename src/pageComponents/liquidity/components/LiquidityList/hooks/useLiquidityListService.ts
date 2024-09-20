@@ -67,7 +67,7 @@ export default function useLiquidityListService() {
 
   useEffect(() => {
     if (!isConnectWallet) {
-      router.replace('/farms');
+      router.replace('/staking');
     }
   }, [isConnectWallet, router]);
 

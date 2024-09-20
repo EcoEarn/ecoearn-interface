@@ -11,14 +11,16 @@ import { useMemo } from 'react';
 import { useWalletService } from 'hooks/useWallet';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { OmittedType, addPrefixSuffix, getOmittedStr } from 'utils/addressFormatting';
+import clsx from 'clsx';
 
-export default function ConnectWallet() {
+export default function ConnectWallet({ isOpen }: { isOpen?: boolean }) {
   const { isLogin } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
   const { isLG } = useResponsive();
   const { isInTelegram } = useTelegram();
   const { wallet, walletType } = useWalletService();
   const { curChain } = useGetCmsInfo() || {};
+
   const fullAddress = useMemo(() => {
     return addPrefixSuffix(wallet?.address || '', curChain);
   }, [curChain, wallet?.address]);
@@ -45,7 +47,12 @@ export default function ConnectWallet() {
         <PortKeySVG className="w-[16px] h-[16px] lg:w-[20px] lg:h-[20px]" />
       )}
       {!isLG && <span>{formatAddressPC}</span>}
-      <DropDownSVG className="w-[12px] h-[12px] lg:w-[16px] lg:h-[16px]" />
+      <DropDownSVG
+        className={clsx(
+          'w-[12px] h-[12px] lg:w-[16px] lg:h-[16px] duration-200 transition-transform transform',
+          isOpen && 'rotate-180',
+        )}
+      />
     </div>
   ) : isInTG ? null : (
     <Button

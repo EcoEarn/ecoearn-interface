@@ -22,7 +22,7 @@ export default function useDiscoverProvider() {
   }, [walletInfo?.extraInfo?.provider]);
 
   const getSignatureAndPublicKey = useCallback(
-    async (data: string, hexData: string, signInfo: string) => {
+    async (data: string, hexData: string) => {
       const provider = await discoverProvider();
       if (!provider || !provider?.request) throw new Error('Discover not connected');
       const isSupportManagerSignature = (provider as any).methodCheck('wallet_getManagerSignature');
@@ -48,7 +48,7 @@ export default function useDiscoverProvider() {
         );
       } else {
         publicKey = ec.recoverPubKey(
-          Buffer.from(signInfo.slice(0, 64), 'hex'),
+          Buffer.from(data.slice(0, 64), 'hex'),
           signature,
           signature.recoveryParam,
         );

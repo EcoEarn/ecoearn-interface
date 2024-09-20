@@ -33,6 +33,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
   const { isLogin } = useGetLoginStatus();
   const { explorerUrl, curChain, showLeaderboard } = useGetCmsInfo() || {};
   const { isInTelegram } = useTelegram();
+  const [open, setOpen] = useState(false);
 
   const fullAddress = useMemo(() => {
     return addPrefixSuffix(wallet?.address || '', curChain);
@@ -98,7 +99,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
             onClick={() => {
               logout();
               if (pathName == '/referral') {
-                router.push('/simple');
+                router.push('/staking');
               }
             }}
           >
@@ -164,18 +165,22 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
 
   const targetNode = useMemo(() => {
     if (type === DropMenuTypeEnum.My) {
-      return <ConnectWallet />;
+      return <ConnectWallet isOpen={open} />;
     } else {
       return <MenuIcon className="fill-brandDefault" />;
     }
-  }, [type]);
+  }, [open, type]);
 
   const title = useMemo(() => {
     return type === DropMenuTypeEnum.My ? 'My' : 'Menu';
   }, [type]);
 
+  const onOpenChange = useCallback((isOpen: boolean) => {
+    setOpen(isOpen);
+  }, []);
+
   if (!isLogin && type === DropMenuTypeEnum.My) {
-    return <ConnectWallet />;
+    return <ConnectWallet isOpen={open} />;
   }
 
   return (
@@ -184,6 +189,7 @@ export function DropMenu({ isMobile, type }: IDropMenuMy) {
       isMobile={isMobile}
       items={items}
       itemsForPhone={itemsForPhone}
+      onOpenChange={onOpenChange}
       targetNode={
         <div
           className="flex items-center justify-center "
