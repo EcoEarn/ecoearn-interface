@@ -611,16 +611,8 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
   );
 
   const onClickEmptyBtn = useCallback(() => {
-    if (poolType === PoolType.POINTS) {
-      router.push('/');
-    } else if (poolType === PoolType.LP) {
-      router.push('/farms');
-    } else if (poolType == PoolType.TOKEN) {
-      router.push('/simple');
-    } else {
-      router.push('/');
-    }
-  }, [poolType, router]);
+    router.push('/staking');
+  }, [router]);
 
   return {
     data,

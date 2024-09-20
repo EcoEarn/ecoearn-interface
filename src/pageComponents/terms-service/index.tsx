@@ -6,7 +6,7 @@ export default function TermsService() {
       <article>
         <hgroup>
           <h1>EcoEarn Terms of Service</h1>
-          <p>Last updated: 8 July 2024</p>
+          <p>Last updated: September 2024</p>
         </hgroup>
         <p>
           These Terms of Service {`(the "Terms of Service" or "Terms")`} explains the terms and
@@ -35,7 +35,7 @@ export default function TermsService() {
 
         <section>
           <h2>1. Agreement to Terms of Service</h2>
-          <h3>1.1. Your Assent to these Terms of Service. </h3>
+          <h3>1.1 Your Assent to these Terms of Service</h3>
           <p>
             These Terms of Service constitute a legally binding agreement between you, whether
             personally or on behalf of an entity or group (“you” or “your”) and EcoEarn (“we,”
@@ -43,7 +43,7 @@ export default function TermsService() {
             strictly prohibited from, and agree to refrain from, using or accessing any part of the
             Site if you do not consent to these Terms of Service.
           </p>
-          <h3>1.2. Entire Agreement. </h3>
+          <h3>1.2 Entire Agreement</h3>
           <p>
             These Terms of Service, together with any other terms, policies, or notices to which you
             may agree in writing, as applicable (including but not limited to those documents
@@ -55,7 +55,7 @@ export default function TermsService() {
             agree that, by accessing the Site, you represent and warrant that you have read,
             understood, and agreed to all provisions of these Terms of Service.
           </p>
-          <h3>1.3. Contact Us. </h3>
+          <h3>1.3 Contact Us</h3>
           <p>
             Please reach out to us{' '}
             <a href="https://form.aelf.com/contact" target="_blank" rel="noreferrer">
@@ -63,7 +63,7 @@ export default function TermsService() {
             </a>
             .
           </p>
-          <h3>1.4. Our Site. </h3>
+          <h3>1.4 Our Site</h3>
           <p>
             These Terms of Service govern your use of our {`"Site,"`} which INCLUDE the software and
             internet-based information, services, and features (and related communications)
@@ -84,7 +84,7 @@ export default function TermsService() {
               by us (collectively, “Social Media”).
             </li>
           </ol>
-          <h3>1.5. Legal Limitations on Disclaimers. </h3>
+          <h3>1.5 Legal Limitations on Disclaimers</h3>
           <p>
             Some jurisdictions do not allow the exclusion of certain warranties, or the limitation
             or exclusion of certain liabilities, and damages. Accordingly, some of the disclaimers
@@ -92,7 +92,7 @@ export default function TermsService() {
             disclaimers and limitations of liability provided in these terms shall apply to the
             fullest extent as permitted by applicable law.
           </p>
-          <h3>1.6. Your Agreement to Modifications. </h3>
+          <h3>1.6 Your Agreement to Modifications</h3>
           <p>
             We may make changes to these Terms of Service at any time, and, by accessing the Site,
             you agree to be bound by the most current version. “Last Updated” section at the
@@ -106,12 +106,12 @@ export default function TermsService() {
             these Terms of Service and any other pages or policies on the Site, these Terms shall
             prevail.
           </p>
-          <h3>1.7. Changes to our Site. </h3>
+          <h3>1.7 Changes to our Site</h3>
           <p>
             We may update or change any component of the Site from time to time to reflect changes
             to our products, user needs or business priorities, without providing notice to you.
           </p>
-          <h3>1.8. Access Restrictions. </h3>
+          <h3>1.8 Access Restrictions</h3>
           <p>
             The information and features provided on the Site are not intended for distribution to
             or use by any person or entity in any jurisdiction or country where distribution or use
@@ -123,7 +123,7 @@ export default function TermsService() {
             your access to and use of the Site does not violate any applicable laws or regulations
             in any jurisdiction to which you may be subject.
           </p>
-          <h3>1.9. Representation of inapplicability of Sanctions. </h3>
+          <h3>1.9 Representation of inapplicability of Sanctions</h3>
           <p>
             Without limiting any other provision in these Terms of Service, by using the Site, you
             represent and warrant that (a) you are not located in a country that is subject to a
@@ -132,14 +132,14 @@ export default function TermsService() {
             restricted parties politically exposed person under anti-money laundering legislation or
             a sanctioned person.
           </p>
-          <h3>1.10. Representation of Capacity and Authority. </h3>
+          <h3>1.10 Representation of Capacity and Authority</h3>
           <p>
             The Site is only to be used by persons who are at least 18 years old. By using the Site,
             you agree to these Terms of Service and represent and warrant that you are at least 18
             years old, and that you have both the authority (on your own behalf or as an agent of an
             entity) and capacity to assent to these Terms and Conditions.
           </p>
-          <h3>1.11. Incorporation of Other Terms. </h3>
+          <h3>1.11 Incorporation of Other Terms</h3>
           <p>
             As between you and EcoEarn, all other terms, conditions, policies, or notices to which
             you may agree, including but not limited to each of the following, are expressly
@@ -165,7 +165,7 @@ export default function TermsService() {
               the Site.
             </li>
           </ol>
-          <h3>1.12. References to Your Account. </h3>
+          <h3>1.12 References to Your Account</h3>
           <p>
             Any reference to an “account” in these Terms of Service refers to an account or
             credential maintained and used uniquely to identify you and permit your access to any
@@ -175,21 +175,54 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>2. Acceptable Use</h2>
-          <h3>2.1. Use Restricted to Site Purposes. </h3>
+          <h2>2. Scope of Service</h2>
+          <p>
+            EcoEarn provides a decentralized platform facilitating various staking and farming
+            opportunities designed to reward users for their participation in supported programs.
+            The services offered by EcoEarn include, but are not limited to, the following:
+          </p>
+          <h3>2.1 Simple Staking</h3>
+          <p>
+            EcoEarn offers a non-custodial staking service whereby users may stake supported tokens
+            directly through the platform. This process allows users to deposit tokens into
+            designated staking contracts, earning rewards in accordance with the duration of their
+            stake and the specific terms associated with each staking pool. Users retain control of
+            their staked tokens, and all rewards are subject to the terms outlined in the respective
+            staking contract.
+          </p>
+          <h3>2.2 Liquidity Provider (LP) Staking</h3>
+          <p>{`EcoEarn supports Liquidity Provider (LP) Staking, allowing users to stake LP tokens that are generated by providing liquidity to supported decentralized exchanges. In return, users may earn additional rewards, which are distributed in accordance with the platform’s predefined reward schedules. LP Staking typically involves staking LP tokens derived from liquidity pools that include assets supported by EcoEarn, contributing to enhanced liquidity within the platform's ecosystem while providing users with staking incentives.`}</p>
+          <h3>2.3 Points Staking</h3>
+          <p>
+            {`EcoEarn's points staking feature allows users to utilize accumulated points to mine additional tokens, fostering long-term engagement and participation with the platform's supported projects. Unlike traditional airdrop mechanisms, Points Staking provides ongoing incentives for active involvement in the ecosystem, encouraging sustained user interaction.`}
+          </p>
+          <h3>2.4 Rewards Distribution</h3>
+          <p>
+            EcoEarn calculates and distributes staking and farming rewards to users in accordance
+            with the terms and conditions outlined in the respective contracts governing the staking
+            pools or farming programs. Rewards may consist of additional tokens, points, or other
+            assets as specified by the platform. EcoEarn ensures transparency by providing users
+            with information regarding reward rates, distribution schedules, and any relevant
+            updates. Users are encouraged to review such details in order to effectively plan their
+            staking strategies.
+          </p>
+        </section>
+        <section>
+          <h2>3. Acceptable Use</h2>
+          <h3>3.1 Use Restricted to Site Purposes</h3>
           <p>
             You may not access or use any part of the Site other than for the purpose or purposes
             expressly stated or readily implied by us through the Site or in other communications to
             you.
           </p>
-          <h3>2.2. Your Revocable Licence. </h3>
+          <h3>3.2 Your Revocable Licence</h3>
           <p>
             Your use of our Site, including related software components, is subject to a limited,
             revocable licence granted to you under these Terms of Service. We do not sell this
             licence to you, and you acknowledge that we do not transfer or assign any title or
             ownership rights to any part of the Site to you.
           </p>
-          <h3>2.3. Prohibited Uses. </h3>
+          <h3>3.3 Prohibited Uses</h3>
           <p>
             EcoEarn is not responsible or liable for your acts or behaviours, or the acts or
             behaviours of other Site users or other third parties, including but not limited to,
@@ -310,7 +343,7 @@ export default function TermsService() {
               username, title, or other identifying information or credential).
             </li>
           </ol>
-          <h3>2.4. Unauthorised Access or Use. </h3>
+          <h3>3.4 Unauthorised Access or Use</h3>
           <p>
             You understand and agree that you are strictly prohibited from (a) making any attempt to
             gain unauthorised access to the Site or any networks, servers, or computer systems
@@ -321,8 +354,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>3. Your Responsibilities</h2>
-          <h3>3.1. Responsibility for Your Conduct. </h3>
+          <h2>4. Your Responsibilities</h2>
+          <h3>4.1 Responsibility for Your Conduct</h3>
           <p>
             You accept and acknowledge that you are solely responsible for your conduct and all
             activity associated with your Site accounts and credentials, any Wallet you may hold,
@@ -333,7 +366,7 @@ export default function TermsService() {
             that are legal, proper, and in accordance with any applicable laws or regulations and
             the provisions of these Terms and Conditions.
           </p>
-          <h3>3.2 Responsibility for Your Credentials. </h3>
+          <h3>4.2 Responsibility for Your Credentials</h3>
           <p>
             You understand and accept that you are responsible for securing your own private keys or
             other credentials you use to access any component of the Site, your Wallet, or
@@ -343,8 +376,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>4. Our Content</h2>
-          <h3>4.1. Rights to Site Content. </h3>
+          <h2>5. Our Content</h2>
+          <h3>5.1 Rights to Site Content</h3>
           <p>
             Unless otherwise indicated by us in writing, we own all rights to our Site and all
             related content and features, including but not limited to source code, databases,
@@ -357,7 +390,7 @@ export default function TermsService() {
             trademarks or copyrighted material without first receiving our written consent or the
             consent of the owner of the marks.
           </p>
-          <h3>4.2. Use of Open-Source Code. </h3>
+          <h3>5.2 Use of Open-Source Code</h3>
           <p>
             Some components of the Site and related services or features may include certain open
             source components that are subject to open source software licenses owned by one or more
@@ -367,7 +400,7 @@ export default function TermsService() {
             in these Terms and Conditions limits your rights under, or grants you rights
             superseding, the terms of any Open-Source Code.
           </p>
-          <h3>4.3. Copying Our Site or Content. </h3>
+          <h3>5.3 Copying Our Site or Content</h3>
           <p>
             Unless otherwise expressly provided in these Terms and Conditions, you are prohibited
             from, and agree not to, copy, reproduce, aggregate, republish, upload, post, publicly
@@ -375,14 +408,14 @@ export default function TermsService() {
             commercially exploit any part of the Site or any Site Content without first obtaining
             our express written permission.
           </p>
-          <h3>4.4. Your Limited Licence.</h3>
+          <h3>5.4 Your Limited Licence</h3>
           <p>
             If you are eligible to use the Site, we grant you a limited licence to access and use
             the Site and our Site Content in accordance with these Terms and Conditions, and to
             download or print a copy of any Site Content that you are authorised to access, but
             solely to the extent you use the copies for your own personal, non-commercial use.
           </p>
-          <h3>4.5. Third-Party Products. </h3>
+          <h3>5.5 Third-Party Products</h3>
           <p>
             In addition to or as part of our Site Content, third parties may advertise, make
             commercial offers, or provide you with information, products, or services, including
@@ -396,7 +429,7 @@ export default function TermsService() {
             the actions of any third parties. We are not responsible for the actions of any third
             party or their compliance or noncompliance with any applicable laws or regulations.
           </p>
-          <h3>4.6. Purposes of Content.</h3>
+          <h3>5.6 Purposes of Content</h3>
           <p>
             All Site Content is provided to you for informational purposes only. To the extent
             permitted by law and subject to clauses 8.6 and 8.7, we disclaim all liability in
@@ -409,7 +442,7 @@ export default function TermsService() {
             Products or otherwise engage with third parties or third-party sites, links, or pop-ups,
             you do so at YOUR OWN RISK.
           </p>
-          <h3>4.7. Notifying Us of improper Copyright or Trademark use. </h3>
+          <h3>5.7.Notifying Us of improper Copyright or Trademark use</h3>
           <p>
             If you are, or are authorised to act on behalf of, a copyright or trademark owner, and
             if you believe in good faith that your copyrighted work or trademark has been copied in
@@ -418,7 +451,7 @@ export default function TermsService() {
             receipt of your notice, we will take whatever action we deem appropriate under the
             circumstances and applicable law, in our sole discretion.
           </p>
-          <h3>4.8. Disclaimer of Warranties. </h3>
+          <h3>5.8 Disclaimer of Warranties</h3>
           <p>
             Although we make reasonable efforts to update the information on our Site, we make no
             representations, warranties, or guarantees, whether express or implied, that our Site
@@ -438,8 +471,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>5. Your Content</h2>
-          <h3>5.1. Our Use of Your Content. </h3>
+          <h2>6. Your Content</h2>
+          <h3>6.1 Our Use of Your Content</h3>
           <p>
             The Site may provide you with opportunities to upload, display, or transmit data or
             other content (together, “User Content”). As part of these Terms and Conditions and
@@ -455,13 +488,13 @@ export default function TermsService() {
             to incorporate any User Content as part of the Site or any Site Content, or into any
             other material.
           </p>
-          <h3>5.2. Your Feedback. </h3>
+          <h3>6.2 Your Feedback</h3>
           <p>
             No User Content you submit will be deemed to establish any additional or separate
             contractual relationship between you and us outside the provisions of these Terms and
             Conditions.
           </p>
-          <h3>5.3. Your Waiver of Moral Rights. </h3>
+          <h3>6.3 Your Waiver of Moral Rights</h3>
           <p>
             Except to the extent prohibited by law, you agree to waive any intellectual property
             interest or other “moral rights” you may have in the User Content in any competent
@@ -469,8 +502,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>6. Site Management</h2>
-          <h3>6.1. Our Functions. </h3>
+          <h2>7. Site Management</h2>
+          <h3>7.1 Our Functions</h3>
           <p>We reserve the right, but not the obligation to do any of the following:</p>
           <ol className={styles['lower-alpha']}>
             <li>Monitor the Site for breaches or violations of these Terms of Service;</li>
@@ -489,7 +522,7 @@ export default function TermsService() {
               to facilitate the proper functioning of our Site.
             </li>
           </ol>
-          <h3>6.2. Site Uptime. </h3>
+          <h3>7.2 Site Uptime</h3>
           <p>
             We cannot guarantee or make any assurances of any kind that our Site will always be
             available and free from defects, viruses and malware and we expressly disclaim all
@@ -502,8 +535,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>7. Information Collection</h2>
-          <h3>7.1. Privacy of Your Information. </h3>
+          <h2>8. Information Collection</h2>
+          <h3>8.1 Privacy of Your Information</h3>
           <p>
             To use certain features of the Site, you may be required to provide us with your
             personal information, including but not limited to your name, address, and contact
@@ -511,7 +544,7 @@ export default function TermsService() {
             Policy which is incorporated in these Terms of Service. Any data collected about you or
             from you by third parties on our behalf is also subject to our Privacy Policy.
           </p>
-          <h3>7.2. Collecting Anonymised Data. </h3>
+          <h3>8.2 Collecting Anonymised Data</h3>
           <p>
             When you use the Site, we may monitor your computer or mobile device’s memory to ensure
             the Site is performing properly. During this process, we may collect anonymised data
@@ -519,21 +552,21 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>8. Limitation of Liability</h2>
-          <h3>8.1. Scope of Limitations. </h3>
+          <h2>9. Limitation of Liability</h2>
+          <h3>9.1 Scope of Limitations</h3>
           <p>
             All warranties, terms, conditions and undertakings, express or implied (including by
             statute, custom or usage, a course of dealing, or common law), which we expressly
             disclaim in clause 4.8, as well as the liability we disclaim under this Section 8, are
             excluded to the fullest extent permitted by applicable law.
           </p>
-          <h3>8.2. Force Majeure. </h3>
+          <h3>9.2 Force Majeure</h3>
           <p>
             We will not be responsible for any delay or failure to comply with our obligations under
             these Terms of Service if our delay or failure is caused by an event reasonably beyond
             our control.
           </p>
-          <h3>8.3. Your Acceptance of Risks. </h3>
+          <h3>9.3 Your Acceptance of Risks</h3>
           <p>
             You warrant that you understand and accept the inherent security risks of providing
             information over the internet and dealing online, and you agree that we have no
@@ -546,16 +579,16 @@ export default function TermsService() {
             market risk as described in clause 4 (Assumption of risks) in our Supplemental Wallet
             Terms.
           </p>
-          <h3>8.4. Liability Cap. </h3>
+          <h3>9.4 Liability Cap</h3>
           <p>
             Notwithstanding anything to the contrary contained in these Terms and Conditions, our
             liability to you (for any cause whatsoever and regardless of the form of action) will at
             all times be limited to no more than a total aggregate amount equal to the greater of
-            (a) the sum of $10,000 (USD) or (b) the amount paid, if any, by you to us for the use of
-            any part of the Site during the 6-month period preceding the rise of any lawful cause of
+            (a) the sum of US$100 or (b) the amount paid, if any, by you to us for the use of any
+            part of the Site during the 6-month period preceding the rise of any lawful cause of
             action.
           </p>
-          <h3>8.5. Our Responsibility for Loss or Damage. </h3>
+          <h3>9.5 Our Responsibility for Loss or Damage</h3>
           <p>
             Regardless of whether you are a consumer or business user, we do not exclude or in any
             way limit our liability to you where it would be unlawful, such as liability for death
@@ -589,7 +622,7 @@ export default function TermsService() {
             <li>Corrupted wallet files; and</li>
             <li>Infringement of intellectual property rights by other users.</li>
           </ol>
-          <h3>8.6. Our Additional Responsibility if You Are a Consumer.</h3>
+          <h3>9.6 Our Additional Responsibility if You Are a Consumer</h3>
           <p>
             If you are a consumer user of the Site, you agree that we have no liability to you for
             any loss of profit, loss of business or business opportunity, or business interruption
@@ -600,8 +633,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>9. User Representations</h2>
-          <h3>9.1. Your Representations and Warranties. </h3>
+          <h2>10. User Representations</h2>
+          <h3>10.1 Your Representations and Warranties</h3>
           <p>
             By using the Site, you represent and warrant each of the following (in addition to any
             other representations or warranties made by you in these Terms of Service):
@@ -623,7 +656,7 @@ export default function TermsService() {
             <li>You will not use the Site for any illegal or unauthorised purpose; and</li>
             <li>Your use of the Site will not violate any applicable law or regulation.</li>
           </ol>
-          <h3>9.2. Misrepresentations. </h3>
+          <h3>10.2 Misrepresentations</h3>
           <p>
             If you provide any information that is untrue, inaccurate, not current, incomplete, or
             misleading, we have the right to suspend or terminate your account and refuse any and
@@ -633,8 +666,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>10. Indemnification</h2>
-          <h3>10.1. Our Indemnity. </h3>
+          <h2>11. Indemnification</h2>
+          <h3>11.1 Our Indemnity </h3>
           <p>
             You agree to defend, release, indemnify, and hold harmless us, our subsidiaries,
             affiliates, and all our respective officers, agents, partners, and employees, from and
@@ -656,7 +689,7 @@ export default function TermsService() {
             </li>
             <li>Any overt harmful act toward any other user of the Site.</li>
           </ol>
-          <h3>10.2. Defence of Our Indemnity. </h3>
+          <h3>11.2 Defence of Our Indemnity</h3>
           <p>
             We reserve the right, at your expense, to assume the exclusive defence and control of
             any matter for which you indemnify us under these Terms of Service, and you agree to
@@ -668,8 +701,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>11. Term and Termination</h2>
-          <h3>11.1. Your Right to Not Use the Site. </h3>
+          <h2>12. Term and Termination</h2>
+          <h3>12.1 Your Right to Not Use the Site</h3>
           <p>
             These Terms and Conditions will remain in full force and effect when you use any part of
             or maintain any account through the Site. You may terminate your use or participation at
@@ -695,7 +728,7 @@ export default function TermsService() {
               again to create a new account.
             </li>
           </ol>
-          <h3>11.2. Our Right to Restrict Access. </h3>
+          <h3>12.2 Our Right to Restrict Access</h3>
           <p>
             Without limiting any other provision of these Terms of Service, we reserve the right, in
             our sole and absolute discretion and without notice or liability, to deny access to and
@@ -712,7 +745,7 @@ export default function TermsService() {
             under your name, a fake or a borrowed name, or the name of any third party, even if you
             may be acting on behalf of your principal or other third party.
           </p>
-          <h3>11.3. Our Right to Seek Redress for your Breach.</h3>
+          <h3>12.3 Our Right to Seek Redress for your Breach</h3>
           <p>
             If we determine that your use of the Site in any way breaches these Terms of Service,
             violates any applicable law or regulation, poses a security risk to our Site or any
@@ -724,7 +757,7 @@ export default function TermsService() {
             or other competent authorities in prosecuting violations of law or these Terms of
             Service.
           </p>
-          <h3>11.4. Survival. </h3>
+          <h3>12.4 Survival</h3>
           <p>
             Upon any termination of these Terms of Service under this Section 11, all provisions of
             these Terms of Service and its incorporated documents that by their nature should
@@ -733,8 +766,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>12. Miscellaneous</h2>
-          <h3>12.1. Your consent to Electronic Communications. </h3>
+          <h2>13. Miscellaneous</h2>
+          <h3>13.1 Your consent to Electronic Communications</h3>
           <p>
             Visiting any component of the Site, sending us emails, and completing online forms are
             all considered forms of electronic communication. You consent to receiving
@@ -746,30 +779,30 @@ export default function TermsService() {
             or other laws in any jurisdiction that may require an original signature or delivery or
             retention of non-electronic records, or for delivery of payments or electronic credits.
           </p>
-          <h3>12.2. No Waiver. </h3>
+          <h3>13.2 No Waiver</h3>
           <p>
             Our failure to exercise or enforce any right or provision of these Terms and Conditions
             shall not operate as a waiver of such right or provision.
           </p>
-          <h3>12.3. Our Right to Assignment. </h3>
+          <h3>13.3 Our Right to Assignment</h3>
           <p>
             We may assign any or all our rights and obligations under these Terms and Conditions to
             any other person or persons at any time.
           </p>
-          <h3>12.4. Severability. </h3>
+          <h3>13.4 Severability</h3>
           <p>
             If any provision of these Terms of Service is deemed unlawful, void, or unenforceable by
             a court or tribunal of competent jurisdiction, then that provision is deemed severable
             from these Terms of Service and does not affect the validity and enforceability of the
             remaining provisions.
           </p>
-          <h3>12.5. No Partnership. </h3>
+          <h3>13.5 No Partnership</h3>
           <p>
             There is no joint venture, partnership, employment, or agency relationship created
             between us and you as a result of these Terms of Service or your use of any part of the
             Site.
           </p>
-          <h3>12.6. Choice of Law. </h3>
+          <h3>13.6 Choice of Law</h3>
           <p>
             All matters relating to the Site and these Terms of Service and any dispute or claim
             arising therefrom or related thereto (in each case, including non-contractual disputes
@@ -777,14 +810,14 @@ export default function TermsService() {
             Islands without giving effect to any choice or conflict of law provision or rule
             (whether of the Cayman Islands or any other jurisdiction).
           </p>
-          <h3>12.7. Enforcing Your Rights or Providing Notice. </h3>
+          <h3>13.7 Enforcing Your Rights or Providing Notice</h3>
           <p>
             A person who is not a party to these Terms of Service will have no right to enforce any
             of these Terms of Service against us. To resolve a complaint regarding your use of the
             Site, or to receive further information regarding its use, please contact us using the
             contact details provided in clause 1.3.
           </p>
-          <h3>12.8. Interpretation of Headings and Text. </h3>
+          <h3>13.8 Interpretation of Headings and Text</h3>
           <p>
             Section and clause headings used in these Terms of Service, and as they may be used in
             any other documents incorporated as part of these Terms of Service, are for ease of
@@ -797,8 +830,8 @@ export default function TermsService() {
           </p>
         </section>
         <section>
-          <h2>13. Dispute Resolution and Arbitration</h2>
-          <h3>13.1. Agreement to Arbitration. </h3>
+          <h2>14. Dispute Resolution and Arbitration</h2>
+          <h3>14.1 Agreement to Arbitration</h3>
           <p>
             You and EcoEarn both understand and agree that any claim or dispute arising under these
             Terms of Service or your relationship with EcoEarn (past, present, or future) will be
@@ -814,7 +847,7 @@ export default function TermsService() {
             </a>
             ), which are incorporated into these Terms of Service by reference.
           </p>
-          <h3>13.2. Pre-Arbitration Procedures. </h3>
+          <h3>14.2 Pre-Arbitration Procedures</h3>
           <p>
             You and EcoEarn mutually agree to attempt to resolve all disputes using good-faith and
             strive for a prompt, low-cost, and mutually beneficial outcome. Therefore, a party who
@@ -842,7 +875,7 @@ export default function TermsService() {
             deadlines will be tolled while the parties engage in required informal dispute
             resolution procedures.
           </p>
-          <h3>13.3. Arbitration Procedures. </h3>
+          <h3>14.3 Arbitration Procedures</h3>
           <p>
             Should any dispute proceed to arbitration, you and EcoEarn expressly agree that an
             arbitrator properly appointed under the UNCITRAL Arbitration Rules may issue all
