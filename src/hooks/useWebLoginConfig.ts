@@ -58,6 +58,7 @@ export default function useWebLoginConfig() {
       design: SignInDesignEnum.CryptoDesign,
       titleForSocialDesign: 'Crypto wallet',
       // iconSrcForSocialDesign: 'url or base64',
+      enableAcceleration: true,
     };
   }, [curChain, networkTypeV2]);
 
