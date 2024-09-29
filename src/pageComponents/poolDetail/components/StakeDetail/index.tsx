@@ -273,7 +273,7 @@ export default function StakeDetail(props: IStakeDetailProps) {
       </div>
       {renewalTip}
       {actionButtons}
-      <div className="mt-6 p-6 rounded-[16px] border-[#F4F9FE] border-[1px] border-solid bg-[#F9FCFF] flex gap-6">
+      <div className="p-6 rounded-[16px] border-[#F4F9FE] border-[1px] border-solid bg-[#F9FCFF] flex gap-6">
         <Flex vertical gap={16} className="text-sm font-normal text-[#808080] w-full">
           <Flex justify="space-between">
             <Flex gap={4} align="center">

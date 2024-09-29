@@ -1,5 +1,6 @@
 import { NetworkType } from '@etransfer/ui-react';
 import { ILinkItem } from 'components/Footer';
+import { ITradeConfirmProps } from 'components/TradeConfrim';
 
 export type InfoStateType = {
   isMobile?: boolean;
@@ -12,6 +13,7 @@ export type InfoStateType = {
   };
   cmsInfo?: ICMSInfo;
   dappList?: Array<IStakingItem>;
+  confirmInfo?: ITradeConfirmProps;
 };
 
 export interface ICMSInfo {

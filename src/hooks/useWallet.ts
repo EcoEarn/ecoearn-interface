@@ -20,12 +20,14 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did-ui-react';
 import { formatErrorMsg } from 'utils/formatError';
+import useNotification from './useNotification';
 
 export const useWalletInit = () => {
   const [, setLocalWalletInfo] = useLocalStorage<WalletInfoType>(storages.walletInfo);
   const { getToken } = useGetToken();
   const { walletInfo, walletType, isLocking, isConnected, loginError } = useConnectWallet();
   const backToHomeByRoute = useBackToHomeByRoute();
+  const notification = useNotification();
 
   useEffect(() => {
     if (isLocking) {
@@ -77,7 +79,7 @@ export const useWalletInit = () => {
         needLoading: true,
       });
       dispatch(setWalletInfo(cloneDeep(walletInfo)));
-      setLocalWalletInfo(cloneDeep(walletInfo));
+      setLocalWalletInfo(cloneDeep(walletInfo as any));
     }
   }, [getToken, setLocalWalletInfo, walletInfo, walletType]);
 
@@ -85,9 +87,9 @@ export const useWalletInit = () => {
     if (loginError) {
       const resError = loginError as IContractError;
       const errorMessage = formatErrorMsg(resError).errorMessage.message;
-      message.error(`${errorMessage || 'LOGIN_ERROR'}`);
+      notification.error({ description: `${errorMessage || 'LOGIN_ERROR'}` });
     }
-  }, [loginError]);
+  }, [loginError, notification]);
 };
 
 export const useWalletService = () => {

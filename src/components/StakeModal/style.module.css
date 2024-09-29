@@ -5,7 +5,7 @@
     }
   }
   :global(.earn-form-item-label){
-    @apply pb-0;
+    @apply !pb-0;
   }
 }
 

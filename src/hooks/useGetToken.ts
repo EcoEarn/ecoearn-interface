@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { storages } from 'storages';
 import { fetchToken } from 'api/request';
-import { message } from 'antd';
 import useDiscoverProvider from './useDiscoverProvider';
 import { sleep } from '@portkey/utils';
 import useLoading from 'hooks/useLoading';
@@ -11,6 +10,7 @@ import { resetLoginStatus, setLoginStatus } from 'redux/reducer/loginStatus';
 import { store } from 'redux/store';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import useNotification from './useNotification';
 
 const AElf = require('aelf-sdk');
 
@@ -23,6 +23,7 @@ export const useGetToken = () => {
     useConnectWallet();
   const { showLoading, closeLoading } = useLoading();
   const { getSignatureAndPublicKey } = useDiscoverProvider();
+  const notification = useNotification();
 
   const isConnectWallet = useMemo(() => {
     return isConnected;
@@ -56,7 +57,7 @@ export const useGetToken = () => {
           );
           return res.access_token;
         } else {
-          message.error(LoginFailed);
+          notification.error({ description: LoginFailed });
           store.dispatch(resetLoginStatus());
           return '';
         }
@@ -69,14 +70,14 @@ export const useGetToken = () => {
             retryCount: retry,
           });
         } else {
-          message.error(LoginFailed);
+          notification.error({ description: LoginFailed });
           isConnectWallet && disConnectWallet();
           needLoading && closeLoading();
           return '';
         }
       }
     },
-    [closeLoading, disConnectWallet, isConnectWallet, showLoading, walletInfo],
+    [closeLoading, disConnectWallet, isConnectWallet, notification, showLoading, walletInfo],
   );
 
   const checkTokenValid = useCallback(() => {
@@ -124,9 +125,10 @@ export const useGetToken = () => {
           signature = signatureStr || '';
           source = 'portkey';
         } catch (error) {
+          console.error('sign error', error);
           const resError = error as IContractError;
           const errorMessage = formatErrorMsg(resError).errorMessage.message;
-          message.error(errorMessage);
+          notification.error({ description: errorMessage });
           isConnectWallet && disConnectWallet();
           return;
         }
@@ -140,7 +142,7 @@ export const useGetToken = () => {
         if (sign?.errorMessage) {
           const errorMessage = formatErrorMsg(sign?.errorMessage as unknown as IContractError)
             .errorMessage.message;
-          message.error(errorMessage);
+          notification.error({ description: errorMessage });
           isConnectWallet && disConnectWallet();
           return;
         }
@@ -176,6 +178,7 @@ export const useGetToken = () => {
       walletType,
       getTokenFromServer,
       getSignatureAndPublicKey,
+      notification,
       isConnectWallet,
       disConnectWallet,
       getSignature,

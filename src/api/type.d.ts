@@ -67,6 +67,10 @@ interface IStakePoolData {
   supportEarlyStake?: boolean;
   marketCap?: number;
   stakers?: number;
+  minimalStakeAmount?: number | string;
+  minimalStakePeriod?: number | string;
+  extendStakePeriod?: string | number;
+  minimalExtendStakeAmount?: string | number;
 }
 
 type TStakePoolDataKey = keyof IStakePoolData;
@@ -170,6 +174,7 @@ interface IPoolRewardsItem {
   dappId: string;
   rewardsTokenName: string;
   rate: string;
+  tokenIcon: Array<string>;
 }
 
 interface IRewardListParams {
@@ -183,6 +188,7 @@ interface IRewardListParams {
 
 interface IRewardListItem {
   poolType: string;
+  poolTypeStr: string;
   projectOwner: string;
   rewardsToken: string;
   rewardsInUsd: number;
@@ -226,6 +232,10 @@ interface IEarlyStakeInfo {
   lastOperationTime?: number | string;
   subStakeInfos: Array<IStakeInfoItem>;
   earnedSymbol: string;
+  minimalStakeAmount?: number | string;
+  minimalStakePeriod?: number | string;
+  extendStakePeriod?: string | number;
+  minimalExtendStakeAmount?: string | number;
 }
 
 interface IFetchStakeParams {
@@ -273,9 +283,13 @@ interface IWithdrawSignParams {
 }
 
 interface IEarlyStakeSignData {
-  signature: string;
-  seed: Array<number>;
-  expirationTime: number;
+  data: {
+    signature: string;
+    seed: Array<number>;
+    expirationTime: number;
+  };
+  code: number;
+  message: string;
 }
 
 interface IEarlyStakeParams {
