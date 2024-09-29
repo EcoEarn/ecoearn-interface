@@ -10,7 +10,6 @@ import {
   orderPairTokens,
   splitTokensFromPairSymbol,
 } from 'utils/format';
-import BigNumber from 'bignumber.js';
 import useResponsive from 'utils/useResponsive';
 import { ToolTip } from 'aelf-design';
 
@@ -38,6 +37,8 @@ export interface IStakeTokenProps {
   tokenSymbolClassName?: string;
   tagClassName?: string;
   symbolDigs?: number;
+  ratePosition?: 'bottom' | 'right';
+  showProjectName?: boolean;
 }
 
 const StakeToken = memo(
@@ -52,6 +53,8 @@ const StakeToken = memo(
     tokenSymbolClassName,
     tagClassName,
     symbolDigs,
+    ratePosition = 'right',
+    showProjectName = true,
   }: IStakeTokenProps) => {
     const { isLG } = useResponsive();
 
@@ -144,12 +147,23 @@ const StakeToken = memo(
               tokenSymbolClassName,
             )}
           >
-            <ToolTip title={showSymbolTip ? formatTokenSymbol(tokenName || '') || '' : ''}>
-              <span className="truncate min-w-0 break-all">{tokenNameText}</span>
-            </ToolTip>
-            {!!rate && <RateTag value={Number(rate) * 100} className={tagClassName} />}
+            <div className="flex flex-col gap-1">
+              <ToolTip title={showSymbolTip ? formatTokenSymbol(tokenName || '') || '' : ''}>
+                <span className="truncate min-w-0 break-all">{tokenNameText}</span>
+              </ToolTip>
+              {!!rate && ratePosition === 'bottom' && (
+                <span className="text-[14px] font-medium leading-5 text-neutralTertiary">{`${
+                  Number(rate) * 100
+                }%`}</span>
+              )}
+            </div>
+            {!!rate && ratePosition === 'right' && (
+              <RateTag value={Number(rate) * 100} className={tagClassName} />
+            )}
           </div>
-          {/* {projectName && <div className="text-base text-neutralTertiary">{projectName}</div>} */}
+          {projectName && showProjectName && (
+            <div className="text-base text-neutralTertiary">{projectName}</div>
+          )}
         </div>
       </div>
     );

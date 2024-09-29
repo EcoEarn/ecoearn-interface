@@ -33,7 +33,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
         <div className="pt-[24px] pb-[24px] text-[28px] lg:pt-[64px] lg:pb-[24px] font-[600] lg:text-[36px] text-neutralTitle">
           {title}
         </div>
-        <div className="md:items-center">
+        {/* <div className="md:items-center">
           {poolType === 'Lp' && (
             <span
               className="text-sm text-brandDefault font-[600] cursor-pointer inline-block mb-[24px]"
@@ -47,7 +47,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
               />
             </span>
           )}
-        </div>
+        </div> */}
       </div>
       <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-auto-fill-400">
         {stakeData.length > 0 ? (
@@ -72,11 +72,11 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
           </>
         ) : (
           <>
-            {[1, 2].map((list, index) => {
+            {[1].map((list, index) => {
               return (
                 <div
                   key={index}
-                  className="stake-card h-[156px] lg:h-[230px] lg:w-[443px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg "
+                  className="stake-card h-[156px] lg:h-[230px] flex flex-col lg:gap-[64px] gap-[32px] px-4 py-4 md:px-8 md:py-8 rounded-xl border border-solid border-neutralDivider bg-neutralWhiteBg "
                 >
                   <Skeleton avatar active paragraph={{ rows: 2 }} round />
                 </div>

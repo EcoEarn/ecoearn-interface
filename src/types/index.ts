@@ -36,6 +36,7 @@ export interface IContractError extends Error {
     message: string;
     name?: string;
     stake?: string;
+    title?: string;
   };
   Error?: string;
   from?: string;

@@ -77,8 +77,6 @@ export default function Rewards() {
     setCurrentType(value as RewardsTypeEnum);
   }, []);
 
-  console.log('showLoading', showLoading);
-
   return (
     <>
       <h2 className="text-4xl lg:text-5xl font-[600] text-neutralTitle pt-8 lg:pt-10">Rewards</h2>
@@ -113,15 +111,11 @@ export default function Rewards() {
         />
       )}
       <div className="mt-6">
-        {!['points', 'farms'].includes(currentType) ? (
-          <PoolsAmount currentType={currentType} visible={visible} />
-        ) : (
-          <ComingSoon />
-        )}
+        <PoolsAmount currentType={currentType} visible={visible} />
       </div>
-      {isLogin && hasHistoryData && !['points', 'farms'].includes(currentType) && (
-        <div className="mt-6">
-          <div className="mb-4 text-base font-[600] text-neutralTitle">Claim History</div>
+      {isLogin && hasHistoryData && (
+        <div className="mt-8">
+          <div className="mb-6 text-base font-[600] text-neutralTitle">Claim History</div>
           {isMD ? (
             <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
           ) : (

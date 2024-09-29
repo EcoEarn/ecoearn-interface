@@ -7,6 +7,7 @@ import { tokenClaim } from 'contract/tokenStaking';
 import { divDecimals } from 'utils/calculate';
 import { useRouter } from 'next/navigation';
 import { message } from 'antd';
+import useNotification from 'hooks/useNotification';
 
 interface IClaimModalProps {
   amount: string | number;
@@ -38,6 +39,7 @@ function ClaimModal({
   const [transactionId, setTransactionId] = useState('');
   const [errorTip, setErrorTip] = useState('');
   const router = useRouter();
+  const notification = useNotification();
 
   const onConfirm = useCallback(async () => {
     try {
@@ -47,16 +49,16 @@ function ClaimModal({
       setStatus('success');
       onSuccess?.();
     } catch (error) {
-      const { showInModal, errorMessage } = error as any;
+      const { errorMessage } = error as any;
       const errorTip = errorMessage?.message;
       console.log('===claim error', errorTip);
-      if (!showInModal) message.error(errorTip);
+      if (errorTip) notification.error({ description: errorTip, message: errorMessage?.title });
       setStatus('error');
       errorTip && setErrorTip(errorTip);
     } finally {
       setLoading(false);
     }
-  }, [onSuccess, poolId]);
+  }, [notification, onSuccess, poolId]);
 
   const onclose = useCallback(() => {
     setLoading(false);

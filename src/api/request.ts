@@ -181,3 +181,10 @@ export const getLeaderboardInfo = async (
 export const checkJoinStatus = async (params: IUseJoin): Promise<any> => {
   return request.get('/app/ranking/join/check', { params: params });
 };
+
+export const checkScanConfirm = async (params: {
+  chainId: string;
+  transactionBlockHeight: number | string;
+}): Promise<boolean> => {
+  return request.get('/app/rewards/transaction/result', { params });
+};
