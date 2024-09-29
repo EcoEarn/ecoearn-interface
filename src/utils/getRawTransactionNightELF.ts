@@ -46,11 +46,19 @@ const getSignature = async ({
   data: string;
   address: string;
 }) => {
-  const result = await provider.getSignature({
-    address,
-    hexToBeSign: data,
-  });
-  return result.signature;
+  try {
+    const result = await provider.getSignature({
+      address,
+      hexToBeSign: data,
+    });
+    if (result?.errorMessage) {
+      return Promise.reject(result.errorMessage);
+    }
+    return result.signature;
+  } catch (error) {
+    console.log('getSignature error', error);
+    return Promise.reject(error);
+  }
 };
 
 export type GetRawTx = {
@@ -86,34 +94,40 @@ export const handleTransaction = async ({
   functionName,
   provider,
 }: GetRawTx & { provider: IPortkeyProvider }) => {
-  // Create transaction
-  const rawTx = getRawTx({
-    blockHeightInput,
-    blockHashInput,
-    packedInput,
-    address,
-    contractAddress,
-    functionName,
-  });
-  rawTx.params = Buffer.from(rawTx.params, 'hex');
+  try {
+    // Create transaction
+    const rawTx = getRawTx({
+      blockHeightInput,
+      blockHashInput,
+      packedInput,
+      address,
+      contractAddress,
+      functionName,
+    });
+    rawTx.params = Buffer.from(rawTx.params, 'hex');
 
-  const ser = AElf.pbUtils.Transaction.encode(rawTx).finish();
+    const ser = AElf.pbUtils.Transaction.encode(rawTx).finish();
 
-  const m = AElf.utils.sha256(ser);
-  // signature
-  const signatureStr = await getSignature({ provider, data: m, address });
-  if (!signatureStr) return;
+    const m = AElf.utils.sha256(ser);
+    // signature
+    const signatureStr = await getSignature({ provider, data: m, address });
+    console.log('=====signatureStr', signatureStr);
 
-  let tx = {
-    ...rawTx,
-    signature: Buffer.from(signatureStr, 'hex'),
-  };
+    if (!signatureStr) return;
 
-  tx = AElf.pbUtils.Transaction.encode(tx).finish();
-  if (tx instanceof Buffer) {
-    return tx.toString('hex');
+    let tx = {
+      ...rawTx,
+      signature: Buffer.from(signatureStr, 'hex'),
+    };
+
+    tx = AElf.pbUtils.Transaction.encode(tx).finish();
+    if (tx instanceof Buffer) {
+      return tx.toString('hex');
+    }
+    return AElf.utils.uint8ArrayToHex(tx); // hex params
+  } catch (error) {
+    return Promise.reject(error);
   }
-  return AElf.utils.uint8ArrayToHex(tx); // hex params
 };
 
 export interface CreateTransactionParams {
@@ -139,28 +153,32 @@ export const getRawTransactionNightELF = async ({
     pure: true,
   });
 
-  const instance = aelf.getAelfInstance(rpcUrl);
+  try {
+    const instance = aelf.getAelfInstance(rpcUrl);
 
-  const result = await handleTransactionParams({
-    contractAddress,
-    methodName,
-    args: params,
-    instance,
-  });
+    const result = await handleTransactionParams({
+      contractAddress,
+      methodName,
+      args: params,
+      instance,
+    });
 
-  const transactionParams = AElf.utils.uint8ArrayToHex(result);
+    const transactionParams = AElf.utils.uint8ArrayToHex(result);
 
-  const aelfInstance = getAElf(rpcUrl);
-  const { BestChainHeight, BestChainHash } = await aelfInstance.chain.getChainStatus();
+    const aelfInstance = getAElf(rpcUrl);
+    const { BestChainHeight, BestChainHash } = await aelfInstance.chain.getChainStatus();
 
-  const transaction = await handleTransaction({
-    blockHeightInput: BestChainHeight,
-    blockHashInput: BestChainHash,
-    packedInput: transactionParams,
-    address: account,
-    contractAddress,
-    functionName: methodName,
-    provider,
-  });
-  return transaction;
+    const transaction = await handleTransaction({
+      blockHeightInput: BestChainHeight,
+      blockHashInput: BestChainHash,
+      packedInput: transactionParams,
+      address: account,
+      contractAddress,
+      functionName: methodName,
+      provider,
+    });
+    return transaction;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };

@@ -12,7 +12,7 @@ import { GetBalance } from 'contract/multiToken';
 import { GetBalance as GetLpBalance } from 'contract/lpToken';
 import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
 import { ZERO } from 'constants/index';
-import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
+import { GetReward, Renew, tokenClaim, tokenStake, tokenUnlock } from 'contract/tokenStaking';
 import dayjs from 'dayjs';
 import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import useLoading from 'hooks/useLoading';
@@ -32,6 +32,10 @@ import { IContractError } from 'types';
 import { IStakeWithConfirmProps } from 'components/StakeWithConfirm';
 import { fixEarlyStakeData } from 'utils/stake';
 import qs from 'qs';
+import { store } from 'redux/store';
+import { setConfirmInfo } from 'redux/reducer/info';
+import { TradeConfirmTypeEnum } from 'components/TradeConfrim';
+import useNotification from 'hooks/useNotification';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -48,8 +52,20 @@ export default function usePoolDetailService() {
     return searchParams.get('poolType') || '';
   }, [searchParams]);
 
+  const dappId = useMemo(() => {
+    return searchParams.get('dappId') || '';
+  }, [searchParams]);
+
   const stakeRewards = useMemo(() => {
     return searchParams.get('stakeRewards') || '';
+  }, [searchParams]);
+
+  const rewardsFrom = useMemo(() => {
+    return searchParams.get('rewardsFrom') || '';
+  }, [searchParams]);
+
+  const source = useMemo(() => {
+    return searchParams.get('source') || '';
   }, [searchParams]);
 
   const { showLoading, closeLoading, visible } = useLoading();
@@ -68,22 +84,26 @@ export default function usePoolDetailService() {
   const [symbolBalance, setSymbolBalance] = useState('0');
   const [earlyStakeInfo, setEarlyStakeInfo] = useState<IEarlyStakeInfo>();
   const [rewardsInfo, setRewardsInfo] = useState<IPoolRewardsItem>();
+  const notification = useNotification();
+
+  console.log('====rewardsInfo', rewardsInfo);
 
   const goStakingPage = useCallback(() => {
     router.replace('/staking');
   }, [router]);
 
   const initEarlyStakeInfo = useCallback(async () => {
-    if (!poolInfo || !wallet?.address || !curChain || !stakeRewards) return;
+    if (!wallet?.address || !curChain || !stakeRewards) return;
     try {
       showLoading();
-      const earlyStakeInfoList = await getEarlyStakeInfo({
-        tokenName: poolInfo?.stakeSymbol || '',
+      let earlyStakeInfoList = await getEarlyStakeInfo({
+        tokenName: '',
         address: wallet?.address || '',
         chainId: curChain,
-        poolType,
-        rate: poolInfo?.rate || 0,
+        poolType: PoolType.TOKEN,
+        rate: 0,
       });
+      earlyStakeInfoList = earlyStakeInfoList?.filter((item) => item.poolId === poolId);
       if (earlyStakeInfoList) {
         const fixedEarlyStakeData = (
           fixEarlyStakeData(earlyStakeInfoList) as Array<IEarlyStakeInfo>
@@ -91,25 +111,33 @@ export default function usePoolDetailService() {
         if (fixedEarlyStakeData) setEarlyStakeInfo(fixedEarlyStakeData);
       }
     } catch (err) {
-      message.error((err as Error)?.message);
+      notification.error({ description: (err as Error)?.message });
       console.error(err);
     } finally {
       closeLoading();
     }
-  }, [closeLoading, curChain, poolInfo, poolType, showLoading, stakeRewards, wallet?.address]);
+  }, [closeLoading, curChain, notification, poolId, showLoading, stakeRewards, wallet?.address]);
+
+  console.log('===searchParams', rewardsFrom, poolId, dappId);
 
   const initRewardsData = useCallback(async () => {
-    if (!wallet?.address || !poolId || !poolType || poolType !== PoolType.TOKEN) return;
+    if (
+      !earlyStakeInfo ||
+      !wallet?.address ||
+      (rewardsFrom !== PoolType.POINTS && !poolId) ||
+      !rewardsFrom
+    )
+      return;
     try {
       showLoading();
       const rewardsList = await getPoolRewards({
         address: wallet?.address || '',
-        poolType: PoolType.ALL,
+        poolType: rewardsFrom as PoolType,
       });
       if (rewardsList && rewardsList?.length > 0) {
-        const rewardsData = rewardsList?.find(
-          (item) => item.poolId === poolId && item.poolType === poolType,
-        );
+        const rewardsData = rewardsList?.find((item) => {
+          return item.rewardsTokenName === earlyStakeInfo?.stakeSymbol;
+        });
         if (rewardsData) setRewardsInfo(rewardsData);
       }
     } catch (err) {
@@ -117,7 +145,7 @@ export default function usePoolDetailService() {
     } finally {
       closeLoading();
     }
-  }, [closeLoading, poolId, poolType, showLoading, wallet?.address]);
+  }, [closeLoading, earlyStakeInfo, poolId, rewardsFrom, showLoading, wallet?.address]);
 
   useEffect(() => {
     initEarlyStakeInfo();
@@ -130,7 +158,7 @@ export default function usePoolDetailService() {
   const initPoolData = useCallback(
     async (props?: IFetchDataProps) => {
       const { withLoading = true } = props || {};
-      if (!curChain || !poolId || !poolType || poolType !== PoolType.TOKEN) {
+      if (!curChain || !poolId || !poolType) {
         return;
       }
       try {
@@ -163,13 +191,22 @@ export default function usePoolDetailService() {
           throw new Error('Pool not found');
         }
       } catch (error) {
-        message.error((error as Error)?.message);
+        notification.error({ description: (error as Error)?.message });
         goStakingPage();
       } finally {
         withLoading && closeLoading();
       }
     },
-    [closeLoading, curChain, goStakingPage, poolId, poolType, showLoading, wallet?.address],
+    [
+      closeLoading,
+      curChain,
+      goStakingPage,
+      notification,
+      poolId,
+      poolType,
+      showLoading,
+      wallet?.address,
+    ],
   );
 
   useEffect(() => {
@@ -177,7 +214,7 @@ export default function usePoolDetailService() {
   }, [initPoolData]);
 
   useEffect(() => {
-    if (!poolId || !poolType || poolType !== PoolType.TOKEN) {
+    if ((poolType !== PoolType.POINTS && !poolId) || !poolType) {
       goStakingPage();
     }
   }, [goStakingPage, poolId, poolType]);
@@ -243,7 +280,6 @@ export default function usePoolDetailService() {
         }
         return divDecimals(balance || 0, decimal).toFixed(4);
       } catch (error) {
-        // singleMessage.error('get balance error.');
         console.error('GetBalance error', error);
         return;
       } finally {
@@ -328,12 +364,12 @@ export default function usePoolDetailService() {
       onStake: async (amount: number | string, period: number | string) => {
         if (stakeRewards) {
           if (!rewardsInfo || !earlyStakeInfo) {
-            singleMessage.error('missing params');
+            notification.error({ description: 'missing params' });
             return;
           }
           return await earlyStakeFn({
             rewardsInfo: rewardsInfo,
-            poolType: poolType as PoolType,
+            poolType: rewardsFrom as PoolType,
             earlyStakeInfo,
             period,
           });
@@ -359,6 +395,21 @@ export default function usePoolDetailService() {
           throw new Error();
         }
         if (checked) {
+          store.dispatch(
+            setConfirmInfo({
+              backPath: location.href,
+              type: TradeConfirmTypeEnum.Stake,
+              content: {
+                rate: poolInfo?.rate || 0,
+                poolType: poolType as PoolType,
+                amount,
+                days: period,
+                unlockDateTimeStamp: dayjs().add(Number(period), 'day').valueOf(),
+                tokenSymbol: poolInfo?.stakeSymbol || '',
+                rewardsSymbol: poolInfo?.earnedSymbol || '',
+              },
+            }),
+          );
           try {
             operationAmount.current = timesDecimals(amount, poolInfo?.decimal).toFixed(0);
             const stakeRes = await tokenStake({
@@ -368,9 +419,13 @@ export default function usePoolDetailService() {
             });
             return stakeRes;
           } catch (error) {
-            const { showInModal, errorMessage } = error as any;
-            if (!showInModal) message.error(errorMessage.message);
-            throw Error(showInModal ? errorMessage.message : '');
+            const { errorMessage } = error as any;
+            errorMessage &&
+              notification.error({
+                description: errorMessage.message,
+                message: errorMessage.title || '',
+              });
+            throw Error(errorMessage.message);
           }
         }
       },
@@ -407,9 +462,11 @@ export default function usePoolDetailService() {
     initBalance,
     initPoolData,
     longestReleaseTime,
+    notification,
     poolId,
     poolInfo,
     poolType,
+    rewardsFrom,
     rewardsInfo,
     router,
     stakeRewards,
@@ -420,9 +477,9 @@ export default function usePoolDetailService() {
 
   const showStakeModal = useCallback(
     async (type: StakeType, stakeData: IStakePoolData) => {
-      const { stakeSymbol = '', decimal = 8, rate = 0.003 } = stakeData;
+      const { stakeSymbol = '', decimal = 8, rate = 0, unlockTime, earnedSymbol } = stakeData;
       if (!stakeSymbol) {
-        singleMessage.error('stakeSymbol is required.');
+        notification.error({ description: 'stakeSymbol is required.' });
         return;
       }
       let symbolBalance;
@@ -452,6 +509,20 @@ export default function usePoolDetailService() {
         onStake: async (amount, period) => {
           const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
           if (type === StakeType.RENEW) {
+            store.dispatch(
+              setConfirmInfo({
+                type: TradeConfirmTypeEnum.Renew,
+                backPath: location.href,
+                content: {
+                  rate,
+                  amount,
+                  days: period,
+                  unlockDateTimeStamp: dayjs().add(Number(period), 'day').valueOf(),
+                  tokenSymbol: stakeSymbol,
+                  rewardsSymbol: earnedSymbol,
+                },
+              }),
+            );
             operationAmount.current = stakeData?.staked || '';
             try {
               const renewRes = await Renew({
@@ -460,9 +531,13 @@ export default function usePoolDetailService() {
               });
               return renewRes;
             } catch (error) {
-              const { showInModal, errorMessage } = error as any;
-              if (!showInModal) message.error(errorMessage.message);
-              throw Error(showInModal ? errorMessage.message : '');
+              const { errorMessage } = error as any;
+              errorMessage &&
+                notification.error({
+                  description: errorMessage.message,
+                  message: errorMessage.title || '',
+                });
+              throw Error(errorMessage.message);
             }
           } else {
             await checkApproveParams(rate as TFeeType);
@@ -482,6 +557,29 @@ export default function usePoolDetailService() {
               throw new Error();
             }
             if (checked) {
+              store.dispatch(
+                setConfirmInfo({
+                  backPath: location.href,
+                  type:
+                    type === StakeType.ADD
+                      ? TradeConfirmTypeEnum.Add
+                      : type === StakeType.EXTEND
+                      ? TradeConfirmTypeEnum.Extend
+                      : TradeConfirmTypeEnum.Stake,
+                  content: {
+                    rate,
+                    poolType: poolType as PoolType,
+                    amount,
+                    days: period,
+                    unlockDateTimeStamp:
+                      type === StakeType.ADD || type === StakeType.EXTEND
+                        ? dayjs(unlockTime).add(Number(period), 'day').valueOf()
+                        : dayjs().add(Number(period), 'day').valueOf(),
+                    tokenSymbol: stakeSymbol,
+                    rewardsSymbol: earnedSymbol,
+                  },
+                }),
+              );
               try {
                 operationAmount.current =
                   type !== StakeType.EXTEND
@@ -494,9 +592,13 @@ export default function usePoolDetailService() {
                 });
                 return stakeRes;
               } catch (error) {
-                const { showInModal, errorMessage } = error as any;
-                if (!showInModal) message.error(errorMessage.message);
-                throw Error(showInModal ? errorMessage.message : '');
+                const { errorMessage } = error as any;
+                if (errorMessage)
+                  notification.error({
+                    description: errorMessage.message,
+                    message: errorMessage.title || '',
+                  });
+                throw Error(errorMessage.message);
               }
             }
           }
@@ -533,6 +635,7 @@ export default function usePoolDetailService() {
       poolType,
       getBalanceDec,
       getSymbolBalance,
+      notification,
       checkApproveParams,
       tokensContractAddress,
       wallet?.address,
@@ -551,7 +654,7 @@ export default function usePoolDetailService() {
   );
 
   const onClaim = useCallback(
-    (stakeData: IStakePoolData) => {
+    async (stakeData: IStakePoolData) => {
       const {
         earnedSymbol = '--',
         stakeId,
@@ -561,41 +664,44 @@ export default function usePoolDetailService() {
         poolId,
         supportEarlyStake,
       } = stakeData;
-      claimModal.show({
-        amount: earned,
-        tokenSymbol: earnedSymbol,
-        decimal,
-        poolId: String(poolId) || '',
-        releasePeriod,
-        supportEarlyStake,
-        onClose: () => {
-          initPoolData();
-        },
-        onSuccess: () => {
+      try {
+        if (!poolId) return;
+        showLoading();
+        const { TransactionId } = await tokenClaim(poolId);
+        if (TransactionId) {
           saveTransaction({
             address: wallet?.address || '',
             amount: String(earned || ''),
             transactionType:
               poolType === 'Token' ? TransactionType.TokenClaim : TransactionType.LpClaim,
           });
-        },
-        onEarlyStake: () => {
-          claimModal.hide();
-          earlyStake({
-            poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
-            rewardsTokenName: earnedSymbol,
-            beforeLeave: () => {
-              claimModal.remove();
-            },
-            onSuccess: () => {
-              claimModal.remove();
-              initPoolData();
-            },
-          });
-        },
-      });
+          store.dispatch(
+            setConfirmInfo({
+              backPath: '/rewards',
+              type: TradeConfirmTypeEnum.Claim,
+              poolType: poolType as PoolType,
+              content: {
+                amount: divDecimals(earned, decimal).toString(),
+                releasePeriod,
+                supportEarlyStake,
+                tokenSymbol: earnedSymbol,
+                rewardsSymbol: earnedSymbol,
+                poolType: poolType as PoolType,
+              },
+            }),
+          );
+          router.push(`/tx/${TransactionId}`);
+        }
+      } catch (error) {
+        const { errorMessage } = error as any;
+        const errorTip = errorMessage?.message;
+        errorTip &&
+          notification.error({ description: errorTip, message: errorMessage?.title || '' });
+      } finally {
+        closeLoading();
+      }
     },
-    [claimModal, earlyStake, initPoolData, poolType, wallet?.address],
+    [closeLoading, notification, poolType, router, showLoading, wallet?.address],
   );
 
   const onUnlock = useCallback(
@@ -610,9 +716,10 @@ export default function usePoolDetailService() {
         decimal,
         releasePeriod,
         supportEarlyStake,
+        rate,
       } = stakeData;
       if (!stakeId || !poolId) {
-        singleMessage.error('missing params');
+        notification.error({ description: 'missing params' });
         return;
       }
       try {
@@ -620,31 +727,18 @@ export default function usePoolDetailService() {
         const { rewardInfos } = await GetReward({
           stakeIds: [String(stakeData.stakeId)],
         });
-
-        closeLoading();
-        unlockModal.show({
-          amount: divDecimals(staked, decimal || 8).toString(),
-          autoClaimAmount: divDecimals(rewardInfos?.[0]?.amount, decimal || 8).toString(),
-          amountFromEarlyStake:
-            poolType === PoolType.LP
-              ? '0'
-              : divDecimals(earlyStakedAmount, decimal || 8).toString(),
-          amountFromWallet:
-            poolType === PoolType.LP
-              ? '0'
-              : divDecimals(
-                  ZERO.plus(staked || 0).minus(earlyStakedAmount || 0),
-                  decimal || 8,
-                ).toString(),
-          tokenSymbol: stakeSymbol,
-          rewardsSymbol: earnedSymbol,
-          poolId,
-          releasePeriod,
-          supportEarlyStake,
-          onClose: () => {
-            initPoolData();
-          },
-          onSuccess: () => {
+        console.log(
+          '==rewardInfos',
+          rewardInfos,
+          divDecimals(rewardInfos?.[0]?.amount, decimal || 8).toString(),
+        );
+        try {
+          if (!poolId) {
+            notification.error({ description: 'missing params poolId' });
+            return;
+          }
+          const { TransactionId } = await tokenUnlock(poolId);
+          if (TransactionId) {
             saveTransaction({
               address: wallet?.address || '',
               amount: String(staked || ''),
@@ -653,42 +747,50 @@ export default function usePoolDetailService() {
                   ? TransactionType.TokenStakeUnlock
                   : TransactionType.LpStakeUnlock,
             });
-          },
-          onEarlyStake: () => {
-            unlockModal.hide();
-            earlyStake({
-              poolType: poolType === 'Token' ? PoolType.TOKEN : PoolType.LP,
-              rewardsTokenName: earnedSymbol,
-              beforeLeave: () => {
-                claimModal.remove();
-              },
-              onSuccess: () => {
-                unlockModal.remove();
-                initPoolData();
-              },
-            });
-          },
-        });
+            store.dispatch(
+              setConfirmInfo({
+                type: TradeConfirmTypeEnum.Unstake,
+                backPath: '/rewards',
+                poolType: poolType as PoolType,
+                content: {
+                  rate,
+                  poolType: poolType as PoolType,
+                  autoClaimAmount: divDecimals(rewardInfos?.[0]?.amount, decimal || 8).toString(),
+                  amountFromEarlyStake: divDecimals(earlyStakedAmount, decimal || 8).toString(),
+                  amountFromWallet: divDecimals(
+                    ZERO.plus(staked || 0).minus(earlyStakedAmount || 0),
+                    decimal || 8,
+                  ).toString(),
+                  tokenSymbol: stakeSymbol,
+                  rewardsSymbol: earnedSymbol,
+                  releasePeriod,
+                  supportEarlyStake,
+                },
+              }),
+            );
+            router.push(`/tx/${TransactionId}`);
+          }
+        } catch (error) {
+          const { errorMessage } = error as any;
+          const errorTip = errorMessage?.message;
+          console.log('tokenUnlock error', errorTip);
+          errorTip &&
+            notification.error({ description: errorTip, message: errorMessage?.title || '' });
+        } finally {
+          closeLoading();
+        }
       } catch (error) {
         console.error('GetReward error', error);
-        singleMessage.error(
-          (error as IContractError).errorMessage?.message ||
+        notification.error({
+          description:
+            (error as IContractError).errorMessage?.message ||
             'unlock failed, please try again later',
-        );
+        });
       } finally {
         closeLoading();
       }
     },
-    [
-      claimModal,
-      closeLoading,
-      earlyStake,
-      initPoolData,
-      poolType,
-      showLoading,
-      unlockModal,
-      wallet?.address,
-    ],
+    [closeLoading, notification, poolType, router, showLoading, wallet?.address],
   );
 
   const onAdd = useCallback(
@@ -724,6 +826,14 @@ export default function usePoolDetailService() {
     router.push('/liquidity');
   }, [checkLogin, isLogin, router]);
 
+  const onBack = useCallback(() => {
+    if (source === 'result') {
+      router.replace('/staking');
+      return;
+    }
+    router.back();
+  }, [router, source]);
+
   return {
     poolInfo,
     isFirstStake,
@@ -738,5 +848,7 @@ export default function usePoolDetailService() {
     stakeProps,
     stakeRewards,
     loading: visible,
+    poolType,
+    onBack,
   };
 }

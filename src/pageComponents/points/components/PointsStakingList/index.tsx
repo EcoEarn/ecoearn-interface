@@ -110,6 +110,22 @@ export function PointsStakeItem({
             </span>
           )}
         </Flex>
+      </Flex>
+      <Flex
+        className="mt-2 text-sm font-medium"
+        justify="space-between"
+        vertical={isMD}
+        align="flex-start"
+      >
+        <Flex
+          className="text-neutralTertiary w-full md:w-fit mt-2 md:mt-0"
+          justify="space-between"
+          align={isMD ? 'start' : 'end'}
+          gap={isMD ? 0 : 8}
+        >
+          Total Staked:
+          <span className="text-neutralPrimary">{totalStake}</span>
+        </Flex>
         <Flex
           align="center"
           className="md:mt-0 mt-2 w-full md:w-fit"
@@ -127,32 +143,6 @@ export function PointsStakeItem({
               className="ml-1 fill-brandDefault"
             />
           </span>
-        </Flex>
-      </Flex>
-      <Flex
-        className="mt-2 text-sm font-medium"
-        justify="space-between"
-        vertical={isMD}
-        align="flex-start"
-      >
-        <Flex
-          className="text-neutralTertiary w-full md:w-fit"
-          justify="space-between"
-          gap={isMD ? 0 : 8}
-        >
-          Mining Pool Rewards / Day:
-          <span className="text-neutralPrimary">
-            {poolDailyRewards} {displayRewardsTokenName}
-          </span>
-        </Flex>
-        <Flex
-          className="text-neutralTertiary w-full md:w-fit mt-2 md:mt-0"
-          justify="space-between"
-          align={isMD ? 'start' : 'end'}
-          gap={isMD ? 0 : 8}
-        >
-          Total Staked:
-          <span className="text-neutralPrimary">{totalStake}</span>
         </Flex>
       </Flex>
       <div className="mt-4 grid grid-flow-row  md:grid-flow-col gap-6 grid-cols-1 md:grid-cols-2">
@@ -242,7 +232,6 @@ export default function PointsStakingList({ dappName }: { dappName: string }) {
           amount: curItem?.realEarned || 0,
           tokenSymbol: curItem?.rewardsTokenName,
           releasePeriod: curItem?.releasePeriod,
-          supportEarlyStake: true,
         }}
         status={status}
         loading={loading}
@@ -252,7 +241,7 @@ export default function PointsStakingList({ dappName }: { dappName: string }) {
           resetState();
           fetchData();
         }}
-        onConfirm={handleConfirm}
+        // onConfirm={handleConfirm}
         transactionId={transactionId}
         onEarlyStake={() => {
           handleEarlyStake(curItem?.rewardsTokenName || '');
@@ -288,7 +277,7 @@ export default function PointsStakingList({ dappName }: { dappName: string }) {
       ) : (
         <Empty
           onClick={handleGain}
-          emptyBtnText="Gain points"
+          emptyBtnText="Earn Points"
           emptyText="Staking can not be made because currently no points have been earned."
         />
       )}

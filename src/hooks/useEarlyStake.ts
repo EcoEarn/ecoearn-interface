@@ -16,12 +16,14 @@ import { ICMSInfo } from 'redux/types/reducerTypes';
 import { earlyStake as earlyStakeApi } from 'api/request';
 import { ISendResult } from 'types';
 import getBalanceTip, { fixEarlyStakeData } from 'utils/stake';
-import { getTxResult } from 'utils/aelfUtils';
 import { matchErrorMsg } from 'utils/formatError';
-import useStakeConfig from './useStakeConfig';
 import { formatTokenSymbol } from 'utils/format';
 import qs from 'qs';
 import { useRouter } from 'next/navigation';
+import useNotification from 'hooks/useNotification';
+import { store } from 'redux/store';
+import { setConfirmInfo } from 'redux/reducer/info';
+import { TradeConfirmTypeEnum } from 'components/TradeConfrim';
 
 const noAmountErrorTip = 'No amount available for staking. Please try again later.';
 const poolIsUnlockedError =
@@ -42,17 +44,14 @@ export default function useEarlyStake() {
   const { curChain, caContractAddress, rewardsContractAddress } = useGetCmsInfo() || {};
   const config = useGetCmsInfo();
   const stakeModal = useModal(StakeModalWithConfirm);
-  const { min } = useStakeConfig();
   const router = useRouter();
+  const notification = useNotification();
 
-  const getAmountNotEnoughErrorTip = useCallback(
-    (tokenName: string) => {
-      return `Insufficient balance for early staking; a minimum of ${min} ${formatTokenSymbol(
-        tokenName,
-      )} is required. Your current reward is being processed on the blockchain, please try again later.`;
-    },
-    [min],
-  );
+  const getAmountNotEnoughErrorTip = useCallback((tokenName: string, min: string | number) => {
+    return `Insufficient balance for early staking; a minimum of ${min} ${formatTokenSymbol(
+      tokenName,
+    )} is required. Your current reward is being processed on the blockchain, please try again later.`;
+  }, []);
 
   const checkRewardsAmount = useCallback(
     async (poolType: PoolType, rewardsTokenName?: string) => {
@@ -66,29 +65,37 @@ export default function useEarlyStake() {
       )?.[0];
 
       const { frozen, withdrawable, decimal, claimInfos } = rewardsInfo?.rewardsInfo || {};
-      const stakeTotal = divDecimals(ZERO.plus(frozen || 0).plus(withdrawable || 0), decimal || 8);
-      if (stakeTotal.gte(min)) {
-        return {
-          amount: ZERO.plus(frozen || 0)
-            .plus(withdrawable || 0)
-            .toString(),
-          tokenName: rewardsTokenName || '',
-          dappId: rewardsInfo?.dappId || '',
-          claimInfos: claimInfos || [],
-          claimIds: (claimInfos || []).map((item) => {
-            return item.claimId;
-          }),
-          longestReleaseTime:
-            claimInfos && claimInfos?.length > 0
-              ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
-              : 0,
-        };
-      }
-      throw Error(
-        stakeTotal.isZero() ? noAmountErrorTip : getAmountNotEnoughErrorTip(rewardsTokenName || ''),
+      console.log(
+        'rewardsInfo',
+        frozen,
+        withdrawable,
+        rewardsInfo,
+        rewardsTokenName,
+        poolType,
+        ZERO.plus(frozen || 0)
+          .plus(withdrawable || 0)
+          .toString(),
       );
+
+      return {
+        rewardsInfo,
+        decimal,
+        amount: ZERO.plus(frozen || 0)
+          .plus(withdrawable || 0)
+          .toString(),
+        tokenName: rewardsTokenName || '',
+        dappId: rewardsInfo?.dappId || '',
+        claimInfos: claimInfos || [],
+        claimIds: (claimInfos || []).map((item) => {
+          return item.claimId;
+        }),
+        longestReleaseTime:
+          claimInfos && claimInfos?.length > 0
+            ? claimInfos?.[claimInfos?.length - 1]?.releaseTime || 0
+            : 0,
+      };
     },
-    [getAmountNotEnoughErrorTip, min, wallet?.address],
+    [wallet?.address],
   );
 
   const stake = useCallback(
@@ -98,12 +105,17 @@ export default function useEarlyStake() {
         showLoading();
         const {
           amount: earlyStakeAmount,
+          decimal,
           tokenName,
           dappId = '',
           claimIds = [],
           claimInfos = [],
           longestReleaseTime = 0,
+          rewardsInfo,
         } = (await checkRewardsAmount(poolType, rewardsTokenName)) || {};
+        if (BigNumber(earlyStakeAmount || 0).isZero()) {
+          throw Error(noAmountErrorTip);
+        }
         const earlyStakeData = await getEarlyStakeInfo({
           tokenName: tokenName || '',
           address: wallet?.address || '',
@@ -115,18 +127,53 @@ export default function useEarlyStake() {
           fixEarlyStakeData(earlyStakeData) as Array<IEarlyStakeInfo>
         )?.[0];
         if (fixedEarlyStakeData) {
+          const hasHistoryStake = !BigNumber(fixedEarlyStakeData?.staked || 0).isZero();
+          if (hasHistoryStake) {
+            if (
+              BigNumber(earlyStakeAmount).lt(
+                BigNumber(fixedEarlyStakeData?.minimalExtendStakeAmount || 0),
+              )
+            ) {
+              throw Error(
+                getAmountNotEnoughErrorTip(
+                  tokenName,
+                  divDecimals(
+                    fixedEarlyStakeData?.minimalExtendStakeAmount || 0,
+                    decimal || 8,
+                  ).toString(),
+                ),
+              );
+            }
+          } else {
+            if (
+              BigNumber(earlyStakeAmount).lt(
+                BigNumber(fixedEarlyStakeData?.minimalStakeAmount || 0),
+              )
+            ) {
+              throw Error(
+                getAmountNotEnoughErrorTip(
+                  tokenName,
+                  divDecimals(
+                    fixedEarlyStakeData?.minimalStakeAmount || 0,
+                    decimal || 8,
+                  ).toString(),
+                ),
+              );
+            }
+          }
           if (
             !BigNumber(fixedEarlyStakeData?.staked || 0).isZero() &&
             dayjs(fixedEarlyStakeData?.unlockTime || 0).isBefore(dayjs())
           ) {
             throw Error(poolIsUnlockedError);
           }
-          const hasHistoryStake = !BigNumber(fixedEarlyStakeData?.staked || 0).isZero();
           if (!hasHistoryStake) {
             const params = {
-              poolType,
+              poolType: PoolType.TOKEN,
               poolId: fixedEarlyStakeData?.poolId || '',
               stakeRewards: true,
+              rewardsFrom: poolType,
+              source: 'result',
             };
             const fixedParams = qs.stringify(params);
             beforeLeave?.();
@@ -159,13 +206,13 @@ export default function useEarlyStake() {
                 dappId,
                 poolId: fixedEarlyStakeData?.poolId || '',
                 period: periodInSeconds,
-                operationPoolIds:
-                  poolType === PoolType.POINTS ? [] : [fixedEarlyStakeData?.poolId || ''],
+                operationPoolIds: poolType === PoolType.POINTS ? [] : [rewardsInfo?.poolId || ''],
                 operationDappIds: poolType === PoolType.POINTS ? [dappId || ''] : [],
               };
-              const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
-              if (!signature || !seed || !expirationTime) throw Error();
               try {
+                const res = await earlyStakeSign(signParams);
+                const { signature, seed, expirationTime } = res?.data || {};
+                if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
                 const rpcUrl = (config as Partial<ICMSInfo>)[
                   `rpcUrl${curChain?.toLocaleUpperCase()}`
                 ];
@@ -203,7 +250,7 @@ export default function useEarlyStake() {
                   });
                 } catch (error) {
                   await cancelSign(signParams);
-                  throw Error();
+                  throw Error((error as Error)?.message || '');
                 }
                 console.log('rawTransaction', rawTransaction);
                 if (!rawTransaction) {
@@ -215,26 +262,45 @@ export default function useEarlyStake() {
                   rawTransaction: rawTransaction || '',
                 });
                 if (TransactionId) {
-                  const { TransactionId: resultTransactionId } = await getTxResult(
-                    TransactionId,
-                    rpcUrl,
-                    curChain!,
+                  const params: any = {
+                    poolId: fixedEarlyStakeData?.poolId || '',
+                    poolType: PoolType.TOKEN,
+                  };
+                  const fixedParams = qs.stringify(params);
+                  const targetUrl = `/pool-detail?${fixedParams}`;
+                  store.dispatch(
+                    setConfirmInfo({
+                      backPath: targetUrl,
+                      type: hasHistoryStake ? TradeConfirmTypeEnum.Add : TradeConfirmTypeEnum.Stake,
+                      isStakeRewards: true,
+                      poolDetailPath: `/pool-detail?poolId=${
+                        fixedEarlyStakeData?.poolId || ''
+                      }&poolType=Token`,
+                      poolType,
+                      content: {
+                        poolType,
+                        amount: divDecimals(earlyStakeAmount || 0, decimal || 8).toString(),
+                        days: period,
+                        unlockDateTimeStamp: hasHistoryStake
+                          ? dayjs(fixedEarlyStakeData.unlockTime)
+                              .add(Number(period), 'day')
+                              .valueOf()
+                          : dayjs().add(Number(period), 'day').valueOf(),
+                        tokenSymbol: tokenName || '',
+                        rewardsSymbol: rewardsTokenName || '',
+                      },
+                    }),
                   );
-                  if (resultTransactionId) {
-                    return { TransactionId: resultTransactionId } as ISendResult;
-                  } else {
-                    throw Error();
-                  }
+                  return { TransactionId } as ISendResult;
                 } else {
-                  const { showInModal, matchedErrorMsg } = matchErrorMsg(
-                    errorMessage,
-                    'EarlyStake',
-                  );
-                  if (!showInModal) message.error(matchedErrorMsg);
-                  throw Error(showInModal ? matchedErrorMsg : '');
+                  throw Error(errorMessage);
                 }
               } catch (error) {
-                throw Error((error as Error).message);
+                const errorTip = (error as Error).message;
+                const { matchedErrorMsg, title } = matchErrorMsg(errorTip, 'EarlyStake');
+                matchedErrorMsg &&
+                  notification.error({ description: matchedErrorMsg, message: title || '' });
+                throw Error(errorTip);
               }
             },
             onSuccess: () => {
@@ -246,7 +312,7 @@ export default function useEarlyStake() {
           throw Error('no pool');
         }
       } catch (error) {
-        message.error((error as Error).message);
+        notification.error({ description: (error as Error).message });
       } finally {
         closeLoading();
       }
@@ -257,6 +323,8 @@ export default function useEarlyStake() {
       closeLoading,
       config,
       curChain,
+      getAmountNotEnoughErrorTip,
+      notification,
       rewardsContractAddress,
       router,
       showLoading,
@@ -280,7 +348,7 @@ export default function useEarlyStake() {
     }) => {
       const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
       // const periodInSeconds = 5 * 60;
-      const { frozen, withdrawable, claimInfos } = rewardsInfo?.rewardsInfo || {};
+      const { frozen, withdrawable, claimInfos, decimal } = rewardsInfo?.rewardsInfo || {};
       const earlyStakeAmount = ZERO.plus(frozen || 0)
         .plus(withdrawable || 0)
         .toString();
@@ -295,12 +363,13 @@ export default function useEarlyStake() {
         dappId: rewardsInfo?.dappId || '',
         poolId: earlyStakeInfo?.poolId || '',
         period: periodInSeconds,
-        operationPoolIds: poolType === PoolType.POINTS ? [] : [earlyStakeInfo?.poolId || ''],
+        operationPoolIds: poolType === PoolType.POINTS ? [] : [rewardsInfo?.poolId || ''],
         operationDappIds: poolType === PoolType.POINTS ? [rewardsInfo?.dappId || ''] : [],
       };
-      const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
-      if (!signature || !seed || !expirationTime) throw Error();
       try {
+        const res = (await earlyStakeSign(signParams)) || {};
+        const { signature, seed, expirationTime } = res?.data || {};
+        if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
         const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
         const longestReleaseTime =
           claimInfos && claimInfos?.length > 0
@@ -333,38 +402,57 @@ export default function useEarlyStake() {
           });
         } catch (error) {
           await cancelSign(signParams);
-          throw Error();
+          throw Error((error as Error)?.message || '');
         }
         console.log('rawTransaction', rawTransaction);
         if (!rawTransaction) {
           await cancelSign(signParams);
-          throw Error();
+          throw Error('');
         }
         const { data: TransactionId, message: errorMessage } = await earlyStakeApi({
           chainId: curChain!,
           rawTransaction: rawTransaction || '',
         });
         if (TransactionId) {
-          const { TransactionId: resultTransactionId } = await getTxResult(
-            TransactionId,
-            rpcUrl,
-            curChain!,
+          const hasHistoryStake = BigNumber(earlyStakeInfo?.staked || 0).gt(ZERO);
+          const params: any = {
+            poolId: earlyStakeInfo?.poolId || '',
+            poolType: PoolType.TOKEN,
+          };
+          const fixedParams = qs.stringify(params);
+          const targetUrl = `/pool-detail?${fixedParams}`;
+          store.dispatch(
+            setConfirmInfo({
+              backPath: targetUrl,
+              type: hasHistoryStake ? TradeConfirmTypeEnum.Add : TradeConfirmTypeEnum.Stake,
+              isStakeRewards: true,
+              poolDetailPath: `/pool-detail?poolId=${earlyStakeInfo?.poolId || ''}&poolType=Token`,
+              poolType,
+              content: {
+                poolType,
+                amount: divDecimals(earlyStakeAmount || 0, decimal || 8).toString(),
+                days: period,
+                unlockDateTimeStamp: hasHistoryStake
+                  ? dayjs(earlyStakeInfo.unlockTime).add(Number(period), 'day').valueOf()
+                  : dayjs().add(Number(period), 'day').valueOf(),
+                tokenSymbol: rewardsInfo?.rewardsTokenName || '',
+                rewardsSymbol: rewardsInfo?.rewardsTokenName || '',
+              },
+            }),
           );
-          if (resultTransactionId) {
-            return { TransactionId: resultTransactionId } as ISendResult;
-          } else {
-            throw Error();
-          }
+          return { TransactionId } as ISendResult;
         } else {
-          const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'EarlyStake');
-          if (!showInModal) message.error(matchedErrorMsg);
-          throw Error(showInModal ? matchedErrorMsg : '');
+          throw Error(errorMessage);
         }
       } catch (error) {
-        throw Error((error as Error).message);
+        const errorTip = (error as Error).message;
+        const { matchedErrorMsg, title } = matchErrorMsg(errorTip, 'EarlyStake');
+        matchedErrorMsg &&
+          notification.error({ description: matchedErrorMsg, message: title || '' });
+        throw Error(errorTip);
       }
     },
-    [caContractAddress, config, curChain, rewardsContractAddress, wallet, walletType],
+    [caContractAddress, config, curChain, notification, rewardsContractAddress, wallet, walletType],
   );
 
   return {
