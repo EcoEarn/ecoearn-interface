@@ -67,7 +67,10 @@ export const approve = async (
     }
 
     if (approveResult.error) {
-      message.error(approveResult?.errorMessage?.message || DEFAULT_ERROR);
+      window?.notification.error({
+        description: approveResult?.errorMessage?.message || DEFAULT_ERROR,
+        message: approveResult?.errorMessage?.title || '',
+      });
       captureMessage({
         type: SentryMessageType.CONTRACT,
         params: {
@@ -94,7 +97,10 @@ export const approve = async (
   } catch (error) {
     const resError = error as unknown as IContractError;
     if (resError) {
-      message.error(resError?.errorMessage?.message || DEFAULT_ERROR);
+      window?.notification.error({
+        description: resError?.errorMessage?.message || DEFAULT_ERROR,
+        message: resError?.errorMessage?.title || '',
+      });
     }
     captureMessage({
       type: SentryMessageType.CONTRACT,
@@ -160,7 +166,10 @@ export const checkAllowanceAndApprove = async (options: {
       );
     }
     if (allowance.error) {
-      message.error(allowance.errorMessage?.message || allowance.error.toString() || DEFAULT_ERROR);
+      window?.notification.error({
+        description: allowance.errorMessage?.message || allowance.error.toString() || DEFAULT_ERROR,
+        message: allowance.errorMessage?.title || '',
+      });
       return false;
     }
 
@@ -189,7 +198,10 @@ export const checkAllowanceAndApprove = async (options: {
     message.destroy();
     const resError = error as unknown as IContractError;
     if (resError) {
-      message.error(resError.errorMessage?.message || DEFAULT_ERROR);
+      window?.notification.error({
+        description: resError.errorMessage?.message || DEFAULT_ERROR,
+        message: resError.errorMessage?.title || '',
+      });
     }
     captureMessage({
       type: SentryMessageType.CONTRACT,
@@ -212,6 +224,7 @@ export async function getTxResult(
   retryCountWhenNotExist = 0,
 ): Promise<any> {
   const txResult = await getAElf(rpcUrl).chain.getTxResult(TransactionId);
+  console.log('txResult', txResult);
   if (txResult.error && txResult.errorMessage) {
     throw Error(txResult.errorMessage.message || txResult.errorMessage.Message);
   }

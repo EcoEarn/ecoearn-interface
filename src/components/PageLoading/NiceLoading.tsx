@@ -28,7 +28,10 @@ export function NiceLoading({ showClose = false, content, onClose }: ILoadingPro
   return (
     <>
       {modal.visible && (
-        <div className="w-full h-full fixed top-0 left-0 text-black bg-transparent z-[500] flex items-center justify-center">
+        <div
+          className="w-full h-full fixed top-0 left-0 text-black bg-transparent flex items-center justify-center"
+          style={{ zIndex: Number.MAX_SAFE_INTEGER }}
+        >
           <Loading />
         </div>
       )}

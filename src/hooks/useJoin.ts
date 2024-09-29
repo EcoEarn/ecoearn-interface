@@ -8,12 +8,14 @@ import { message } from 'antd';
 import { Join } from 'contract/rewards';
 import { useWalletService } from './useWallet';
 import { store } from 'redux/store';
+import useNotification from './useNotification';
 
 export default function useJoin() {
   const joinModal = useModal(JoinModal);
   const { showLoading, closeLoading } = useLoading();
   const [loading, setLoading] = useState(false);
   const { wallet } = useWalletService();
+  const notification = useNotification();
 
   const checkJoinsStatus = useCallback(async () => {
     let isJoin = false;
@@ -48,13 +50,13 @@ export default function useJoin() {
     } catch (error) {
       console.log('=====error', error);
       const errorMessage = (error as IContractError).errorMessage?.message;
-      message.error(errorMessage);
+      errorMessage && notification.error({ description: errorMessage });
       return false;
     } finally {
       setLoading(false);
       joinModal.hide();
     }
-  }, [checkJoinsStatus, joinModal]);
+  }, [checkJoinsStatus, joinModal, notification]);
 
   return {
     checkJoinsStatus,

@@ -85,8 +85,10 @@ export default function StakeCard({ type, data, isLogin }: IStakeCardProps) {
           icons={icons}
           rate={rate}
           tokenName={stakeSymbol}
+          showProjectName={false}
           projectName={projectOwner || '--'}
           symbolDigs={12}
+          ratePosition={type === PoolType.TOKEN ? 'right' : 'bottom'}
         />
         {showStakeInfo && typeof isUnLocked === 'boolean' && (
           <>
@@ -131,8 +133,9 @@ export default function StakeCard({ type, data, isLogin }: IStakeCardProps) {
         </div>
         <div className="w-full mt-[20px] lg:mt-0 lg:absolute -bottom-[20px] left-0 lg:opacity-0 transition-all ease-in-out duration-300 group-hover:bg-white group-hover:opacity-100 group-hover:bottom-0 group-hover:transition-all group-hover:ease-in-out group-hover:duration-300">
           <Button
-            className="w-full !h-[40px] lg:self-center !rounded-lg m-auto"
+            className="w-full lg:self-center !rounded-lg m-auto"
             type="primary"
+            size="medium"
             onClick={() => {
               router.push(`/pool-detail?poolId=${data.poolId}&poolType=${type}`);
             }}

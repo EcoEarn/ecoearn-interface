@@ -23,6 +23,7 @@ import { ICMSInfo } from 'redux/types/reducerTypes';
 import { getTxResult } from 'utils/aelfUtils';
 import styles from './style.module.css';
 import { matchErrorMsg } from 'utils/formatError';
+import useNotification from 'hooks/useNotification';
 
 interface IRemoveLiquidityModalProps {
   tokenA: {
@@ -86,6 +87,7 @@ function RemoveLiquidityModal({
   const { wallet, walletType } = useWalletService();
   const { caContractAddress, rewardsContractAddress, curChain } = useGetCmsInfo() || {};
   const config = useGetCmsInfo() || {};
+  const notification = useNotification();
 
   useEffect(() => {
     if (!tokenA?.symbol || !tokenB?.symbol) return;
@@ -172,8 +174,9 @@ function RemoveLiquidityModal({
             tokenBMin,
             liquidityIds,
           };
-          const { seed, signature, expirationTime } = (await liquidityRemoveSign(signParams)) || {};
-          if (!seed || !signature || !expirationTime) throw Error();
+          const res = (await liquidityRemoveSign(signParams)) || {};
+          const { signature, seed, expirationTime } = res?.data || {};
+          if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
           const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
           let rawTransaction = null;
           try {
@@ -201,7 +204,7 @@ function RemoveLiquidityModal({
             });
           } catch (error) {
             await cancelSign(signParams);
-            throw Error();
+            throw Error((error as Error)?.message || '');
           }
           console.log('rawTransaction', rawTransaction);
           if (!rawTransaction) {
@@ -226,9 +229,10 @@ function RemoveLiquidityModal({
               throw Error();
             }
           } else {
-            const { showInModal, matchedErrorMsg } = matchErrorMsg(message, 'RemoveLiquidity');
-            if (!showInModal) AntdMessage.error(matchedErrorMsg);
-            throw Error(showInModal ? matchedErrorMsg : '');
+            const { matchedErrorMsg, title } = matchErrorMsg(message, 'RemoveLiquidity');
+            if (matchedErrorMsg)
+              notification.error({ description: matchedErrorMsg, message: title });
+            throw Error(matchedErrorMsg);
           }
         } catch (error) {
           const errorTip = (error as Error).message;
@@ -252,6 +256,7 @@ function RemoveLiquidityModal({
     fee,
     liquidityIds,
     lpAmount,
+    notification,
     receiveModal,
     rewardsContractAddress,
     showLoading,

@@ -44,6 +44,11 @@ class Request {
         if (
           response?.config?.url &&
           [
+            '/app/rewards/early/stake/signature',
+            '/app/rewards/withdraw/signature',
+            '/app/rewards/add/liquidity/signature',
+            '/app/rewards/liquidity/stake/signature',
+            '/app/rewards/remove/liquidity/signature',
             '/app/points/staking/claim',
             '/app/rewards/early/stake',
             '/app/rewards/withdraw',
@@ -69,7 +74,9 @@ class Request {
           case '50000':
             return null;
           default:
-            message.error(errorMessage);
+            window?.notification.error({
+              description: errorMessage,
+            });
             return res;
         }
       },
@@ -81,7 +88,9 @@ class Request {
             break;
 
           case 401:
-            message.error('The signature has expired. Please log in again.');
+            window?.notification.error({
+              description: 'The signature has expired. Please log in again.',
+            });
             setTimeout(() => {
               location.pathname = '/';
             }, 3000);
@@ -104,7 +113,9 @@ class Request {
             break;
         }
 
-        message.error(errMessage);
+        window?.notification.error({
+          description: errMessage,
+        });
         return Promise.reject(errMessage);
       },
     );

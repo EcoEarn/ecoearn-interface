@@ -53,13 +53,16 @@ export default function PoolsTable({
         render: (text, item) => {
           const { tokenIcon, tokenName, projectOwner } = item;
           return (
-            <div className="flex items-center gap-4">
-              {tokenIcon && <img className="w-[48px] h-[48px]" src={tokenIcon[0]} alt="" />}
-              <div>
-                <div className="text-[20px] text-neutralTitle font-[600]">{tokenName}</div>
-                <div className="text-[16px] text-neutralSecondary">{projectOwner}</div>
-              </div>
-            </div>
+            <>
+              <StakeToken
+                type={item.poolTypeStr as PoolType}
+                icons={tokenIcon}
+                tokenName={tokenName}
+                projectName={projectOwner}
+                rate={item?.rate}
+                tagClassName="!text-base !font-[500] !px-[7px] !py-[3px] !rounded-md"
+              />
+            </>
           );
         },
       },
@@ -70,7 +73,6 @@ export default function PoolsTable({
         title: (
           <div className="flex items-center">
             <span>Claimed rewards</span>
-            <CommonTooltip title="Claimed Rewards" className="ml-1" />
           </div>
         ),
         render: (text, item) => {

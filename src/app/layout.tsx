@@ -5,6 +5,7 @@ import 'styles/global.css';
 import 'styles/theme.css';
 import Provider from 'provider';
 import StyleRegistry from './StyleRegistry';
+import Head from 'next/head';
 
 export const metadata = {
   title: 'ecoearn',
@@ -14,11 +15,7 @@ export const metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
+      <Head>
         <link
           rel="preload"
           href="/font/Poppins-Regular.ttf"
@@ -44,7 +41,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
         />
-      </head>
+      </Head>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-JER8ZTSQ19" />
       <Script id="google-analytics">
         {`

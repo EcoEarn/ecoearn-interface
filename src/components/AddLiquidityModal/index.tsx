@@ -35,6 +35,7 @@ import { ZERO } from 'constants/index';
 import styles from './index.module.css';
 import { matchErrorMsg } from 'utils/formatError';
 import { fixEarlyStakeData } from 'utils/stake';
+import useNotification from 'hooks/useNotification';
 
 export interface IAddLiquidityModalProps {
   tokenA: {
@@ -102,6 +103,7 @@ function AddLiquidityModal({
   const config = useGetCmsInfo() || {};
   const [tolerance, setTolerance] = useState('0.5');
   const [deadline, setDeadline] = useState('20');
+  const notification = useNotification();
 
   const onTokenAChange = useCallback((value: string) => {
     setTokenAValue(value);
@@ -223,23 +225,32 @@ function AddLiquidityModal({
           !BigNumber(fixedEarlyStakeData?.staked || 0).isZero() &&
           dayjs(fixedEarlyStakeData?.unlockTime || 0).isBefore(dayjs())
         ) {
-          message.error(
-            'Stake has expired, cannot be added stake. Please renew the staking first.',
-          );
+          notification.error({
+            description:
+              'Stake has expired, cannot be added stake. Please renew the staking first.',
+          });
           return;
         }
         return fixedEarlyStakeData;
       } else {
-        message.error('no pool');
+        notification.error({ description: 'no pool' });
         return;
       }
     } catch (error) {
-      singleMessage.error('getPool failed');
+      notification.error({ description: 'getPool failed' });
       return;
     } finally {
       closeLoading();
     }
-  }, [closeLoading, curChain, lpToken.rate, lpToken?.symbol, showLoading, wallet?.address]);
+  }, [
+    closeLoading,
+    curChain,
+    lpToken.rate,
+    lpToken?.symbol,
+    notification,
+    showLoading,
+    wallet?.address,
+  ]);
 
   const handleSupply = useCallback(async () => {
     const stakeData = await checkStakeData();
@@ -302,9 +313,10 @@ function AddLiquidityModal({
               operationDappIds: dappIdsToStake ? dappIdsToStake : [],
               operationPoolIds: poolIdsToStake ? poolIdsToStake : [],
             };
-            const { seed, signature, expirationTime } = (await addLiquiditySign(signParams)) || {};
+            const res = (await addLiquiditySign(signParams)) || {};
             closeLoading();
-            if (!seed || !signature || !expirationTime) throw Error();
+            const { signature, seed, expirationTime } = res?.data || {};
+            if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
             const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
             const seconds = Math.ceil(new Date().getTime() / 1000) + Number(deadline || 20) * 60;
             let rawTransaction = null;
@@ -337,7 +349,7 @@ function AddLiquidityModal({
               });
             } catch (error) {
               await cancelSign(signParams);
-              throw Error();
+              throw Error((error as Error)?.message || '');
             }
             console.log('rawTransaction', rawTransaction);
             if (!rawTransaction) {
@@ -364,12 +376,13 @@ function AddLiquidityModal({
                 throw Error();
               }
             } else {
-              const { showInModal, matchedErrorMsg } = matchErrorMsg(
+              const { matchedErrorMsg, title } = matchErrorMsg(
                 errorMessage,
                 'AddLiquidityAndStake',
               );
-              if (!showInModal) message.error(matchedErrorMsg);
-              throw Error(showInModal ? matchedErrorMsg : '');
+              if (!matchedErrorMsg)
+                notification.error({ description: matchedErrorMsg, message: title });
+              throw Error(matchedErrorMsg);
             }
           } catch (error) {
             const errorMsg = (error as Error).message;
@@ -410,6 +423,7 @@ function AddLiquidityModal({
     deadline,
     walletType,
     caContractAddress,
+    notification,
     onSuccess,
   ]);
 

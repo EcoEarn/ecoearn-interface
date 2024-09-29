@@ -4,13 +4,14 @@ import { useModal } from '@ebay/nice-modal-react';
 import { useCallback } from 'react';
 import { joinContent, joinTitle, joinButton } from 'constants/joinMessage';
 import { AcceptReferral } from 'contract/rewards';
-import { message } from 'antd';
 import { IContractError } from 'types';
+import useNotification from 'hooks/useNotification';
 
 export default function useAccountModal() {
   const modal = useModal(AccountModal);
   const router = useRouter();
   const urlSearchParams = useSearchParams();
+  const notification = useNotification();
 
   const newUser = useCallback(() => {
     modal.show({
@@ -28,11 +29,11 @@ export default function useAccountModal() {
           router.push('/staking');
         } catch (error) {
           const errorMessage = (error as IContractError).errorMessage?.message;
-          message.error(errorMessage);
+          errorMessage && notification.error({ description: errorMessage });
         }
       },
     });
-  }, [modal, router, urlSearchParams]);
+  }, [modal, notification, router, urlSearchParams]);
 
   const oldUser = useCallback(() => {
     modal.show({

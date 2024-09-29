@@ -45,6 +45,10 @@ export default function useWebLoginConfig() {
           botId: telegramBotId,
         },
       },
+      referralInfo: {
+        referralCode: '',
+        projectCode: '13025',
+      },
     };
   }, [connectUrlV2, graphqlServerV2, networkTypeV2, portkeyServerV2, telegramBotId]);
 

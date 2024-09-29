@@ -1,10 +1,17 @@
 import { Flex } from 'antd';
 import { ZERO } from 'constants/index';
 import { useMemo } from 'react';
+import { PoolType } from 'types/stake';
 import { divDecimals } from 'utils/calculate';
-import { formatNumber, formatTokenSymbol } from 'utils/format';
+import { formatNumber, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 
-export default function AmountInfo({ poolInfo }: { poolInfo: IStakePoolData }) {
+export default function AmountInfo({
+  poolInfo,
+  poolType,
+}: {
+  poolInfo: IStakePoolData;
+  poolType: PoolType;
+}) {
   const totalStakedValueText = useMemo(() => {
     return `${formatNumber(divDecimals(poolInfo?.totalStake || 0, poolInfo?.decimal || 8), {
       decimalPlaces: 0,
@@ -12,12 +19,18 @@ export default function AmountInfo({ poolInfo }: { poolInfo: IStakePoolData }) {
   }, [poolInfo?.decimal, poolInfo?.stakeSymbol, poolInfo?.totalStake]);
 
   const marketCapText = useMemo(() => {
-    return `${formatTokenSymbol(poolInfo?.stakeSymbol || '')} Market Cap`;
-  }, [poolInfo?.stakeSymbol]);
+    return poolType === PoolType.LP
+      ? 'TVL'
+      : `${formatTokenSymbol(poolInfo?.stakeSymbol || '')} Market Cap`;
+  }, [poolInfo?.stakeSymbol, poolType]);
 
   const marketCapValueText = useMemo(() => {
-    return `$ ${formatNumber(poolInfo?.marketCap || 0, { decimalPlaces: 0 })}`;
-  }, [poolInfo?.marketCap]);
+    return poolType === PoolType.LP
+      ? formatUSDPrice(divDecimals(poolInfo?.totalStakeInUsd || 0, poolInfo?.decimal), {
+          decimalPlaces: 0,
+        })
+      : `$ ${formatNumber(poolInfo?.marketCap || 0, { decimalPlaces: 0 })}`;
+  }, [poolInfo?.decimal, poolInfo?.marketCap, poolInfo?.totalStakeInUsd, poolType]);
 
   const stakersValueText = useMemo(() => {
     return ZERO.plus(poolInfo?.stakers || 0).toFormat();

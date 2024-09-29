@@ -66,7 +66,7 @@ export const getRawTransactionDiscover = async ({
 
     return transaction;
   } catch (error) {
-    return null;
+    return Promise.reject(error);
   }
 };
 
@@ -80,35 +80,39 @@ export const handleTransaction = async ({
   provider,
   rpcUrl,
 }: any) => {
-  // Create transaction
-  const rawTx = aelf.getRawTx({
-    blockHeightInput,
-    blockHashInput,
-    packedInput,
-    address,
-    contractAddress,
-    functionName,
-  });
-  rawTx.params = Buffer.from(rawTx.params, 'hex');
+  try {
+    // Create transaction
+    const rawTx = aelf.getRawTx({
+      blockHeightInput,
+      blockHashInput,
+      packedInput,
+      address,
+      contractAddress,
+      functionName,
+    });
+    rawTx.params = Buffer.from(rawTx.params, 'hex');
 
-  const signData = aelf.encodeTransaction(rawTx);
+    const signData = aelf.encodeTransaction(rawTx);
 
-  console.log(signData, 'signData===');
+    console.log(signData, 'signData===');
 
-  const instance1 = getAElf(rpcUrl);
+    const instance1 = getAElf(rpcUrl);
 
-  const p = await getRawParams(instance1, signData);
-  console.log(p, '===getRawParams');
+    const p = await getRawParams(instance1, signData);
+    console.log(p, '===getRawParams');
 
-  const sin = await provider.request({
-    method: MethodsWallet.GET_WALLET_TRANSACTION_SIGNATURE,
-    payload: { data: aelf.encodeTransaction(rawTx) },
-  });
+    const sin = await provider.request({
+      method: MethodsWallet.GET_WALLET_TRANSACTION_SIGNATURE,
+      payload: { data: aelf.encodeTransaction(rawTx) },
+    });
 
-  const transaction = aelf.encodeTransaction({
-    ...rawTx,
-    signature: Buffer.from(sigObjToStr(sin as any), 'hex'),
-  });
+    const transaction = aelf.encodeTransaction({
+      ...rawTx,
+      signature: Buffer.from(sigObjToStr(sin as any), 'hex'),
+    });
 
-  return transaction;
+    return transaction;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };

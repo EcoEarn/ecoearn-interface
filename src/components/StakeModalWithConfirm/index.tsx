@@ -16,6 +16,7 @@ import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
 import { formatTokenSymbol } from 'utils/format';
 import { useRouter } from 'next/navigation';
+import useLoading from 'hooks/useLoading';
 
 interface IStakeModalProps {
   type: StakeType;
@@ -82,6 +83,7 @@ function StakeModalWithConfirm({
   const [transactionId, setTransactionId] = useState('');
   const { stakeSymbol, staked, unlockTime = '', decimal = 8, poolId } = stakeData || {};
   const router = useRouter();
+  const { showLoading, closeLoading } = useLoading();
 
   const getNewUnlockTimeStamp = useCallback(
     (period: string) =>
@@ -95,22 +97,46 @@ function StakeModalWithConfirm({
     modal.remove();
   }, [modal]);
 
+  const onConfirm = useCallback(
+    async (content: TConfirmModalContentType) => {
+      try {
+        setLoading(true);
+        showLoading();
+        const { amount, period } = content as TStakeExtendContent;
+        const res = await onStake(amount || '', period || '', poolId);
+        if (res?.TransactionId) {
+          onSuccess?.();
+          setVisible(false);
+          modal.hide();
+          router.push(`/tx/${res?.TransactionId}`);
+        } else {
+          throw Error();
+        }
+      } catch (error) {
+        const errorTip = (error as Error).message;
+        console.error('===stake error', errorTip);
+      } finally {
+        setLoading(false);
+        closeLoading();
+      }
+    },
+    [closeLoading, modal, onStake, onSuccess, poolId, router, showLoading],
+  );
+
   const setConfirmContent = useCallback(
     (amount: string, period: string) => {
       console.log('stake--type', type, amount);
       const _staked = divDecimals(staked, decimal).toFixed();
+      let content;
       if (type === StakeType.EXTEND) {
-        setContent({
+        content = {
           amount,
           period,
           days: period,
           oldDateTimeStamp: unlockTime,
           newDateTimeStamp: getNewUnlockTimeStamp(period),
-        });
-        return;
-      }
-
-      if (type === StakeType.STAKE || type === StakeType.RENEW) {
+        };
+      } else if (type === StakeType.STAKE || type === StakeType.RENEW) {
         const seconds = dayjs.duration(Number(period), 'day').asSeconds();
         console.log(
           'unlockDateTimeStamp',
@@ -118,27 +144,26 @@ function StakeModalWithConfirm({
           +period,
           seconds,
         );
-        setContent({
+        content = {
           amount,
           period,
           unlockDateTimeStamp: dayjs().add(seconds, 'second').valueOf(),
           tokenSymbol: stakeSymbol ? formatTokenSymbol(stakeSymbol) : '--',
-        });
-        return;
+        };
+      } else {
+        content = {
+          amount,
+          period,
+          oldAmount: earlyAmount ? divDecimals(earlyAmount, decimal || 8).toNumber() : _staked,
+          unlockDateTimeStamp: period ? undefined : unlockTime,
+          oldDateTimeStamp: period ? unlockTime : undefined,
+          newDateTimeStamp: period ? getNewUnlockTimeStamp(period) : undefined,
+          tokenSymbol: stakeSymbol ? formatTokenSymbol(stakeSymbol) : '--',
+        };
       }
-
-      setContent({
-        amount,
-        period,
-        oldAmount: earlyAmount ? divDecimals(earlyAmount, decimal || 8).toNumber() : _staked,
-        unlockDateTimeStamp: period ? undefined : unlockTime,
-        oldDateTimeStamp: period ? unlockTime : undefined,
-        newDateTimeStamp: period ? getNewUnlockTimeStamp(period) : undefined,
-        tokenSymbol: stakeSymbol ? formatTokenSymbol(stakeSymbol) : '--',
-      });
-      return;
+      onConfirm(content);
     },
-    [decimal, earlyAmount, getNewUnlockTimeStamp, stakeSymbol, staked, type, unlockTime],
+    [decimal, earlyAmount, getNewUnlockTimeStamp, onConfirm, stakeSymbol, staked, type, unlockTime],
   );
 
   const onStakeModalConfirm = useCallback(
@@ -151,34 +176,8 @@ function StakeModalWithConfirm({
       );
       setStatus('normal');
       setConfirmContent(amount, period);
-      setVisible(true);
     },
     [setConfirmContent, type],
-  );
-
-  const onConfirm = useCallback(
-    async (content: TConfirmModalContentType) => {
-      try {
-        setLoading(true);
-        const { amount, period } = content as TStakeExtendContent;
-        const res = await onStake(amount || '', period || '', poolId);
-        if (res?.TransactionId) {
-          setStatus('success');
-          setTransactionId(res?.TransactionId);
-          onSuccess?.();
-        } else {
-          throw Error();
-        }
-      } catch (error) {
-        const errorTip = (error as Error).message;
-        console.error('===stake error', errorTip);
-        errorTip && setErrorTip(errorTip);
-        setStatus('error');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [onStake, onSuccess, poolId],
   );
 
   const onConfirmClose = useCallback(() => {

@@ -152,3 +152,32 @@ code {
   @apply z-[100100];
 }
 
+.ant-notification-notice-wrapper {
+	@apply !shadow-none;
+}
+
+.notification-ecoearn {
+	@apply shadow-none !w-[590px] max-w-[590px] !rounded-md !overflow-hidden !p-6;
+	.ant-notification-notice-message {
+		@apply !text-base !font-medium !text-neutralTitle;
+	}
+	.ant-notification-notice-description {
+		@apply !text-sm !font-normal !text-neutralTitle;
+	}
+}
+
+.notification-ecoearn-error {
+	@apply border-[1px] border-solid border-[#FFBFBF] bg-[#FEE8E8];
+}
+
+.notification-ecoearn-success{
+	@apply border-[1px] border-solid border-functionalSuccess bg-functionalSuccessBg;
+}
+
+.notification-ecoearn-withoutmessage {
+	.ant-notification-notice-message {
+		@apply hidden;
+	}
+}
+
+

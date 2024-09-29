@@ -24,6 +24,7 @@ import { formatTokenSymbol } from 'utils/format';
 import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import { ZERO } from 'constants/index';
 import { message } from 'antd';
+import useNotification from 'hooks/useNotification';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -44,6 +45,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const { stake: earlyStake } = useEarlyStake();
   const { getAddress } = useGetAwakenContract();
   const operationAmount = useRef('0');
+  const notification = useNotification();
 
   const goLiquidity = useCallback(() => {
     if (!isLogin) {
@@ -62,16 +64,17 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       const { withLoading = true } = props || {};
       // withLoading && showLoading();
       try {
-        const { pools, textNodes } = await fetchStakingPoolsData({
-          poolType,
-          sorting: '',
-          name: '',
-          skipCount: 0,
-          maxResultCount: 20,
-          address: wallet?.address || '',
-          chainId: curChain!,
-        });
-        const stakeData = (pools || []).map((item, index) => {
+        const { pools, textNodes } =
+          (await fetchStakingPoolsData({
+            poolType,
+            sorting: '',
+            name: '',
+            skipCount: 0,
+            maxResultCount: 20,
+            address: wallet?.address || '',
+            chainId: curChain!,
+          })) || {};
+        const stakeData = (pools || [])?.map((item, index) => {
           return {
             ...item,
             unlockTime: getTargetUnlockTimeStamp(
@@ -89,7 +92,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         withLoading && closeLoading();
       }
     },
-    [closeLoading, curChain, poolType, showLoading, wallet?.address],
+    [closeLoading, curChain, poolType, wallet?.address],
   );
 
   useInterval(
@@ -161,7 +164,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         supportEarlyStake,
       } = stakeData;
       if (!stakeId || !poolId) {
-        singleMessage.error('missing params');
+        notification.error({ description: 'missing params' });
         return;
       }
       try {
@@ -215,15 +218,25 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         });
       } catch (error) {
         console.error('GetReward error', error);
-        singleMessage.error(
-          (error as IContractError).errorMessage?.message ||
+        notification.error({
+          description:
+            (error as IContractError).errorMessage?.message ||
             'unlock failed, please try again later',
-        );
+        });
       } finally {
         closeLoading();
       }
     },
-    [closeLoading, earlyStake, getStakeData, poolType, showLoading, unlockModal, wallet?.address],
+    [
+      closeLoading,
+      earlyStake,
+      getStakeData,
+      notification,
+      poolType,
+      showLoading,
+      unlockModal,
+      wallet?.address,
+    ],
   );
 
   const getLpTokenContractAddress = useCallback(
@@ -275,21 +288,21 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
         }
         return divDecimals(balance || 0, decimal).toFixed(4);
       } catch (error) {
-        singleMessage.error('get balance error.');
+        notification.error({ description: 'get balance error.' });
         console.error('GetBalance error', error);
         return;
       } finally {
         closeLoading();
       }
     },
-    [closeLoading, getLpTokenContractAddress, poolType, showLoading, wallet?.address],
+    [closeLoading, getLpTokenContractAddress, notification, poolType, showLoading, wallet?.address],
   );
 
   const showStakeModal = useCallback(
     async (type: StakeType, stakeData: IStakePoolData) => {
       const { stakeSymbol = '', decimal = 8, rate = 0.003 } = stakeData;
       if (!stakeSymbol) {
-        singleMessage.error('stakeSymbol is required.');
+        notification.error({ description: 'stakeSymbol is required.' });
         return;
       }
       let symbolBalance;
@@ -331,9 +344,10 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
               });
               return renewRes;
             } catch (error) {
-              const { showInModal, errorMessage } = error as any;
-              if (!showInModal) message.error(errorMessage.message);
-              throw Error(showInModal ? errorMessage.message : '');
+              const { errorMessage } = error as any;
+              const { message, title } = errorMessage;
+              if (message) notification.error({ description: message, message: title });
+              throw Error(message);
             }
           } else {
             await checkApproveParams(rate as TFeeType);
@@ -365,9 +379,10 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
                 });
                 return stakeRes;
               } catch (error) {
-                const { showInModal, errorMessage } = error as any;
-                if (!showInModal) message.error(errorMessage.message);
-                throw Error(showInModal ? errorMessage.message : '');
+                const { errorMessage } = error as any;
+                const { message, title } = errorMessage;
+                if (message) notification.error({ description: message, message: title });
+                throw Error(message);
               }
             }
           }
@@ -403,6 +418,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       poolType,
       stakeModal,
       getSymbolBalance,
+      notification,
       checkApproveParams,
       tokensContractAddress,
       wallet?.address,

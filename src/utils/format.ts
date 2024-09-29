@@ -219,7 +219,7 @@ export function formatTokenSymbol(symbol: string) {
     const pair = splitSymbol[1];
     const tokens = splitTokensFromPairSymbol(pair);
     const orderedTokens = orderPairTokens(tokens?.[0], tokens?.[1]);
-    return orderedTokens ? `${orderedTokens[0]}-${orderedTokens[1]} LP` : `${pair} LP`;
+    return orderedTokens ? `${orderedTokens[0]}-${orderedTokens[1]}` : `${pair}`;
   }
   return formatSymbol(symbol);
 }

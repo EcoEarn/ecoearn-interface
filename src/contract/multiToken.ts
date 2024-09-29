@@ -117,7 +117,7 @@ export const GetBalance = async (
 export const GetAllowance = async (
   params: IGetAllowanceParams,
   options?: IContractOptions,
-): Promise<IGetAllowanceResponse & IContractError> => {
+): Promise<any> => {
   try {
     const res = (await multiTokenContractRequest('GetAllowance', params, {
       ...options,
@@ -129,14 +129,11 @@ export const GetAllowance = async (
   }
 };
 
-export const Approve = async (
-  params: IApproveParams,
-  options?: IContractOptions,
-): Promise<IContractError> => {
+export const Approve = async (params: IApproveParams, options?: IContractOptions): Promise<any> => {
   try {
     const res = (await multiTokenContractRequest('Approve', params, {
       ...options,
-    })) as IContractError;
+    })) as any;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);

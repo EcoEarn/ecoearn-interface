@@ -1,0 +1,7 @@
+/* stylelint-disable color-function-notation */
+/* stylelint-disable alpha-value-notation */
+.coming-soon {
+  @apply w-fit rounded-[20px] px-2 h-6 text-[13px] leading-5 font-normal text-[#7D48E8] flex justify-center items-center;
+
+  background: rgba(125, 72, 232, 0.15);
+}

@@ -10,6 +10,7 @@ import { RewardsTypeEnum } from 'pageComponents/rewards';
 import { formatTokenSymbol } from 'utils/format';
 import { useRouter } from 'next/navigation';
 import { useTimeout } from 'ahooks';
+import RewardsPoolName from '../RewardsPoolName';
 
 export default forwardRef(function PoolsAmount({
   currentType,
@@ -59,7 +60,6 @@ export default forwardRef(function PoolsAmount({
                 const amountTip = `All ${formatTokenSymbol(
                   rewardItem?.rewardsTokenName,
                 )} rewards claimed in the ${rewardItem?.poolName} pool.`;
-                const poolNameFormat = formatTokenSymbol(rewardItem?.poolName);
                 const icons = rewardItem?.tokenIcon;
                 return (
                   <div
@@ -67,15 +67,12 @@ export default forwardRef(function PoolsAmount({
                     className="col-span-1 flex flex-col border-solid border-neutralBorder border-[1px] rounded-[24px] p-6 overflow-hidden bg-neutralWhiteBg transition-all ease-in-out duration-300 hover:shadow-xl hover:ease hover:duration-300 group"
                   >
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-[16px]">
-                        {icons && <img className="w-[48px]" src={icons} alt="" />}
-                        <span className="text-[20px] text-neutralTitle font-[600]">
-                          {poolNameFormat}
-                        </span>
-                        {/* {Number(rewardItem?.rate || 0) !== 0 && (
-                        <RateTag value={Number(rewardItem?.rate || 0) * 100} />
-                      )} */}
-                      </div>
+                      <RewardsPoolName
+                        poolType={rewardItem?.poolType}
+                        name={rewardItem?.poolName}
+                        icons={icons}
+                        rate={rewardItem?.rate}
+                      />
                       {/* <div
                       className="flex gap-1 items-center text-sm font-medium text-brandDefault w-fit cursor-pointer"
                       onClick={() => {
@@ -147,7 +144,7 @@ export default forwardRef(function PoolsAmount({
                           type="primary"
                           onClick={() => {
                             router.push(
-                              `/rewards-detail?poolId=${rewardItem.poolId}&poolType=${rewardItem.poolType}`,
+                              `/rewards-detail?poolId=${rewardItem.poolId}&dappId=${rewardItem.dappId}&poolType=${rewardItem.poolType}`,
                             );
                           }}
                         >

@@ -131,11 +131,11 @@ export const Approve = async (
   params: IApproveParams,
   contractAddress: string,
   options?: IContractOptions,
-): Promise<IContractError> => {
+): Promise<any> => {
   try {
     const res = (await lpTokenContractRequest('Approve', contractAddress, params, {
       ...options,
-    })) as IContractError;
+    })) as any;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);

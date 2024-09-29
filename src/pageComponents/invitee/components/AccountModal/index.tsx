@@ -6,6 +6,7 @@ import styles from './style.module.css';
 import { useCallback, useState } from 'react';
 import { singleMessage } from '@portkey/did-ui-react';
 import { IContractError } from 'types';
+import useNotification from 'hooks/useNotification';
 
 interface IAccountModal {
   showLoading?: boolean;
@@ -19,6 +20,7 @@ function AccountModal({ showLoading, title, content, btnText, onOk }: IAccountMo
   const modal = useModal();
   const { isLG } = useResponsive();
   const [loading, setLoading] = useState(false);
+  const notification = useNotification();
 
   const handleClick = useCallback(async () => {
     if (showLoading) {
@@ -27,11 +29,12 @@ function AccountModal({ showLoading, title, content, btnText, onOk }: IAccountMo
     try {
       await onOk();
     } catch (error) {
-      singleMessage.error((error as IContractError).errorMessage?.message);
+      const errorTip = (error as IContractError).errorMessage?.message;
+      errorTip && notification.error({ description: errorTip });
     } finally {
       setLoading(false);
     }
-  }, [onOk, showLoading]);
+  }, [notification, onOk, showLoading]);
 
   return (
     <Modal

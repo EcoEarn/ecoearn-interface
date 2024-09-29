@@ -27,10 +27,11 @@ export default function ItemCard({
     const { tokenIcon, tokenName, projectOwner } = item;
     return (
       <StakeToken
-        type={item.poolType as unknown as PoolType}
+        type={item.poolTypeStr as unknown as PoolType}
         icons={tokenIcon}
         tokenName={tokenName}
         projectName={projectOwner}
+        tagClassName="!text-base !font-[500] !px-[7px] !py-[3px] !rounded-md"
       />
     );
   }, [item]);
@@ -47,7 +48,6 @@ export default function ItemCard({
       <Flex className="text-base mt-[32px]" justify="space-between" align="start">
         <Flex align="center">
           <span className="text-neutralSecondary">Claimed rewards</span>
-          <CommonTooltip title="Claimed rewards" className="ml-2" />
         </Flex>
         <Flex vertical align="end" className="text-base">
           <span className="text-neutralPrimary font-[600]">{`${formatTokenPrice(

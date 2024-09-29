@@ -17,6 +17,7 @@ interface Window {
       platform?: import('types').DeviceTypeEnum;
     };
   };
+  notification?: any;
 }
 
 type MethodType = <T, R>(params: CallContractParams<T>) => Promise<R>;

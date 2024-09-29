@@ -66,10 +66,17 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
 
     let resMessage: string = defaultErrorTip;
     let showInModal = false;
+    let title = '';
+    console.log('===errorMessage', message);
 
     if (
       message.includes('Operation canceled.') ||
-      message.includes('You closed the prompt without any action.') ||
+      message.includes('You closed the prompt without any action.')
+    ) {
+      resMessage = 'It looks like you’ve rejected the transaction. Please try again.';
+      title = 'Transaction Rejected';
+      showInModal = false;
+    } else if (
       message.includes('There is something wrong at login stage with discover') ||
       message.includes('User denied.')
     ) {
@@ -111,7 +118,7 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
       resMessage =
         'You can claim once during the unlock period; remaining rewards will be claimed upon unlocking.';
       showInModal = true;
-    } else if (message.includes('Cannot stake during unlock window.')) {
+    } else if (message.includes('Cannot stake during unstake window.')) {
       resMessage = 'Unlock period reached, unable to add staking or extend.';
       showInModal = true;
     } else if (message.includes('Position exceed maximum.')) {
@@ -146,6 +153,7 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
     return {
       matchedErrorMsg: resMessage.replace('AElf.Sdk.CSharp.AssertionException: ', ''),
       showInModal,
+      title,
     };
   } else {
     return {
@@ -199,12 +207,13 @@ export const formatErrorMsg = (result: IContractError, method?: string) => {
 
   const errorMessage = resError.errorMessage?.message;
 
-  const { matchedErrorMsg, showInModal } = matchErrorMsg(errorMessage, method);
+  const { matchedErrorMsg, showInModal, title } = matchErrorMsg(errorMessage, method);
 
   return {
     ...resError,
     errorMessage: {
       message: matchedErrorMsg,
+      title,
     },
     showInModal,
   };

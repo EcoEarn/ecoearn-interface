@@ -1,13 +1,12 @@
 import { useMemo, useCallback, useState, useEffect, ReactNode } from 'react';
 import CommonModal from 'components/CommonModal';
-import { Button, Typography, FontWeightEnum, ToolTip } from 'aelf-design';
+import { Button, Typography } from 'aelf-design';
 import InputNumberBase from 'components/InputNumberBase';
 import DaysSelect from 'components/DaysSelect';
 import ViewItem from 'components/ViewItem';
 import { Form, message } from 'antd';
 import { ZERO, DEFAULT_DATE_FORMAT } from 'constants/index';
 import { MIN_STAKE_PERIOD, MAX_STAKE_PERIOD, ONE_DAY_IN_SECONDS } from 'constants/stake';
-import { RightOutlined } from '@ant-design/icons';
 import style from './style.module.css';
 import dayjs from 'dayjs';
 import { PoolType, StakeType } from 'types/stake';
@@ -25,7 +24,6 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { getTotalStakedWithAdd, getOwnerAprK, divDecimals, timesDecimals } from 'utils/calculate';
 import RateTag from 'components/RateTag';
 import BigNumber from 'bignumber.js';
-import useStakeConfig from 'hooks/useStakeConfig';
 import { useModal } from '@ebay/nice-modal-react';
 import DepositModal from 'components/DepositModal';
 import { useETransferAuthToken } from 'hooks/useETransferAuthToken';
@@ -33,15 +31,16 @@ import SwapModal from 'components/SwapModal';
 import { GetBalance } from 'contract/multiToken';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import useLoading from 'hooks/useLoading';
+import useNotification from 'hooks/useNotification';
 
 const FormItem = Form.Item;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function StakeTitle({ text, rate }: { text: string; rate?: string | number }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2">
       <span>{text}</span>
-      {!!rate && <RateTag value={Number(rate) * 100} />}
+      {!!rate && <RateTag value={Number(rate) * 100} className="!ml-0 !font-medium" />}
     </div>
   );
 }
@@ -107,15 +106,19 @@ function StakeModal({
     usdRate,
     longestReleaseTime,
     earlyStakedAmount,
+    minimalExtendStakeAmount,
+    minimalStakeAmount,
+    minimalStakePeriod,
+    extendStakePeriod,
   } = stakeData || {};
   const [form] = Form.useForm();
   const [amount, setAmount] = useState<string>('');
   const [period, setPeriod] = useState('');
   const [totalStaked, setTotalStaked] = useState<string>();
   const { getAprK, getAprKAve } = useAPRK();
-  const { min } = useStakeConfig();
   const [balance, setBalance] = useState<string>(defaultBalance || '0');
   const { getETransferAuthToken } = useETransferAuthToken();
+  const notification = useNotification();
 
   const typeIsExtend = useMemo(() => type === StakeType.EXTEND, [type]);
   const typeIsStake = useMemo(() => type === StakeType.STAKE, [type]);
@@ -128,6 +131,26 @@ function StakeModal({
   const [elfBalance, setElfBalance] = useState<number | string>('0');
   const { walletInfo } = useConnectWallet();
   const { showLoading, closeLoading } = useLoading();
+
+  const minStakeAmount = useMemo(
+    () => divDecimals(minimalStakeAmount || 0, decimal).toString(),
+    [decimal, minimalStakeAmount],
+  );
+
+  const minAddStakeAmount = useMemo(
+    () => divDecimals(minimalExtendStakeAmount || 0, decimal).toString(),
+    [decimal, minimalExtendStakeAmount],
+  );
+
+  const minStakePeriod = useMemo(
+    () => dayjs.duration(Number(minimalStakePeriod || 0), 'seconds').asDays(),
+    [minimalStakePeriod],
+  );
+
+  const minAddStakePeriod = useMemo(
+    () => dayjs.duration(Number(extendStakePeriod || 0), 'seconds').asDays(),
+    [extendStakePeriod],
+  );
 
   console.log('===elfBalance', elfBalance);
 
@@ -199,7 +222,7 @@ function StakeModal({
           />
         );
       case StakeType.EXTEND:
-        return <StakeTitle text="Extend stake duration" rate={rate} />;
+        return <StakeTitle text="Extend stake duration" />;
       case StakeType.RENEW:
         return <StakeTitle text={`Renew ${formattedStakeSymbol}`} rate={rate} />;
       default:
@@ -456,7 +479,7 @@ function StakeModal({
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
         {!typeIsExtend && !isFreezeAmount ? null : (
-          <span className={clsx('text-neutralTertiary font-normal mb-6')}>
+          <span className={clsx('text-neutralTertiary font-normal mb-4')}>
             <span className={clsx('text-neutralPrimary font-semibold')}>
               {`${formatNumberWithDecimalPlaces(_balance || '0')} ${formatTokenSymbol(
                 stakeSymbol || '',
@@ -530,14 +553,20 @@ function StakeModal({
         return Promise.reject(`Insufficient ${formatTokenSymbol(stakeSymbol || '')} balance`);
       }
       if (typeIsAdd && ZERO.plus(_val).lte(0)) return Promise.reject(`Amount must greater than 0`);
-      if (typeIsStake && ZERO.plus(_val).lt(min))
+      if (typeIsStake && ZERO.plus(_val).lt(minStakeAmount))
         return Promise.reject(
-          `Please stake no less than ${min} ${formatTokenSymbol(stakeSymbol || '')}`,
+          `Please stake no less than ${minStakeAmount} ${formatTokenSymbol(stakeSymbol || '')}`,
+        );
+      if (typeIsAdd && ZERO.plus(_val).lt(minAddStakeAmount))
+        return Promise.reject(
+          `Please add stake no less than ${minAddStakeAmount} ${formatTokenSymbol(
+            stakeSymbol || '',
+          )}`,
         );
       setAmountValid(true);
       return Promise.resolve();
     },
-    [balance, min, stakeSymbol, typeIsAdd, typeIsStake],
+    [balance, minAddStakeAmount, minStakeAmount, stakeSymbol, typeIsAdd, typeIsStake],
   );
 
   const onValueChange = useCallback(
@@ -572,26 +601,57 @@ function StakeModal({
       const _val = val.replaceAll(',', '');
       if (ZERO.plus(_val).gt(maxDuration))
         return Promise.reject(`Please stake for no more than ${maxDuration} days`);
-      if (ZERO.plus(_val).lt(minDuration))
-        return Promise.reject(`Please stake for no less than ${minDuration} days`);
-      if (
-        isStakeRewards &&
-        ZERO.plus(_val)
-          .plus(typeIsAdd ? remainingTime || 0 : 0)
-          .lt(rewardsLongestReleaseTime)
-      ) {
-        return Promise.reject(
-          `The staking period needs to be greater than or equal to ${Math.ceil(
-            ZERO.plus(rewardsLongestReleaseTime)
-              .minus(typeIsAdd ? remainingTime : 0)
-              .dp(1)
-              .toNumber(),
-          )} days (${
-            typeIsAdd
-              ? 'the longest release period of your rewards minus the remaining lock-up period'
-              : 'the longest release period of your rewards'
-          }).`,
+      if (typeIsStake) {
+        const isCommonMinStakeError = ZERO.plus(_val).lt(minStakePeriod);
+        const isRewardsMinStakeError =
+          isStakeRewards && ZERO.plus(_val).lt(rewardsLongestReleaseTime);
+        const minStakeError = `Please stake for no less than ${minStakePeriod} days`;
+        const longestTipPeriod = Math.ceil(ZERO.plus(rewardsLongestReleaseTime).dp(1).toNumber());
+        const rewardsMinStakeError = `The staking period needs to be greater than or equal to ${longestTipPeriod} days (the longest release period of your rewards).`;
+        if (isCommonMinStakeError && !isRewardsMinStakeError) {
+          return Promise.reject(minStakeError);
+        }
+        if (!isCommonMinStakeError && isRewardsMinStakeError) {
+          return Promise.reject(rewardsMinStakeError);
+        }
+        if (isCommonMinStakeError && isRewardsMinStakeError) {
+          if (longestTipPeriod > minStakePeriod) {
+            return Promise.reject(rewardsMinStakeError);
+          } else {
+            return Promise.reject(minStakeError);
+          }
+        }
+      }
+      if (!typeIsStake) {
+        const isCommonMinStakeError = ZERO.plus(_val).lt(minAddStakePeriod);
+        const isRewardsMinStakeError =
+          typeIsAdd &&
+          isStakeRewards &&
+          ZERO.plus(_val)
+            .plus(remainingTime || 0)
+            .lt(rewardsLongestReleaseTime);
+
+        const minStakeError = `Please extend the stake for no less than ${minAddStakePeriod} days`;
+        const longestTipPeriod = Math.ceil(
+          ZERO.plus(rewardsLongestReleaseTime)
+            .minus(remainingTime || 0)
+            .dp(1)
+            .toNumber(),
         );
+        const rewardsMinStakeError = `The staking period needs to be greater than or equal to ${longestTipPeriod} days (the longest release period of your rewards minus the remaining lock-up period).`;
+        if (isCommonMinStakeError && !isRewardsMinStakeError) {
+          return Promise.reject(minStakeError);
+        }
+        if (!isCommonMinStakeError && isRewardsMinStakeError) {
+          return Promise.reject(rewardsMinStakeError);
+        }
+        if (isCommonMinStakeError && isRewardsMinStakeError) {
+          if (longestTipPeriod > minAddStakePeriod) {
+            return Promise.reject(rewardsMinStakeError);
+          } else {
+            return Promise.reject(minStakeError);
+          }
+        }
       }
       setPeriodValid(true);
       return Promise.resolve();
@@ -600,10 +660,12 @@ function StakeModal({
       hasLastPeriod,
       isStakeRewards,
       maxDuration,
-      minDuration,
+      minAddStakePeriod,
+      minStakePeriod,
       remainingTime,
       rewardsLongestReleaseTime,
       typeIsAdd,
+      typeIsStake,
     ],
   );
 
@@ -664,14 +726,22 @@ function StakeModal({
           },
         });
       } catch (error) {
-        message.error(error as string);
+        notification.error({ description: error as string });
       }
       return;
     }
     if (gainUrl) {
       window.open(gainUrl, '_blank');
     }
-  }, [depositModal, fetchBalance, gainUrl, getETransferAuthToken, needTransfer, stakeSymbol]);
+  }, [
+    depositModal,
+    fetchBalance,
+    gainUrl,
+    getETransferAuthToken,
+    needTransfer,
+    notification,
+    stakeSymbol,
+  ]);
 
   const displaySwapToken = useMemo(() => {
     return canSwapToken && !BigNumber(elfBalance || 0).isZero();
