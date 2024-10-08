@@ -175,13 +175,15 @@ export function useETransferAuthToken() {
       if (jwtData) {
         authToken = `${jwtData.token_type} ${jwtData.access_token}`;
       } else {
-        const { pubkey, signature, plainText } = await getUserInfo({ managerAddress });
+        const { pubkey, signature, plainText } = await getUserInfo({
+          managerAddress: managerAddress || '',
+        });
         const recaptchaToken = await handleReCaptcha();
         const params = {
           pubkey,
           signature: signature || '',
           plainText,
-          managerAddress: walletInfo?.address,
+          managerAddress: walletInfo?.address || '',
           version: PortkeyVersion.v2,
           source: AuthTokenSource.NightElf,
           recaptchaToken: recaptchaToken,
@@ -209,7 +211,7 @@ export function useETransferAuthToken() {
       const managerAddress = await getManagerAddress();
       const { caHash, originChainId } = await getCaInfo({
         walletType,
-        address: walletInfo?.address,
+        address: walletInfo?.address || '',
         walletInfo: walletInfo,
       });
       let authToken;
