@@ -188,7 +188,7 @@ export function useETransferAuthToken() {
           source: AuthTokenSource.NightElf,
           recaptchaToken: recaptchaToken,
         };
-        authToken = await etransferCore.getAuthToken(params);
+        authToken = await etransferCore.getAuthToken(params as any);
       }
 
       ETransferConfig.setConfig({

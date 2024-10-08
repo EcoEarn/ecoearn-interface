@@ -20,6 +20,7 @@ import { ZERO } from 'constants/index';
 import dayjs from 'dayjs';
 import { TFeeType } from 'hooks/useGetAwakenContract';
 import useLoading from 'hooks/useLoading';
+import useNotification from 'hooks/useNotification';
 import usePair from 'hooks/usePair';
 import useStakeConfig from 'hooks/useStakeConfig';
 import useToken from 'hooks/useToken';
@@ -64,6 +65,7 @@ export default function useLiquidityListService() {
   const stakeModal = useModal(StakeModalWithConfirm);
   const router = useRouter();
   const { min } = useStakeConfig();
+  const notification = useNotification();
 
   useEffect(() => {
     if (!isConnectWallet) {
@@ -445,7 +447,8 @@ export default function useLiquidityListService() {
         });
       } catch (error) {
         console.error('onAddAndStake error', error);
-        message.error((error as IContractError)?.errorMessage?.message);
+        const errorTip = (error as IContractError)?.errorMessage?.message;
+        errorTip && notification.error({ description: errorTip });
       } finally {
         closeLoading();
       }
@@ -462,6 +465,7 @@ export default function useLiquidityListService() {
       getPairInfo,
       getPrice,
       longestReleaseTime,
+      notification,
       poolIdsToStake,
       rewardsSymbol,
       showLoading,
@@ -595,24 +599,25 @@ export default function useLiquidityListService() {
             !BigNumber(stakeData?.staked || 0).isZero() &&
             dayjs(stakeData?.unlockTime || 0).isBefore(dayjs())
           ) {
-            message.error(
-              'Stake has expired, cannot be added stake. Please renew the staking first.',
-            );
+            notification.error({
+              description:
+                'Stake has expired, cannot be added stake. Please renew the staking first.',
+            });
             return;
           }
         } else {
-          message.error('no pool');
+          notification.error({ description: 'no pool' });
           return;
         }
       } catch (error) {
-        singleMessage.error('getPool failed');
+        notification.error({ description: 'getPool failed' });
         return;
       } finally {
         closeLoading();
       }
       const { stakeSymbol = '' } = stakeData;
       if (!stakeSymbol) {
-        singleMessage.error('stakeSymbol is required.');
+        notification.error({ description: 'stakeSymbol is required.' });
         return;
       }
       const typeIsAdd = !BigNumber(stakeData?.staked || 0).isZero();
@@ -641,10 +646,10 @@ export default function useLiquidityListService() {
               dappId: dappIdToStakeOrRemove,
               liquidityIds,
             };
-            const { seed, signature, expirationTime } =
-              (await liquidityStakeSign(signParams)) || {};
+            const res = (await liquidityStakeSign(signParams)) || {};
             closeLoading();
-            if (!seed || !signature || !expirationTime) throw Error();
+            const { signature, seed, expirationTime } = res?.data || {};
+            if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
             const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
             let rawTransaction = null;
             try {
@@ -671,7 +676,7 @@ export default function useLiquidityListService() {
               });
             } catch (error) {
               await cancelSign(signParams);
-              throw Error();
+              throw Error((error as Error)?.message || '');
             }
             console.log('rawTransaction', rawTransaction);
             if (!rawTransaction) {
@@ -694,12 +699,10 @@ export default function useLiquidityListService() {
                 throw Error();
               }
             } else {
-              const { showInModal, matchedErrorMsg } = matchErrorMsg(
-                errorMessage,
-                'StakeLiquidity',
-              );
-              if (!showInModal) message.error(matchedErrorMsg);
-              throw Error(showInModal ? matchedErrorMsg : '');
+              const { matchedErrorMsg, title } = matchErrorMsg(errorMessage, 'StakeLiquidity');
+              if (matchedErrorMsg)
+                notification.error({ description: matchedErrorMsg, message: title });
+              throw Error(matchedErrorMsg);
             }
           } catch (error) {
             const errorMsg = (error as Error).message;
@@ -721,6 +724,7 @@ export default function useLiquidityListService() {
       curChain,
       dappIdToStakeOrRemove,
       fetchData,
+      notification,
       rewardsContractAddress,
       showLoading,
       stakeModal,

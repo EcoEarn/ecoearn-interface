@@ -1,6 +1,6 @@
 import { useModal } from '@ebay/nice-modal-react';
 import NiceLoading from 'components/PageLoading/NiceLoading';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 export default function useLoading() {
   const modal = useModal(NiceLoading);
@@ -22,12 +22,13 @@ export default function useLoading() {
     modalRef.current?.hide();
   }, []);
 
-  return useMemo(
-    () => ({
+  const content = useMemo(() => {
+    return {
       showLoading,
       closeLoading,
       visible: modal.visible,
-    }),
-    [closeLoading, modal.visible, showLoading],
-  );
+    };
+  }, [closeLoading, modal.visible, showLoading]);
+
+  return content;
 }

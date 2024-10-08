@@ -6,7 +6,7 @@ import { tokenUnlock } from 'contract/tokenStaking';
 import { singleMessage } from '@portkey/did-ui-react';
 import { useRouter } from 'next/navigation';
 import { formatTokenSymbol } from 'utils/format';
-import { message } from 'antd';
+import useNotification from 'hooks/useNotification';
 
 interface IUnlockModalProps {
   amount: string;
@@ -43,11 +43,12 @@ function UnlockModal({
   const [loading, setLoading] = useState(false);
   const [TransactionId, setTransactionId] = useState('');
   const router = useRouter();
+  const notification = useNotification();
 
   const onConfirm = useCallback(async () => {
     try {
       if (!poolId) {
-        singleMessage.error('missing params poolId');
+        notification.error({ description: 'missing params poolId' });
         return;
       }
       setLoading(true);
@@ -60,16 +61,17 @@ function UnlockModal({
         throw new Error();
       }
     } catch (error) {
-      const { showInModal, errorMessage } = error as any;
+      const { errorMessage } = error as any;
       const errorTip = errorMessage?.message;
       console.log('tokenUnlock error', errorTip);
-      if (!showInModal) message.error(errorTip);
+      if (errorTip)
+        notification.error({ description: errorTip, message: errorMessage?.title || '' });
       setStatus('error');
       errorTip && setErrorTip(errorTip);
     } finally {
       setLoading(false);
     }
-  }, [onSuccess, poolId]);
+  }, [notification, onSuccess, poolId]);
 
   const onclose = useCallback(() => {
     setLoading(false);

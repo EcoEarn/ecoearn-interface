@@ -33,6 +33,7 @@ import { message } from 'antd';
 import useStakeConfig from 'hooks/useStakeConfig';
 import { RewardsTypeEnum } from '..';
 import { useRouter } from 'next/navigation';
+import useNotification from 'hooks/useNotification';
 
 const stakeEarlyErrorTip =
   'Stake has expired, cannot be added stake. Please renew the staking first.';
@@ -42,7 +43,6 @@ const noStakeAmountTip =
 const withdrawDisabledTip = 'No withdrawable rewards. You can view "Details" for more information.';
 
 export interface IRewardsListDataSource extends IPoolRewardsItem {
-  tokenIcon?: any;
   earlyStakeDisabled: boolean;
   earlyStakeTip: string;
   withdrawDisabled: boolean;
@@ -72,6 +72,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
   const { min } = useStakeConfig();
   const [curItem, setCurItem] = useState<IRewardsListDataSource>();
   const router = useRouter();
+  const notification = useNotification();
 
   const poolType = useMemo(() => {
     if (currentType === RewardsTypeEnum.Points) return PoolType.POINTS;
@@ -223,9 +224,10 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
               operationPoolIds: data?.poolType === PoolType.POINTS ? [] : [data?.poolId || ''],
               operationDappIds: data?.poolType === PoolType.POINTS ? [data?.dappId || ''] : [],
             };
-            const { signature, seed, expirationTime } = (await earlyStakeSign(signParams)) || {};
-            if (!signature || !seed || !expirationTime) throw Error();
             try {
+              const res = (await earlyStakeSign(signParams)) || {};
+              const { signature, seed, expirationTime } = res?.data || {};
+              if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
               const rpcUrl = (config as Partial<ICMSInfo>)[
                 `rpcUrl${curChain?.toLocaleUpperCase()}`
               ];
@@ -260,7 +262,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
                 });
               } catch (error) {
                 await cancelSign(signParams);
-                throw Error();
+                throw Error((error as Error)?.message || '');
               }
               console.log('rawTransaction', rawTransaction);
               if (!rawTransaction) {
@@ -284,9 +286,10 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
                   throw Error();
                 }
               } else {
-                const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'EarlyStake');
-                if (!showInModal) message.error(matchedErrorMsg);
-                throw Error(showInModal ? matchedErrorMsg : '');
+                const { matchedErrorMsg, title } = matchErrorMsg(errorMessage, 'EarlyStake');
+                if (matchedErrorMsg)
+                  notification.error({ description: matchedErrorMsg, message: title });
+                throw Error(matchedErrorMsg);
               }
             } catch (error) {
               throw Error((error as Error).message);
@@ -313,6 +316,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
       getEarlyStakeAmount,
       getFreeAmount,
       getLongestReleaseTime,
+      notification,
       rewardsContractAddress,
       stakeModal,
       wallet,
@@ -367,8 +371,9 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
         operationPoolIds: data?.poolType === PoolType.POINTS ? [] : [data?.poolId || ''],
         operationDappIds: data?.poolType === PoolType.POINTS ? [data?.dappId || ''] : [],
       };
-      const { signature, seed, expirationTime } = (await withdrawSign(signParams)) || {};
-      if (!signature || !seed || !expirationTime) throw Error();
+      const res = (await withdrawSign(signParams)) || {};
+      const { signature, seed, expirationTime } = res?.data || {};
+      if (!signature || !seed || !expirationTime) throw Error(res?.message || '');
       const rpcUrl = (config as Partial<ICMSInfo>)[`rpcUrl${curChain?.toLocaleUpperCase()}`];
       let rawTransaction = null;
       try {
@@ -392,7 +397,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
         });
       } catch (error) {
         await cancelSign(signParams);
-        throw Error();
+        throw Error((error as Error)?.message || '');
       }
       console.log('rawTransaction', rawTransaction);
       if (!rawTransaction) {
@@ -417,9 +422,9 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
           throw Error();
         }
       } else {
-        const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'Withdraw');
-        if (!showInModal) message.error(matchedErrorMsg);
-        throw Error(showInModal ? matchedErrorMsg : '');
+        const { matchedErrorMsg, title } = matchErrorMsg(errorMessage, 'Withdraw');
+        if (matchedErrorMsg) notification.error({ description: matchedErrorMsg, message: title });
+        throw Error(matchedErrorMsg);
       }
     } catch (error) {
       const errorTip = (error as Error).message;
@@ -438,6 +443,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
     curChain,
     curItem,
     getClaimInfos,
+    notification,
     rewardsContractAddress,
     showLoading,
     wallet,

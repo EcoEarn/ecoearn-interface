@@ -1,11 +1,16 @@
 import { message } from 'antd';
 import { getPointsPoolList, pointsClaim, stakingClaim } from 'api/request';
+import { TradeConfirmTypeEnum } from 'components/TradeConfrim';
 import useDappList from 'hooks/useDappList';
 import useEarlyStake from 'hooks/useEarlyStake';
 import useLoading from 'hooks/useLoading';
+import useNotification from 'hooks/useNotification';
 import { useWalletService } from 'hooks/useWallet';
+import { useRouter } from 'next/navigation';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import { setConfirmInfo } from 'redux/reducer/info';
+import { store } from 'redux/store';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { PoolType } from 'types/stake';
 import { getTxResult } from 'utils/aelfUtils';
@@ -34,6 +39,8 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
   const { stake } = useEarlyStake();
   const { dappList } = useDappList();
   const [data, setData] = useState<Array<IPointsPoolItem>>();
+  const router = useRouter();
+  const notification = useNotification();
 
   const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
     { label: 'All', value: ListTypeEnum.All },
@@ -58,11 +65,6 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
   const handleGain = useCallback(() => {
     gainUrl && window.open(gainUrl, '_blank');
   }, [gainUrl]);
-
-  const handleClaim = useCallback((item: IPointsPoolItem) => {
-    setCurItem(item);
-    setModalVisible(true);
-  }, []);
 
   const resetState = useCallback(() => {
     setLoading(false);
@@ -97,6 +99,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
 
   const onClaim = useCallback(
     async (item: IPointsPoolItem) => {
+      if (!wallet?.address) return;
       const amount = timesDecimals(item.earned, item?.decimal || 8).toNumber();
       const { signature, seed, expirationTime } =
         (await stakingClaim({
@@ -127,7 +130,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
             chainId: curChain!,
           });
         } catch (error) {
-          throw Error();
+          throw Error((error as Error)?.message || '');
         }
         console.log('rawTransaction', rawTransaction);
         if (!rawTransaction) throw Error();
@@ -136,20 +139,10 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
           rawTransaction: rawTransaction || '',
         });
         if (TransactionId) {
-          const { TransactionId: resultTransactionId } = await getTxResult(
-            TransactionId,
-            rpcUrl,
-            curChain!,
-          );
-          if (resultTransactionId) {
-            return resultTransactionId;
-          } else {
-            throw Error();
-          }
+          return TransactionId;
         } else {
           const { showInModal, matchedErrorMsg } = matchErrorMsg(errorMessage, 'Claim');
-          if (!showInModal) message.error(matchedErrorMsg);
-          throw Error(showInModal ? matchedErrorMsg : '');
+          throw Error(matchedErrorMsg);
         }
       } catch (error) {
         throw Error((error as Error).message);
@@ -158,26 +151,63 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     [caContractAddress, config, curChain, pointsContractAddress, wallet, walletType],
   );
 
-  const handleConfirm = useCallback(async () => {
-    if (!curItem) return;
-    setLoading(true);
-    try {
-      const transactionId = await onClaim(curItem);
-      if (transactionId) {
-        setStatus('success');
-        setTransactionId(transactionId);
-      } else {
-        throw new Error();
+  console.log('========wallet', wallet);
+
+  const handleConfirm = useCallback(
+    async (curItem: IPointsPoolItem) => {
+      if (!curItem) return;
+      setLoading(true);
+      showLoading();
+      try {
+        const transactionId = await onClaim(curItem);
+        return transactionId;
+      } catch (error) {
+        const errorTip = (error as Error).message;
+        const { matchedErrorMsg, title } = matchErrorMsg(errorTip, 'Claim');
+        if (matchedErrorMsg) {
+          notification.error({
+            description: matchedErrorMsg,
+            message: title || '',
+          });
+        }
+      } finally {
+        setLoading(false);
+        closeLoading();
       }
-    } catch (error) {
-      const errorTip = (error as Error).message;
-      console.error('Points Claim error', errorTip);
-      setStatus('error');
-      setErrorTip(errorTip);
-    } finally {
-      setLoading(false);
-    }
-  }, [curItem, onClaim]);
+    },
+    [closeLoading, notification, onClaim, showLoading],
+  );
+
+  const handleClaim = useCallback(
+    async (item: IPointsPoolItem) => {
+      setCurItem(item);
+      let txId;
+      try {
+        txId = await handleConfirm(item);
+        if (txId) {
+          store.dispatch(
+            setConfirmInfo({
+              backPath: '/rewards',
+              type: TradeConfirmTypeEnum.Claim,
+              poolType: PoolType.POINTS,
+              content: {
+                amount: item.realEarned,
+                tokenSymbol: item?.rewardsTokenName,
+                rewardsSymbol: item?.rewardsTokenName,
+                releasePeriod: item?.releasePeriod,
+                supportEarlyStake: true,
+                poolType: PoolType.POINTS,
+              },
+            }),
+          );
+          router.push(`/tx/${txId}`);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [handleConfirm, router],
+  );
 
   const handleEarlyStake = useCallback(
     async (tokenName: string) => {
