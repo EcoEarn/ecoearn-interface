@@ -51,6 +51,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     if (!isLogin) {
       checkLogin({
         onSuccess: () => {
+          //FIXME:web-login
           router.push('/liquidity');
         },
       });

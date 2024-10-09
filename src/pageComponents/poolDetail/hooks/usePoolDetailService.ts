@@ -818,6 +818,7 @@ export default function usePoolDetailService() {
     if (!isLogin) {
       checkLogin({
         onSuccess: () => {
+          //FIXME: web-login
           router.push('/liquidity');
         },
       });
