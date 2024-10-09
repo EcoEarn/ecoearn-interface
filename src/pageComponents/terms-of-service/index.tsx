@@ -58,7 +58,7 @@ export default function TermsService() {
           <h3>1.3 Contact Us</h3>
           <p>
             Please reach out to us{' '}
-            <a href="https://form.aelf.com/contact" target="_blank" rel="noreferrer">
+            <a href="mailto:contact@ecoearn.io" target="_blank" rel="noreferrer">
               here
             </a>
             .
@@ -477,7 +477,7 @@ export default function TermsService() {
             The Site may provide you with opportunities to upload, display, or transmit data or
             other content (together, “User Content”). As part of these Terms and Conditions and
             subject to our{' '}
-            <a href="https://docs.aelf.com/legal/privacy-policy/" target="_blank" rel="noreferrer">
+            <a href="/privacy-policy" target="_blank">
               Privacy Policy
             </a>
             , you grant us a perpetual, irrevocable, worldwide, fully paid, non-exclusive, and
@@ -709,7 +709,7 @@ export default function TermsService() {
             any time, for any reason, by directing yourself away from the Site or following the
             instructions for terminating your account in your account settings on the Site, if
             available, or by contacting us{' '}
-            <a href="https://form.aelf.com/contact" target="_blank" rel="noreferrer">
+            <a href="mailto:contact@ecoearn.io" target="_blank" rel="noreferrer">
               here
             </a>
             . You can choose to voluntarily terminate your account with us by providing us with
