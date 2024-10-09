@@ -14,7 +14,7 @@ interface ITextProps {
 }
 
 const getActualWidthOfChars = (text: string, options: any = {}) => {
-  const { size = 14, family = 'Poppins' } = options;
+  const { size = 16, family = 'Poppins' } = options;
   const canvas = document.createElement('canvas');
   const ctx: any = canvas.getContext('2d');
   ctx.font = `${size}px ${family}`;
@@ -50,12 +50,21 @@ const Description = memo(
             className={clsx('flex font-semibold gap-2 text-neutralTitle items-center break-all')}
           >
             {!isLG ? (
-              <span className={`${getActualWidthOfChars(value) > 135 && 'text-[10px]'}`}>
+              <span
+                className={clsx(
+                  'truncate max-w-[135px]',
+                  getActualWidthOfChars(value) > 135 && '!text-[10px]',
+                )}
+              >
                 {value}
               </span>
             ) : (
               <span
-                className={`${getActualWidthOfChars(value) > screen.width / 4 && 'text-[10px]'}`}
+                style={{ maxWidth: screen.width / 4 }}
+                className={clsx(
+                  'truncate',
+                  getActualWidthOfChars(value) > screen.width / 4 && '!text-[10px]',
+                )}
               >
                 {value}
               </span>
