@@ -25,7 +25,7 @@ export default function Footer({
     return [
       {
         label: 'Terms of Service',
-        path: '/terms-service',
+        path: '/terms-of-service',
       },
       {
         label: 'Privacy Policy',

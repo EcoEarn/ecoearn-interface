@@ -382,7 +382,7 @@ export default function PrivacyPolicy() {
             <li>You are responsible for your username and password and should keep them safe.</li>
             <li>
               If you believe your privacy has been breached, please contact us immediately{' '}
-              <a href="https://form.aelf.com/contact" target="_blank" rel="noreferrer">
+              <a href="mailto:contact@ecoearn.io" target="_blank" rel="noreferrer">
                 here
               </a>
               .
