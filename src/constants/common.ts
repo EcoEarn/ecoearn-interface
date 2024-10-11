@@ -13,4 +13,6 @@ const env = process.env.NEXT_PUBLIC_APP_ENV;
 export const PrimaryDomainName =
   env === 'test' ? 'https://test-app.ecoearn.io' : 'https://app.ecoearn.io';
 
+export const EcoearnDomainName = env === 'test' ? 'https://test.ecoearn.io' : 'https://ecoearn.io';
+
 export const PORTKEY_LOGIN_CHAIN_ID_KEY = 'PortkeyOriginChainId';

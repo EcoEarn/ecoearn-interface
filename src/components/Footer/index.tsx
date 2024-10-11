@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import clsx from 'clsx';
+import { EcoearnDomainName } from 'constants/common';
 import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
@@ -25,11 +26,11 @@ export default function Footer({
     return [
       {
         label: 'Terms of Service',
-        path: '/terms-of-service',
+        path: `${EcoearnDomainName}/terms-of-service`,
       },
       {
         label: 'Privacy Policy',
-        path: '/privacy-policy',
+        path: `${EcoearnDomainName}/privacy-policy`,
       },
       {
         label: 'Docs',
