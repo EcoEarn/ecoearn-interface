@@ -42,7 +42,7 @@ function StakeTitle({ text, rate }: { text: string; rate?: string | number }) {
   );
 }
 
-interface IStakeProps {
+export interface IStakeProps {
   type?: StakeType;
   isFreezeAmount?: boolean;
   isFreezePeriod?: boolean;
@@ -352,7 +352,9 @@ function Stake({
       : isFreezeAmount
       ? divDecimals(freezeAmount, decimal).toFixed(2, BigNumber.ROUND_DOWN)
       : balance;
-    return (
+    return customAmountModule ? (
+      customAmountModule
+    ) : (
       <div className="flex justify-between text-neutralTitle font-medium text-lg w-full">
         <span>Amount</span>
         {!typeIsExtend && !isFreezeAmount ? null : (
@@ -366,6 +368,7 @@ function Stake({
     );
   }, [
     balance,
+    customAmountModule,
     decimal,
     formattedStakeSymbol,
     freezeAmount,
@@ -386,8 +389,8 @@ function Stake({
   }, [curStakingPeriod]);
 
   const durationLabel = useMemo(() => {
-    return <>{typeIsExtend ? 'Extend Lock-up Period' : 'Stake duration'}</>;
-  }, [typeIsExtend]);
+    return <>{typeIsExtend || typeIsAdd ? 'Extend stake duration by' : 'Stake duration'}</>;
+  }, [typeIsAdd, typeIsExtend]);
 
   const onStake = useCallback(async () => form.submit(), [form]);
 
@@ -492,7 +495,7 @@ function Stake({
       const _val = val.replaceAll(',', '');
       if (ZERO.plus(_val).gt(maxDuration))
         return Promise.reject(`Please stake for no more than ${maxDuration} days`);
-      if (typeIsStake) {
+      if (typeIsStake || typeIsRenew) {
         const isCommonMinStakeError = ZERO.plus(_val).lt(minStakePeriod);
         const isRewardsMinStakeError =
           isStakeRewards && ZERO.plus(_val).lt(rewardsLongestReleaseTime);
@@ -513,7 +516,7 @@ function Stake({
           }
         }
       }
-      if (!typeIsStake) {
+      if (!typeIsStake && !typeIsRenew) {
         const isCommonMinStakeError = ZERO.plus(_val).lt(minAddStakePeriod);
         const isRewardsMinStakeError =
           typeIsAdd &&
@@ -556,6 +559,7 @@ function Stake({
       remainingTime,
       rewardsLongestReleaseTime,
       typeIsAdd,
+      typeIsRenew,
       typeIsStake,
     ],
   );
@@ -1037,6 +1041,8 @@ function Stake({
     return hasLastPeriod && !typeIsStake && !typeIsRenew && !!period;
   }, [hasLastPeriod, period, typeIsRenew, typeIsStake]);
 
+  console.log('====custom', customAmountModule);
+
   const balanceLabel = useMemo(() => {
     const _balance = typeIsExtend
       ? stakedAmount
@@ -1089,6 +1095,7 @@ function Stake({
               suffixText="Max"
               suffixClick={getMaxAmount}
               allowClear
+              suffixClassName="!text-brandDefault"
             />
           </FormItem>
         )}
@@ -1147,14 +1154,10 @@ function Stake({
               }
               valueTip={'Longer staking period increases the multiplier (x), boosting the APR.'}
             />
-            {displayNewPeriod && (
+            {/* {displayNewPeriod && (
               <ViewItem label="Unlock on (current)" text={originReleaseDateStr}></ViewItem>
-            )}
-            <ViewItem
-              label={displayNewPeriod ? 'Unlock on (new)' : 'Unlock on'}
-              isTextBrand={displayNewPeriod}
-              text={releaseDateStr}
-            />
+            )} */}
+            <ViewItem label={'Unlock on'} isTextBrand={displayNewPeriod} text={releaseDateStr} />
             <ViewItem label="Projected Rewards" text={rewardsStr} extra={rewardsUsdStr} />
           </div>
         </FormItem>

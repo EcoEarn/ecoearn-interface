@@ -9,6 +9,7 @@ export default function usePair() {
 
   const getPairInfo = useCallback(
     async (rate: TFeeType, pairAddress: string, symbol: string) => {
+      if (!wallet?.address) return {};
       const swapContractAddress = getAddress(rate)?.swap;
       const tokenContractAddress = getAddress(rate)?.token;
 

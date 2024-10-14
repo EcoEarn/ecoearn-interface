@@ -22,6 +22,7 @@ interface IStakeTokenTitleProps {
   type?: 'stake' | 'rewards' | 'stakeRewards';
   poolType?: PoolType;
   rate?: string | number;
+  isAdd?: boolean;
 }
 
 export default function StakeTokenTitle({
@@ -30,6 +31,7 @@ export default function StakeTokenTitle({
   type = 'stake',
   poolType = PoolType.TOKEN,
   rate,
+  isAdd = false,
 }: IStakeTokenTitleProps) {
   const { isLogin } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
@@ -40,10 +42,10 @@ export default function StakeTokenTitle({
 
   const title = useMemo(() => {
     if (type === 'stakeRewards') {
-      return `Stake ${formattedTokenName} Rewards`;
+      return `${isAdd ? 'Add stake' : 'Stake'} ${formattedTokenName} Rewards`;
     }
     return `${formattedTokenName} ${type === 'stake' ? 'Staking' : 'Staking Rewards'}`;
-  }, [formattedTokenName, type]);
+  }, [formattedTokenName, isAdd, type]);
 
   const symbolTextList = useMemo(() => {
     if (poolType === PoolType.LP) {

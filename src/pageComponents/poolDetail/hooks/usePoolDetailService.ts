@@ -1,7 +1,5 @@
 import { useModal } from '@ebay/nice-modal-react';
-import { singleMessage } from '@portkey/did-ui-react';
 import { useInterval } from 'ahooks';
-import { message } from 'antd';
 import {
   fetchStakingPoolsData,
   getEarlyStakeInfo,
@@ -26,8 +24,6 @@ import { checkAllowanceAndApprove } from 'utils/aelfUtils';
 import { divDecimals, getTargetUnlockTimeStamp, timesDecimals } from 'utils/calculate';
 import { formatTokenSymbol } from 'utils/format';
 import useEarlyStake from 'hooks/useEarlyStake';
-import ClaimModal from 'components/ClaimModal';
-import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
 import { IStakeWithConfirmProps } from 'components/StakeWithConfirm';
 import { fixEarlyStakeData } from 'utils/stake';
@@ -79,8 +75,6 @@ export default function usePoolDetailService() {
   const operationAmount = useRef('0');
   const { getAddress } = useGetAwakenContract();
   const { stake: earlyStake, earlyStakeFn } = useEarlyStake();
-  const claimModal = useModal(ClaimModal);
-  const unlockModal = useModal(UnlockModal);
   const [symbolBalance, setSymbolBalance] = useState('0');
   const [earlyStakeInfo, setEarlyStakeInfo] = useState<IEarlyStakeInfo>();
   const [rewardsInfo, setRewardsInfo] = useState<IPoolRewardsItem>();

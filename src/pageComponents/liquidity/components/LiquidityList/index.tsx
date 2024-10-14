@@ -268,11 +268,11 @@ export default function LiquidityList() {
       }}
     >
       <Segmented
-        className={clsx('mt-6 lg:mt-12', styles.segmented)}
+        className={clsx(styles.segmented)}
         size="large"
         block={isLG}
         value={currentList}
-        defaultValue={LiquidityListTypeEnum.My}
+        defaultValue={LiquidityListTypeEnum.Market}
         onChange={handleSegmentChange}
         options={segmentedOptions}
       />
@@ -298,9 +298,10 @@ export default function LiquidityList() {
         )
       ) : (
         <Empty
-          onClick={handleAddLiquidity}
-          emptyBtnText="Add Liquidity"
-          emptyText="You have no available liquidity."
+          // onClick={handleAddLiquidity}
+          // emptyBtnText="Add Liquidity"
+          className="bg-white rounded-2xl border-solid border-[1px] border-[#E0E0E0] !mt-6 !lg:mt-6 !py-[48px] lg:!py-[48px] h-[288px]"
+          emptyText="Record of liquidity added and staked without rewards."
         />
       )}
     </AELFDProvider>

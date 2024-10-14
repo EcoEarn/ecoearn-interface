@@ -68,8 +68,10 @@ export const matchErrorMsg = <T>(message: T, method?: string) => {
     let showInModal = false;
     let title = '';
     console.log('===errorMessage', message);
-
-    if (
+    if (message.includes('Unmatched network. Please switch the network through')) {
+      resMessage = message;
+      showInModal = false;
+    } else if (
       message.includes('Operation canceled.') ||
       message.includes('You closed the prompt without any action.')
     ) {

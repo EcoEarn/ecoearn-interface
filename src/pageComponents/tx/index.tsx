@@ -65,7 +65,7 @@ export default function TxPage() {
     () => {
       getScanConfirm();
     },
-    1000,
+    3000,
     {
       immediate: true,
     },
