@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useGetToken } from './useGetToken';
 import { getOriginalAddress } from 'utils/addressFormatting';
@@ -19,7 +18,7 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did-ui-react';
-import { formatErrorMsg } from 'utils/formatError';
+import { matchErrorMsg } from 'utils/formatError';
 import useNotification from './useNotification';
 
 export const useWalletInit = () => {
@@ -85,9 +84,16 @@ export const useWalletInit = () => {
 
   useEffect(() => {
     if (loginError) {
-      const resError = loginError as IContractError;
-      const errorMessage = formatErrorMsg(resError).errorMessage.message;
-      notification.error({ description: `${errorMessage || 'LOGIN_ERROR'}` });
+      const resError = loginError as any;
+      console.log('loginError', resError);
+      const { matchedErrorMsg, title } = matchErrorMsg(
+        resError?.nativeError?.message || resError?.message || '',
+      );
+      matchedErrorMsg &&
+        notification.error({
+          description: `${matchedErrorMsg || 'LOGIN_ERROR'}`,
+          message: title || '',
+        });
     }
   }, [loginError, notification]);
 };

@@ -601,7 +601,7 @@ function StakeModal({
       const _val = val.replaceAll(',', '');
       if (ZERO.plus(_val).gt(maxDuration))
         return Promise.reject(`Please stake for no more than ${maxDuration} days`);
-      if (typeIsStake) {
+      if (typeIsStake || typeIsRenew) {
         const isCommonMinStakeError = ZERO.plus(_val).lt(minStakePeriod);
         const isRewardsMinStakeError =
           isStakeRewards && ZERO.plus(_val).lt(rewardsLongestReleaseTime);
@@ -622,7 +622,7 @@ function StakeModal({
           }
         }
       }
-      if (!typeIsStake) {
+      if (!typeIsStake && !typeIsRenew) {
         const isCommonMinStakeError = ZERO.plus(_val).lt(minAddStakePeriod);
         const isRewardsMinStakeError =
           typeIsAdd &&
@@ -665,6 +665,7 @@ function StakeModal({
       remainingTime,
       rewardsLongestReleaseTime,
       typeIsAdd,
+      typeIsRenew,
       typeIsStake,
     ],
   );
@@ -1206,6 +1207,7 @@ function StakeModal({
               suffixText="Max"
               suffixClick={getMaxAmount}
               allowClear
+              suffixClassName="!text-brandDefault"
             />
           </FormItem>
         )}

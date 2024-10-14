@@ -37,7 +37,7 @@ const Description = memo(
             'flex gap-1 text-base  md:text-lg items-center font-medium text-neutralTertiary',
           )}
         >
-          <span className="text-[14px] font-[500]">{label}</span>
+          <span className="text-[14px] font-[500] flex-shrink-0">{label}</span>
           {/* {tip && <CommonTooltip title={tip} />} */}
         </div>
         <div
@@ -60,10 +60,11 @@ const Description = memo(
               </span>
             ) : (
               <span
-                style={{ maxWidth: screen.width / 4 }}
+                style={{ maxWidth: (window.innerWidth - 32 - 34 - 82) / 3 }}
                 className={clsx(
                   'truncate',
-                  getActualWidthOfChars(value) > screen.width / 4 && '!text-[10px]',
+                  getActualWidthOfChars(value) > (window.innerWidth - 32 - 34 - 82) / 3 &&
+                    '!text-[10px]',
                 )}
               >
                 {value}

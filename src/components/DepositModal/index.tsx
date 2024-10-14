@@ -4,7 +4,6 @@ import {
   ETransferConfig,
   ComponentStyle,
 } from '@etransfer/ui-react';
-import '@etransfer/ui-react/dist/assets/index.css';
 import CommonModal from 'components/CommonModal';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';

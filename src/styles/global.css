@@ -49,7 +49,7 @@ input {
 }
 
 * {
-	font-family: Poppins, sans-serif;
+	font-family: Poppins, sans-serif !important;
 	transition: background 0.3s, fill 0.3s, stork 0.3s, color 0.3s,
 		box-shadow 0.3s;
 }
@@ -162,7 +162,7 @@ code {
 		@apply !text-base !font-medium !text-neutralTitle;
 	}
 	.ant-notification-notice-description {
-		@apply !text-sm !font-normal !text-neutralTitle;
+		@apply !text-sm !font-normal !text-neutralTitle !mr-[20px];
 	}
 }
 

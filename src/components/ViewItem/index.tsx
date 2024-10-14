@@ -34,7 +34,7 @@ function ViewItem({
             <div className="flex items-center">
               <div className="flex flex-col items-start line-through">
                 <span>{originText}</span>
-                <span>{extra}</span>
+                <span className="text-neutralSecondary">{extra}</span>
               </div>
               <RightArrowSVG className="w-4 h-4 mx-1" />
               <span className="text-brandDefault font-semibold">{text}</span>
@@ -42,7 +42,7 @@ function ViewItem({
           ) : (
             <div className="flex flex-col items-start md:items-end">
               <span className={clsx(isTextBrand && 'text-brandDefault')}>{text}</span>
-              <span>{extra}</span>
+              <span className="text-neutralSecondary">{extra}</span>
             </div>
           )}
         </div>

@@ -10,6 +10,7 @@ interface IInputNumberBaseProps extends Omit<InputProps, 'type' | 'onChange'> {
   suffixText?: string;
   allowZero?: boolean;
   suffixClick?: (val: string) => void;
+  suffixClassName?: string;
 }
 
 export default function InputNumberBase({
@@ -20,6 +21,7 @@ export default function InputNumberBase({
   suffixText,
   suffixClick,
   allowZero = true,
+  suffixClassName,
   ...rest
 }: IInputNumberBaseProps) {
   const onClick = useCallback(() => {
@@ -33,12 +35,13 @@ export default function InputNumberBase({
         className={clsx(
           'font-medium cursor-pointer text-base',
           disabled ? 'text-[#919191]' : 'text-[#919191]',
+          suffixClassName,
         )}
       >
         {suffixText}
       </span>
     );
-  }, [disabled, onClick, suffixText]);
+  }, [disabled, onClick, suffixClassName, suffixText]);
 
   const onInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

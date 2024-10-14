@@ -5,7 +5,7 @@ import useDiscoverProvider from './useDiscoverProvider';
 import { sleep } from '@portkey/utils';
 import useLoading from 'hooks/useLoading';
 import { IContractError } from 'types';
-import { formatErrorMsg, LoginFailed } from 'utils/formatError';
+import { formatErrorMsg, LoginFailed, matchErrorMsg } from 'utils/formatError';
 import { resetLoginStatus, setLoginStatus } from 'redux/reducer/loginStatus';
 import { store } from 'redux/store';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
@@ -126,9 +126,10 @@ export const useGetToken = () => {
           source = 'portkey';
         } catch (error) {
           console.error('sign error', error);
-          const resError = error as IContractError;
-          const errorMessage = formatErrorMsg(resError).errorMessage.message;
-          notification.error({ description: errorMessage });
+          const resError = (error as Error).message;
+          const { matchedErrorMsg, title } = matchErrorMsg(resError);
+          matchedErrorMsg &&
+            notification.error({ description: matchedErrorMsg, message: title || '' });
           isConnectWallet && disConnectWallet();
           return;
         }
@@ -139,10 +140,14 @@ export const useGetToken = () => {
           signInfo:
             walletType === WalletTypeEnum.aa ? Buffer.from(signStr).toString('hex') : signInfo,
         });
+        console.log('==signRes', sign);
+
         if (sign?.errorMessage) {
-          const errorMessage = formatErrorMsg(sign?.errorMessage as unknown as IContractError)
-            .errorMessage.message;
-          notification.error({ description: errorMessage });
+          const { matchedErrorMsg, title } = matchErrorMsg(
+            (sign?.errorMessage as any)?.message || '',
+          );
+          matchedErrorMsg &&
+            notification.error({ description: matchedErrorMsg, message: title || '' });
           isConnectWallet && disConnectWallet();
           return;
         }
