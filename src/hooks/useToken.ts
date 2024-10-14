@@ -22,9 +22,10 @@ export default function useToken() {
 
   const getBalance = useCallback(
     async (symbol: string) => {
+      if (!wallet?.address || !symbol || !multiTokenContractAddress) return;
       const { balance } = await GetBalance(
         {
-          owner: wallet?.address || '',
+          owner: wallet.address,
           symbol,
         },
         multiTokenContractAddress || '',

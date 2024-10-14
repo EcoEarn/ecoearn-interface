@@ -8,22 +8,25 @@ import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { useMemo } from 'react';
 
 interface IFaqListProps {
-  type?: 'stake' | 'rewards';
+  type?: 'stake' | 'rewards' | 'liquidity';
 }
 
 export default function FaqList(props?: IFaqListProps) {
   const { type = 'stake' } = props || {};
-  const { stakeFaqList, rewardsFaqList } = useGetCmsInfo() || {};
+  const { stakeFaqList, rewardsFaqList, liquidityFaqList } = useGetCmsInfo() || {};
 
   const items: CollapseProps['items'] = useMemo(() => {
-    return ((type === 'stake' ? stakeFaqList : rewardsFaqList) || []).map((item) => {
+    return (
+      (type === 'stake' ? stakeFaqList : type === 'rewards' ? rewardsFaqList : liquidityFaqList) ||
+      []
+    ).map((item) => {
       return {
         key: item.title,
         label: item.title,
         children: <p>{item.content}</p>,
       };
     });
-  }, [rewardsFaqList, stakeFaqList, type]);
+  }, [liquidityFaqList, rewardsFaqList, stakeFaqList, type]);
 
   return (
     <div className="px-4 py-6 md:p-8 border-[1px] border-solid border-neutralBorder bg-white rounded-2xl">

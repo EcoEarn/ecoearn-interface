@@ -25,6 +25,7 @@ export enum TradeConfirmTypeEnum {
   Unstake = 'Unstake',
   Claim = 'Claim',
   WithDraw = 'WithDraw',
+  RemoveLp = 'RemoveLp',
 }
 
 export type TTradeConfirmStatus = 'normal' | 'success' | 'error';
@@ -69,12 +70,20 @@ export interface IUnLockContent {
   rate?: number | string;
 }
 
+export interface IRemoveLpContent {
+  amount?: string | number;
+  tokenA?: any;
+  tokenB?: any;
+  rate?: number | string;
+}
+
 export type TConfirmModalContentType = IExtendedLockupContent &
   IUnLockContent &
   IStakeContent &
   IClaimContent &
   IExtendedLockupContent &
-  IWithDrawContent;
+  IWithDrawContent &
+  IRemoveLpContent;
 
 export interface ITradeConfirmProps {
   type: TradeConfirmTypeEnum;
@@ -82,6 +91,7 @@ export interface ITradeConfirmProps {
   backPath?: string;
   poolType?: PoolType;
   isStakeRewards?: boolean;
+  isStakeLiquidity?: boolean;
   poolDetailPath?: string;
   status?: TTradeConfirmStatus;
   loading?: boolean;
@@ -96,6 +106,7 @@ function TradeConfirm(props: ITradeConfirmProps) {
     backPath,
     poolType,
     isStakeRewards = false,
+    isStakeLiquidity = false,
     poolDetailPath = '',
     status,
     loading,
@@ -117,15 +128,24 @@ function TradeConfirm(props: ITradeConfirmProps) {
 
   const operationName = useMemo(() => {
     return {
-      [TradeConfirmTypeEnum.Stake]: isStakeRewards ? 'Stake rewards' : 'Stake',
-      [TradeConfirmTypeEnum.Add]: isStakeRewards ? 'Add stake rewards' : 'Add stake',
+      [TradeConfirmTypeEnum.Stake]: isStakeRewards
+        ? isStakeLiquidity
+          ? 'Stake rewards liquidity'
+          : 'Stake rewards'
+        : 'Stake',
+      [TradeConfirmTypeEnum.Add]: isStakeRewards
+        ? isStakeLiquidity
+          ? 'Add stake rewards liquidity'
+          : 'Add stake rewards'
+        : 'Add stake',
       [TradeConfirmTypeEnum.Extend]: 'Extend stake',
       [TradeConfirmTypeEnum.Renew]: 'Renew stake',
       [TradeConfirmTypeEnum.Unstake]: 'Unstake',
       [TradeConfirmTypeEnum.Claim]: 'Rewards claim',
       [TradeConfirmTypeEnum.WithDraw]: 'Withdrawal',
+      [TradeConfirmTypeEnum.RemoveLp]: 'Remove liquidity',
     }?.[type];
-  }, [isStakeRewards, type]);
+  }, [isStakeLiquidity, isStakeRewards, type]);
 
   const unStakeHasAmountFromWallet = useMemo(() => {
     return BigNumber(content?.amountFromWallet || 0).gt(ZERO);
@@ -164,6 +184,8 @@ function TradeConfirm(props: ITradeConfirmProps) {
                 : 'Your transaction is being processed. You may close this window. Once completed, your claimed rewards will appear on the rewards page.'
               : type === TradeConfirmTypeEnum.WithDraw
               ? 'Your transaction is being processed. You may close this window. Once completed, the withdrawn amount will be transferred to your wallet.'
+              : type === TradeConfirmTypeEnum.RemoveLp
+              ? 'Your transaction is being processed. You may close this window. Once completed, your received amount will be transferred to your wallet, while the rewards will appear on the rewards page.'
               : 'Your transaction is being processed. You may close this window. Once completed, you can check your staking balance and earned rewards on the staking details page.'}
           </p>
         )}
@@ -186,59 +208,80 @@ function TradeConfirm(props: ITradeConfirmProps) {
     content?.amountFromEarlyStake,
   );
 
+  const showStakeRewardsEntry = useMemo(() => {
+    return (
+      ((type === TradeConfirmTypeEnum.Unstake &&
+        BigNumber(content?.autoClaimAmount || 0).gt(ZERO)) ||
+        type === TradeConfirmTypeEnum.Claim) &&
+      content?.supportEarlyStake
+    );
+  }, [content?.autoClaimAmount, content?.supportEarlyStake, type]);
+
   const resultActions = useMemo(() => {
     return (
       <Flex justify="center" gap={12} vertical={isXS}>
         <Button
           className="!rounded-lg !min-w-[200px]"
+          type={
+            isStakeLiquidity || type === TradeConfirmTypeEnum.RemoveLp || !showStakeRewardsEntry
+              ? 'primary'
+              : 'default'
+          }
           onClick={() => {
             backPath && router.replace(backPath);
           }}
         >
           {type === TradeConfirmTypeEnum.Unstake ||
           type === TradeConfirmTypeEnum.Claim ||
-          type === TradeConfirmTypeEnum.WithDraw
+          type === TradeConfirmTypeEnum.WithDraw ||
+          type === TradeConfirmTypeEnum.RemoveLp
             ? 'View Rewards'
             : 'View My Staking'}
         </Button>
-        {((type === TradeConfirmTypeEnum.Unstake &&
-          BigNumber(content?.autoClaimAmount || 0).gt(ZERO)) ||
-          type === TradeConfirmTypeEnum.Claim) &&
-          content?.supportEarlyStake && (
-            <Button
-              className="!rounded-lg !min-w-[200px]"
-              type="primary"
-              onClick={() => {
-                onEarlyStake?.();
-              }}
-            >
-              Stake Rewards
-            </Button>
-          )}
+        {showStakeRewardsEntry && (
+          <Button
+            className="!rounded-lg !min-w-[200px]"
+            type="primary"
+            onClick={() => {
+              onEarlyStake?.();
+            }}
+          >
+            Stake Rewards
+          </Button>
+        )}
       </Flex>
     );
-  }, [
-    backPath,
-    content?.autoClaimAmount,
-    content?.supportEarlyStake,
-    isXS,
-    onEarlyStake,
-    router,
-    type,
-  ]);
+  }, [backPath, isStakeLiquidity, isXS, onEarlyStake, router, showStakeRewardsEntry, type]);
+
+  console.log('====content', content);
 
   const onClose = useCallback(() => {
     let path = '';
     if (isStakeRewards) {
-      path = type === TradeConfirmTypeEnum.Stake ? '/staking' : poolDetailPath || '/staking';
+      path =
+        type === TradeConfirmTypeEnum.Stake
+          ? isStakeLiquidity
+            ? '/rewards'
+            : '/staking'
+          : poolDetailPath || '/staking';
     } else if (type === TradeConfirmTypeEnum.Stake || type === TradeConfirmTypeEnum.Unstake) {
       path = '/staking';
+    } else if (type === TradeConfirmTypeEnum.RemoveLp) {
+      path = '/rewards';
     } else {
       router.back();
       return;
     }
     router.replace(path);
-  }, [isStakeRewards, poolDetailPath, router, type]);
+  }, [isStakeLiquidity, isStakeRewards, poolDetailPath, router, type]);
+
+  const rewardsLabel = useMemo(() => {
+    return (
+      <div className="text-xs font-medium text-neutralTertiary px-1 py-[2px] rounded-[4px] bg-neutralDefaultBg">
+        Rewards
+      </div>
+    );
+  }, []);
 
   const renderContent = useMemo(() => {
     if (!content) return null;
@@ -250,26 +293,31 @@ function TradeConfirm(props: ITradeConfirmProps) {
         >
           {type !== TradeConfirmTypeEnum.Unstake &&
           type !== TradeConfirmTypeEnum.Claim &&
-          type !== TradeConfirmTypeEnum.WithDraw ? (
+          type !== TradeConfirmTypeEnum.WithDraw &&
+          type !== TradeConfirmTypeEnum.RemoveLp ? (
             <>
               {type !== TradeConfirmTypeEnum.Extend && (
-                <Flex justify="space-between">
-                  <span>
+                <Flex justify="space-between" gap={8} className="w-full">
+                  <span className="flex-shrink-0">
                     {type === TradeConfirmTypeEnum.Add
                       ? isStakeRewards
-                        ? 'Add staked rewards'
+                        ? isStakeLiquidity
+                          ? 'Add stake rewards liquidity'
+                          : 'Add staked rewards'
                         : 'Add staked'
                       : isStakeRewards
-                      ? 'Staked rewards'
+                      ? isStakeLiquidity
+                        ? 'Stake rewards liquidity'
+                        : 'Staked rewards'
                       : 'Staked'}
                   </span>
-                  <Flex align="center" gap={8}>
-                    <span className="text-neutralPrimary font-medium">
+                  <Flex align="center" gap={8} className="min-w-0">
+                    <span className="text-neutralPrimary font-medium truncate">
                       {`${formatTokenPrice(BigNumber(content?.amount || 0))} ${formatTokenSymbol(
                         content?.tokenSymbol || '',
                       )}`}
                     </span>
-                    {!!content?.rate && !isStakeRewards && (
+                    {!!content?.rate && (
                       <RateTag
                         value={Number(content?.rate) * 100}
                         className="!ml-0 !font-[500] !text-xs !px-[6px] !py-0 !rounded-sm"
@@ -297,9 +345,9 @@ function TradeConfirm(props: ITradeConfirmProps) {
             </>
           ) : type === TradeConfirmTypeEnum.Claim ? (
             <>
-              <Flex justify="space-between">
-                <span>Claimed rewards</span>
-                <span className="text-neutralPrimary font-medium">
+              <Flex justify="space-between" className="w-full" gap={8}>
+                <span className="flex-shrink-0">Claimed rewards</span>
+                <span className="text-neutralPrimary font-medium min-w-0 truncate">
                   {`${formatTokenPrice(content?.amount || 0)} ${formatTokenSymbol(
                     content?.tokenSymbol || '',
                   )}`}
@@ -308,26 +356,71 @@ function TradeConfirm(props: ITradeConfirmProps) {
             </>
           ) : type === TradeConfirmTypeEnum.WithDraw ? (
             <>
-              <Flex justify="space-between">
-                <span>Withdrawn</span>
-                <span className="text-neutralPrimary font-medium">
+              <Flex justify="space-between" className="w-full" gap={8}>
+                <span className="flex-shrink-0">Withdrawn</span>
+                <span className="text-neutralPrimary font-medium min-w-0 truncate">
                   {`${formatTokenPrice(content?.amount || 0)} ${formatTokenSymbol(
                     content?.tokenSymbol || '',
                   )}`}
                 </span>
               </Flex>
             </>
+          ) : type === TradeConfirmTypeEnum.RemoveLp ? (
+            <>
+              <Flex justify="space-between" className="w-full" gap={8}>
+                <span className="flex-shrink-0">Remove Liquidity</span>
+                <Flex align="center" gap={8} className="min-w-0">
+                  <span className="text-neutralPrimary font-medium truncate">
+                    {`${formatTokenPrice(content?.amount || 0)} ${formatTokenSymbol(
+                      content?.tokenSymbol || '',
+                    )}`}
+                  </span>
+                  {!!content?.rate && (
+                    <RateTag
+                      value={Number(content?.rate) * 100}
+                      className="!ml-0 !font-[500] !text-xs !px-[6px] !py-0 !rounded-sm"
+                    />
+                  )}
+                </Flex>
+              </Flex>
+              <Flex justify="space-between" align="start" className="w-full" gap={8}>
+                <span className="flex-shrink-0">Receive</span>
+                <Flex
+                  align="end"
+                  gap={8}
+                  vertical
+                  className="text-sm font-medium text-neutralPrimary min-w-0"
+                >
+                  <Flex align="center" gap={8} className="w-full" justify="end">
+                    {content?.tokenA?.fromRewards ? rewardsLabel : null}
+                    <span className="truncate">
+                      {`${formatTokenPrice(content?.tokenA?.amount || 0)} ${formatTokenSymbol(
+                        content?.tokenA?.symbol || '',
+                      )}`}
+                    </span>
+                  </Flex>
+                  <Flex align="center" gap={8} className="w-full" justify="end">
+                    {content?.tokenB?.fromRewards ? rewardsLabel : null}
+                    <span className="truncate">
+                      {`${formatTokenPrice(content?.tokenB?.amount || 0)} ${formatTokenSymbol(
+                        content?.tokenB?.symbol || '',
+                      )}`}
+                    </span>
+                  </Flex>
+                </Flex>
+              </Flex>
+            </>
           ) : (
             <>
               {poolType !== PoolType.LP && (
-                <Flex justify="space-between">
-                  <span>
+                <Flex justify="space-between" className="w-full" gap={8}>
+                  <span className="flex-shrink-0">
                     {(unStakeHasAmountFromWallet && !unStakeHasAmountFromEarlyStake) ||
                     (unStakeHasAmountFromWallet && unStakeHasAmountFromEarlyStake)
                       ? 'Withdrawn'
                       : 'Unstaked rewards'}
                   </span>
-                  <span className="text-neutralPrimary font-medium">
+                  <span className="text-neutralPrimary font-medium min-w-0 truncate">
                     {`${formatTokenPrice(
                       BigNumber(content?.amountFromWallet || 0).gt(ZERO)
                         ? content?.amountFromWallet || 0
@@ -345,9 +438,9 @@ function TradeConfirm(props: ITradeConfirmProps) {
               {unStakeHasAmountFromEarlyStake &&
                 unStakeHasAmountFromWallet &&
                 poolType !== PoolType.LP && (
-                  <Flex justify="space-between">
-                    <span>Unstaked rewards</span>
-                    <span className="text-neutralPrimary font-medium">
+                  <Flex justify="space-between" className="w-full" gap={8}>
+                    <span className="flex-shrink-0">Unstaked rewards</span>
+                    <span className="text-neutralPrimary font-medium min-w-0 truncate">
                       {`${formatTokenPrice(content?.amountFromEarlyStake || 0)} ${formatTokenSymbol(
                         content?.rewardsSymbol || '',
                       )}`}
@@ -355,17 +448,17 @@ function TradeConfirm(props: ITradeConfirmProps) {
                   </Flex>
                 )}
               {poolType === PoolType.LP && (
-                <Flex justify="space-between">
-                  <span>Unstaked</span>
-                  <Flex align="center" gap={8}>
-                    <span className="text-neutralPrimary font-medium">
+                <Flex justify="space-between" className="w-full" gap={8}>
+                  <span className="flex-shrink-0">Unstaked</span>
+                  <Flex align="center" gap={8} className="min-w-0">
+                    <span className="text-neutralPrimary font-medium truncate">
                       {`${formatTokenPrice(
                         BigNumber(content?.amountFromWallet || 0).plus(
                           BigNumber(content?.amountFromEarlyStake || 0),
                         ),
                       )} ${formatTokenSymbol(content?.tokenSymbol || '')}`}
                     </span>
-                    {!!content?.rate && !isStakeRewards && (
+                    {!!content?.rate && (
                       <RateTag
                         value={Number(content?.rate) * 100}
                         className="!ml-0 !font-[500] !text-xs !px-[6px] !py-0 !rounded-sm"
@@ -375,9 +468,9 @@ function TradeConfirm(props: ITradeConfirmProps) {
                 </Flex>
               )}
               {BigNumber(content?.autoClaimAmount || 0).gt(ZERO) && (
-                <Flex justify="space-between">
-                  <span>Claimed rewards</span>
-                  <span className="text-neutralPrimary font-medium">
+                <Flex justify="space-between" className="w-full" gap={8}>
+                  <span className="flex-shrink-0">Claimed rewards</span>
+                  <span className="text-neutralPrimary font-medium min-w-0 truncate">
                     {`${formatTokenPrice(content?.autoClaimAmount || 0)} ${formatTokenSymbol(
                       content?.rewardsSymbol || '',
                     )}`}
@@ -406,18 +499,16 @@ function TradeConfirm(props: ITradeConfirmProps) {
     );
   }, [
     content,
+    isStakeLiquidity,
     isStakeRewards,
     poolType,
+    rewardsLabel,
     status,
     type,
     unStakeHasAmountFromEarlyStake,
     unStakeHasAmountFromWallet,
     withDrawPeriod,
   ]);
-
-  const handleClose = useCallback(() => {
-    //
-  }, []);
 
   const renderFooter = useMemo(() => {
     if (status !== 'success') return null;
