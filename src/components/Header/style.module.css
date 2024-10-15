@@ -90,10 +90,6 @@
       @apply fill-neutralTitle;
     }
   }
-
-  .testnet-warning {
-    @apply bg-[#FEEFF1];
-  }
 }
 
 .dark {
@@ -135,10 +131,6 @@
     .menu-dropdown-arrow {
       @apply fill-neutralWhiteBg;
     }
-  }
-
-  .testnet-warning {
-    @apply bg-[#401015];
   }
 }
 
