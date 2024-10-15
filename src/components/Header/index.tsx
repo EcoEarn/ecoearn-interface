@@ -29,7 +29,7 @@ export default function Header({
   const [menuModalVisibleModel, setMenuModalVisibleModel] = useState(false);
   const { isConnected } = useConnectWallet();
   const pathName = usePathname();
-  const { showLeaderboard } = useGetCmsInfo() || {};
+  const { showLeaderboard, topTip } = useGetCmsInfo() || {};
 
   const menuItems = useMemo(() => {
     return [
@@ -92,17 +92,26 @@ export default function Header({
         </div>
       );
     }
-  }, [isLG, menuItems, onPressCompassItems, pathName]);
+  }, [isLG, pathName]);
 
   return (
     <section
       className={clsx(
-        'sticky top-0 left-0 z-[100] flex-shrink-0 px-4 lg:px-10',
+        'sticky top-0 left-0 z-[100] flex-shrink-0',
         !isCustomBg && 'bg-brandBg',
         className,
       )}
     >
-      <div className="h-[60px] lg:h-[80px] mx-auto flex justify-between items-center w-full">
+      {topTip && (
+        <p
+          className={clsx(
+            'w-full p-[16px] text-sm text-[#F55D6E] font-semibold text-center bg-[#FEEFF1]',
+          )}
+        >
+          {topTip}
+        </p>
+      )}
+      <div className="px-4 lg:px-10 h-[60px] lg:h-[80px] mx-auto flex justify-between items-center w-full">
         <div className="flex flex-1 overflow-hidden justify-start items-center">
           {
             // eslint-disable-next-line @next/next/no-img-element
