@@ -79,6 +79,7 @@ export interface ICMSInfo {
     content: string;
   }>;
   showLiquidityModule: boolean;
+  topTip: string;
   [key: string]: any;
 }
 
