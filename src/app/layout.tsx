@@ -1,8 +1,10 @@
-import Script from 'next/script';
-import Layout from 'pageComponents/layout';
+import '@etransfer/ui-react/dist/assets/index.css';
+import '@portkey/trader-react-ui/dist/assets/index.css';
 import 'styles/tailwindBase.css';
 import 'styles/global.css';
 import 'styles/theme.css';
+import Script from 'next/script';
+import Layout from 'pageComponents/layout';
 import Provider from 'provider';
 import StyleRegistry from './StyleRegistry';
 import Head from 'next/head';

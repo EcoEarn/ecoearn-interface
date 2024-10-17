@@ -74,6 +74,12 @@ export interface ICMSInfo {
     title: string;
     content: string;
   }>;
+  liquidityFaqList: Array<{
+    title: string;
+    content: string;
+  }>;
+  showLiquidityModule: boolean;
+  topTip: string;
   [key: string]: any;
 }
 

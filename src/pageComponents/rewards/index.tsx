@@ -12,6 +12,9 @@ import { getRewardsList, getRewardsType } from 'api/request';
 import { useWalletService } from 'hooks/useWallet';
 import useLoading from 'hooks/useLoading';
 import ComingSoon from './components/ComingSoon';
+import LiquidityList from 'pageComponents/liquidity/components/LiquidityList';
+import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import Empty from 'components/Empty';
 
 export enum RewardsTypeEnum {
   'All' = 'all',
@@ -28,6 +31,9 @@ export default function Rewards() {
   const { showLoading, closeLoading, visible } = useLoading();
   const [currentType, setCurrentType] = useState<RewardsTypeEnum>(RewardsTypeEnum.All);
   const [rewardsTypeList, setRewardsTypeList] = useState<Array<IRewardsTypeItem>>();
+  const { showLiquidityModule } = useGetCmsInfo() || {};
+
+  console.log('====showLiquidityModule', showLiquidityModule);
 
   const fetchInitData = useCallback(async () => {
     if (!wallet?.address) return;
@@ -80,48 +86,51 @@ export default function Rewards() {
   return (
     <>
       <h2 className="text-4xl lg:text-5xl font-[600] text-neutralTitle pt-8 lg:pt-10">Rewards</h2>
-      <div className="text-[16px] font-[600] mt-[48px]">My Rewards</div>
-      {/* <div className="text-base text-neutralPrimary flex flex-col gap-1 mt-2 lg:mt-4">
-        <p>
-          There is a 90-day release period for your claimed rewards, and they can only be withdrawn
-          after the release period expires.
-        </p>
-        <p>
-          After staking, you can restake your claimed rewards early to the mining pool, or stake
-          them early to the Farms through adding liquidity. Rewards that can be staked early include
-          frozen and withdrawable amounts.
-        </p>
-      </div> */}
-      {!isMD ? (
-        <Segmented
-          className={clsx('mt-8 lg:mt-[24px]', styles.segmented)}
-          size="large"
-          value={currentType}
-          defaultValue={RewardsTypeEnum.All}
-          onChange={handleChange}
-          options={options}
-        />
-      ) : (
-        <Select
-          className={clsx(styles.select, 'mt-[24px] min-w-[164px]')}
-          popupClassName={styles.selectOverlay}
-          value={currentType}
-          onChange={handleChange}
-          options={options}
-        />
-      )}
-      <div className="mt-6">
-        <PoolsAmount currentType={currentType} visible={visible} />
-      </div>
-      {isLogin && hasHistoryData && (
-        <div className="mt-8">
-          <div className="mb-6 text-base font-[600] text-neutralTitle">Claim History</div>
-          {isMD ? (
-            <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
+      {isLogin ? (
+        <div>
+          <div className="text-[16px] font-[600] mt-[48px]">My Rewards</div>
+          {!isMD ? (
+            <Segmented
+              className={clsx('mt-8 lg:mt-[24px]', styles.segmented)}
+              size="large"
+              value={currentType}
+              defaultValue={RewardsTypeEnum.All}
+              onChange={handleChange}
+              options={options}
+            />
           ) : (
-            <RewardListPC rewardsTypeList={rewardsTypeList || []} />
+            <Select
+              className={clsx(styles.select, 'mt-[24px] min-w-[164px]')}
+              popupClassName={styles.selectOverlay}
+              value={currentType}
+              onChange={handleChange}
+              options={options}
+            />
+          )}
+          <div className="mt-6">
+            <PoolsAmount currentType={currentType} />
+          </div>
+          {showLiquidityModule && (
+            <div className="mt-8">
+              <div className="mb-6 text-base font-[600] text-neutralTitle">
+                Rewards Liquidity Pools
+              </div>
+              <LiquidityList />
+            </div>
+          )}
+          {hasHistoryData && (
+            <div className="mt-8">
+              <div className="mb-6 text-base font-[600] text-neutralTitle">Claim History</div>
+              {isMD ? (
+                <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
+              ) : (
+                <RewardListPC rewardsTypeList={rewardsTypeList || []} />
+              )}
+            </div>
           )}
         </div>
+      ) : (
+        <Empty emptyText="" />
       )}
     </>
   );

@@ -10,7 +10,6 @@ import { useWalletService } from 'hooks/useWallet';
 import { WalletTypeEnum } from '@etransfer/ui-react';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import useSwapService from './hooks/useSwapService';
-import '@portkey/trader-react-ui/dist/assets/index.css';
 
 export interface ISwapModalProps extends ISwapProps {
   onCancel: () => void;
