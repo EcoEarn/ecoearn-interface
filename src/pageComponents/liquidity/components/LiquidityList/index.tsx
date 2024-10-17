@@ -16,7 +16,7 @@ import { AELFDProviderTheme } from 'provider/config';
 import { APP_PREFIX } from 'constants/index';
 import { ColumnsType } from 'antd/es/table';
 
-export default function LiquidityList() {
+export default function LiquidityList({ initData }: { initData?: ILiquidityItem[] }) {
   const {
     isLG,
     currentList,
@@ -34,7 +34,7 @@ export default function LiquidityList() {
     getRemoveBtnTip,
     isRemoveBtnDisabled,
     onStake,
-  } = useLiquidityListService();
+  } = useLiquidityListService({ initData });
 
   const columns: ColumnsType<ILiquidityItem> = useMemo(() => {
     const allColumns: ColumnsType<ILiquidityItem> = [

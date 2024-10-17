@@ -23,6 +23,7 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
     onRenewal,
     renewText,
     goLiquidity,
+    loading,
   } = useSimpleStakeListService({
     poolType,
   });
@@ -33,24 +34,9 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
         <div className="pt-[24px] pb-[24px] text-[28px] lg:pt-[64px] lg:pb-[24px] font-[600] lg:text-[36px] text-neutralTitle">
           {title}
         </div>
-        {/* <div className="md:items-center">
-          {poolType === 'Lp' && (
-            <span
-              className="text-sm text-brandDefault font-[600] cursor-pointer inline-block mb-[24px]"
-              onClick={goLiquidity}
-            >
-              My Liquidity
-              <RightOutlined
-                className={clsx('w-[14px] h-[14px] text-sm leading-[14px] text-brandDefault ml-2')}
-                width={14}
-                height={14}
-              />
-            </span>
-          )}
-        </div> */}
       </div>
       <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-auto-fill-400">
-        {stakeData.length > 0 ? (
+        {!loading && stakeData.length > 0 ? (
           <>
             {stakeData.map((item, index) => {
               return (

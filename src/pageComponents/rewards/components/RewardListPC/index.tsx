@@ -4,11 +4,13 @@ import { useEffect } from 'react';
 
 export default function RewardListPC({
   rewardsTypeList,
+  initData,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
+  initData?: IRewardListItem[];
 }) {
   const { page, pageSize, dataList, totalCount, onPaginationChange, onChange } =
-    useRewardsListService({ rewardsTypeList });
+    useRewardsListService({ rewardsTypeList, initData });
   return (
     <PoolsTable
       rewardsTypeList={rewardsTypeList}

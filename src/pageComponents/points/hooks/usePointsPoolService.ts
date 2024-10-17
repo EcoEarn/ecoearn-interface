@@ -79,7 +79,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
       return;
     }
     try {
-      showLoading();
+      // showLoading();
       const data = await getPointsPoolList({
         type: currentList,
         sorting: '',
@@ -93,7 +93,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     } catch (err) {
       console.error('getPointsPoolList err', err);
     } finally {
-      closeLoading();
+      // closeLoading();
     }
   }, [closeLoading, currentList, dappId, showLoading, wallet?.address]);
 
@@ -157,7 +157,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     async (curItem: IPointsPoolItem) => {
       if (!curItem) return;
       setLoading(true);
-      showLoading();
+      showLoading({ type: 'block' });
       try {
         const transactionId = await onClaim(curItem);
         return transactionId;

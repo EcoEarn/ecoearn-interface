@@ -9,6 +9,7 @@ import StakeDetail from './components/StakeDetail';
 import StakeTokenTitle from 'components/StakeTokenTitle';
 import BackCom from './components/BackCom';
 import { PoolType } from 'types/stake';
+import Loading from 'components/Loading';
 export default function PoolDetailPage() {
   const {
     poolType,
@@ -16,6 +17,7 @@ export default function PoolDetailPage() {
     stakeProps,
     stakeRewards,
     isFirstStake,
+    isPending,
     onAdd,
     onClaim,
     onExtend,
@@ -24,6 +26,13 @@ export default function PoolDetailPage() {
     onBack,
   } = usePoolDetailService();
   const { isLogin } = useGetLoginStatus();
+
+  if (isPending)
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loading />
+      </div>
+    );
 
   return !poolInfo ? null : (
     <Flex vertical gap={24} className="max-w-[672px] mx-auto mt-6 md:mt-[64px]">

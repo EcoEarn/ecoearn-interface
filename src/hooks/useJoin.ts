@@ -28,7 +28,7 @@ export default function useJoin() {
 
     if (params.address)
       try {
-        showLoading();
+        showLoading({ type: 'block' });
         const res = await checkJoinStatusApi(params);
         console.log('res', res);
         isJoin = res;

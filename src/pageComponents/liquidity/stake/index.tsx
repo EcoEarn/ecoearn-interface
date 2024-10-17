@@ -32,6 +32,7 @@ import qs from 'qs';
 import { TradeConfirmTypeEnum } from 'components/TradeConfrim';
 import StakeTokenTitle from 'components/StakeTokenTitle';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
+import Loading from 'components/Loading';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -50,6 +51,7 @@ export default function StakeLiquidityPage() {
   const { isLogin } = useGetLoginStatus();
   const router = useRouter();
   const [earlyStakeInfoLoaded, setEarlyStakeInfoLoaded] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const { data: rewardsData } = useRequest(
     async () => {
@@ -148,8 +150,8 @@ export default function StakeLiquidityPage() {
       earlyAmount: typeIsAdd ? BigNumber(stakeData?.staked || 0).toNumber() : undefined,
       onStake: async (amount, period) => {
         try {
-          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-          // const periodInSeconds = 5 * 60;
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 5 * 60;
           const signParams: ILiquidityStakeSignParams = {
             lpAmount: String(lpAmount || ''),
             poolId: stakeData?.poolId || '',
@@ -240,6 +242,7 @@ export default function StakeLiquidityPage() {
       },
       onSuccess: () => {
         console.log('===onSuccess');
+        setIsPending(true);
       },
     };
     setStakeProps(stakeProps);
@@ -333,6 +336,14 @@ export default function StakeLiquidityPage() {
       router.replace('/staking');
     }
   }, [isLogin, router]);
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <Loading />
+      </div>
+    );
+  }
 
   return stakeProps ? (
     <div className="flex flex-col gap-6 max-w-[672px] mx-auto mt-6 md:mt-[48px]">

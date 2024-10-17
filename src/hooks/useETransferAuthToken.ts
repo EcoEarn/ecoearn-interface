@@ -76,7 +76,9 @@ export function useETransferAuthToken() {
   }, []);
 
   const handleGetSignature = useCallback(async () => {
-    const plainTextOrigin = `Nonce:${Date.now()}`;
+    const plainTextOrigin = `Welcome to Login ETransfer! Click to connect wallet to and accept its Terms of Service and Privacy Policy. This request will not trigger a blockchain transaction or cost any gas fees.
+
+Nonce:${Date.now()}`;
     const plainText: any = Buffer.from(plainTextOrigin).toString('hex').replace('0x', '');
     let signInfo: string;
     let getSignature;

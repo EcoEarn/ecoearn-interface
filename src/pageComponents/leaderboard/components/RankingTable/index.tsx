@@ -19,6 +19,7 @@ import MyRanking from '../MyRanking';
 import { getLeaderboardInfo } from 'api/request';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import useLoading from 'hooks/useLoading';
+import Loading from 'components/Loading';
 
 const pageSize = 20;
 
@@ -116,8 +117,10 @@ export default function RankingTable({ className }: { className?: string }) {
 
   const getList = useCallback(
     async (page = 1) => {
+      if (page === 1) {
+        showLoading();
+      }
       setLoading(true);
-      showLoading();
       try {
         const data = await getLeaderboardInfo({
           address: wallet?.address || '',
@@ -142,7 +145,7 @@ export default function RankingTable({ className }: { className?: string }) {
         closeLoading();
       }
     },
-    [wallet?.address],
+    [closeLoading, showLoading, wallet?.address],
   );
 
   useEffect(() => {
@@ -162,7 +165,7 @@ export default function RankingTable({ className }: { className?: string }) {
 
   return (
     <>
-      {isLogin && (
+      {wallet?.address && (
         <>{ownerInfo?.address && <MyRanking className="mt-8 md:mt-12" data={ownerInfo} />}</>
       )}
       <AELFDProvider
@@ -172,26 +175,28 @@ export default function RankingTable({ className }: { className?: string }) {
           components: { ...AELFDProviderTheme.components, ...theme.components },
         }}
       >
-        <div className="ranking-table-container" onScrollCapture={onScrollCapture}>
-          {dataSource && (
-            <CommonTable
-              rowKey={(row) => row?.address}
-              // loading={loading}
-              pagination={false}
-              columns={columns as any}
-              dataSource={dataSource}
-              className={clsx(styles.rankingTable, 'mt-4 md:mt-6')}
-              id="ranking-table"
-              scroll={{ x: isMD ? 343 : isLG ? 'max-content' : '100%', y: isMD ? 650 : 890 }}
-              rowClassName={(record, index) => {
-                if (record?.isOwner) {
-                  return 'bg-brandFooterBg';
-                }
-                return '';
-              }}
-            />
-          )}
-        </div>
+        {loading && page === 0 ? null : (
+          <div className="ranking-table-container" onScrollCapture={onScrollCapture}>
+            {dataSource && (
+              <CommonTable
+                rowKey={(row) => row?.address}
+                // loading={loading}
+                pagination={false}
+                columns={columns as any}
+                dataSource={dataSource}
+                className={clsx(styles.rankingTable, 'mt-4 md:mt-6')}
+                id="ranking-table"
+                scroll={{ x: isMD ? 343 : isLG ? 'max-content' : '100%', y: isMD ? 650 : 890 }}
+                rowClassName={(record, index) => {
+                  if (record?.isOwner) {
+                    return 'bg-brandFooterBg';
+                  }
+                  return '';
+                }}
+              />
+            )}
+          </div>
+        )}
       </AELFDProvider>
     </>
   );

@@ -1,20 +1,27 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 
 // import { Modal } from 'antd';
-// import styles from './style.module.css';
+import styles from './style.module.css';
 import { useMount } from 'ahooks';
 import { useState } from 'react';
 // import { ReactComponent as Close } from 'assets/img/modal-close.svg';
 import Loading from 'components/Loading/index';
+import clsx from 'clsx';
 
 export interface ILoadingProps {
   visible?: boolean;
   content?: string;
   showClose?: boolean;
   onClose?: () => void;
+  type?: 'default' | 'block';
 }
 
-export function NiceLoading({ showClose = false, content, onClose }: ILoadingProps) {
+export function NiceLoading({
+  showClose = false,
+  content,
+  onClose,
+  type = 'default',
+}: ILoadingProps) {
   const [isMount, setIsMount] = useState(false);
 
   const modal = useModal();
@@ -29,7 +36,18 @@ export function NiceLoading({ showClose = false, content, onClose }: ILoadingPro
     <>
       {modal.visible && (
         <div className="w-full h-full fixed top-0 left-0 text-black bg-transparent flex items-center justify-center z-[9900]">
-          <Loading />
+          {type === 'block' ? (
+            <div
+              className={clsx(
+                'w-[240px] h-[128px] flex items-center justify-center bg-white rounded-[20px]',
+                styles.shadow,
+              )}
+            >
+              <Loading />
+            </div>
+          ) : (
+            <Loading />
+          )}
         </div>
       )}
     </>

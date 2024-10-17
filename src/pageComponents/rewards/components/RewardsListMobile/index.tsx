@@ -5,11 +5,13 @@ import styles from './index.module.css';
 
 export default function RewardsListMobile({
   rewardsTypeList,
+  initData,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
+  initData?: IRewardListItem[];
 }) {
   const { currentSelect, handleChange, selectOptions, dataSource, loading } =
-    useRewardsListMobileService({ rewardsTypeList });
+    useRewardsListMobileService({ rewardsTypeList, initData });
 
   return (
     <div>

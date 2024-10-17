@@ -9,8 +9,10 @@ const pageSize = 10;
 
 export default function useRewardsListMobileService({
   rewardsTypeList,
+  initData,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
+  initData?: IRewardListItem[];
 }) {
   const [total, setTotal] = useState(0);
   const [dataSource, setDataSource] = useState<IRewardListItem[]>([]);
@@ -21,6 +23,7 @@ export default function useRewardsListMobileService({
   const { wallet } = useWalletService();
   const [poolType, setPoolType] = useState<'Points' | 'Token' | 'Lp' | 'All'>('All');
   const [rewardsTypeId, setRewardsTypeId] = useState('');
+  const isReadInitData = useRef(false);
 
   const selectOptions = useMemo(() => {
     return rewardsTypeList?.map((item) => {
@@ -45,10 +48,14 @@ export default function useRewardsListMobileService({
   const fetchData = useCallback(async () => {
     if (loading.current || !hasMore) {
       return;
-    } else {
-      loading.current = true;
-      showLoading();
     }
+    if (initData && !isReadInitData.current && requestParams.poolType === 'All') {
+      setDataSource(initData);
+      isReadInitData.current = true;
+      return;
+    }
+    loading.current = true;
+    showLoading();
     try {
       const res = await getRewardsList(requestParams);
       loading.current = false;
@@ -67,7 +74,7 @@ export default function useRewardsListMobileService({
       closeLoading();
       loading.current = false;
     }
-  }, [closeLoading, current, hasMore, requestParams, showLoading]);
+  }, [closeLoading, current, hasMore, initData, requestParams, showLoading]);
 
   useEffect(() => {
     fetchData();

@@ -36,7 +36,7 @@ export const useGetToken = () => {
   }) => Promise<string | undefined> = useCallback(
     async (props: { params: ITokenParams; needLoading?: boolean; retryCount?: number }) => {
       const { params, needLoading = false, retryCount = 3 } = props;
-      needLoading && showLoading();
+      needLoading && showLoading({ type: 'block' });
       try {
         const res = await fetchToken(params);
         needLoading && closeLoading();
