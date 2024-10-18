@@ -63,6 +63,7 @@ export interface ICMSInfo {
     networkType: NetworkType;
     etransferUrl: string;
     etransferAuthUrl: string;
+    etransferSocketUrl: string;
   };
   socialList: Array<ILinkItem>;
   showLeaderboard: boolean;

@@ -14,6 +14,8 @@ import { ReactComponent as WarnSVG } from 'assets/img/warn.svg';
 import useResponsive from 'utils/useResponsive';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import clsx from 'clsx';
+import { useWalletService } from 'hooks/useWallet';
+import { addPrefixSuffix } from 'utils/addressFormatting';
 
 export interface IDepositModalProps {
   defaultDepositToken?: string;
@@ -32,6 +34,7 @@ function DepositModal(props: IDepositModalProps) {
   const { curChain, etransferGitBookUrl } = useGetCmsInfo() || {};
   const { isMD } = useResponsive();
   const modal = useModal();
+  const { wallet, walletType } = useWalletService();
 
   const tokenSymbolText = useMemo(() => {
     return formatTokenSymbol(defaultReceiveToken);
@@ -68,8 +71,22 @@ function DepositModal(props: IDepositModalProps) {
         defaultChainId: curChain || 'tDVV',
         defaultNetwork: defaultNetwork || 'TRX',
       },
+      accountInfo: {
+        accounts: {
+          AELF: addPrefixSuffix(wallet?.address || '', 'AELF'),
+          [curChain || 'tDVV']: addPrefixSuffix(wallet?.address || '', curChain || 'tDVV'),
+        },
+        walletType,
+      },
     });
-  }, [curChain, defaultDepositToken, defaultNetwork, defaultReceiveToken]);
+  }, [
+    curChain,
+    defaultDepositToken,
+    defaultNetwork,
+    defaultReceiveToken,
+    wallet?.address,
+    walletType,
+  ]);
 
   return (
     <CommonModal

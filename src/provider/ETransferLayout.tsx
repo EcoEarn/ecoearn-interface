@@ -17,9 +17,11 @@ export default function ETransferLayout({ children }: { children: React.ReactNod
       networkType: etransferConfig?.networkType,
       etransferUrl: etransferConfig?.etransferUrl,
       etransferAuthUrl: etransferConfig?.etransferAuthUrl,
+      etransferSocketUrl: etransferConfig?.etransferSocketUrl,
     });
   }, [
     etransferConfig?.etransferAuthUrl,
+    etransferConfig?.etransferSocketUrl,
     etransferConfig?.etransferUrl,
     etransferConfig?.networkType,
   ]);
