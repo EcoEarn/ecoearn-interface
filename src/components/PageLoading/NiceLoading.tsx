@@ -39,7 +39,7 @@ export function NiceLoading({
           {type === 'block' ? (
             <div
               className={clsx(
-                'w-[128px] h-[128px] flex items-center justify-center bg-white rounded-[20px]',
+                'w-[128px] h-[128px] flex items-center justify-center bg-[#FFFFFFF2] rounded-[20px]',
                 styles.shadow,
               )}
             >
