@@ -108,6 +108,7 @@ export default function AddLiquidity({
   const [tolerance, setTolerance] = useState('0.5');
   const [deadline, setDeadline] = useState('20');
   const notification = useNotification();
+  const [loading, setLoading] = useState(false);
 
   const onTokenAChange = useCallback((value: string) => {
     setTokenAValue(value);
@@ -247,7 +248,6 @@ export default function AddLiquidity({
   const checkStakeData = useCallback(async () => {
     let stakeData: Array<IEarlyStakeInfo>;
     try {
-      showLoading();
       stakeData = await getEarlyStakeInfo({
         tokenName: lpToken?.symbol || '',
         address: wallet?.address || '',
@@ -255,7 +255,6 @@ export default function AddLiquidity({
         poolType: PoolType.LP,
         rate: lpToken.rate,
       });
-      closeLoading();
       const fixedEarlyStakeData = (fixEarlyStakeData(stakeData) as Array<IEarlyStakeInfo>)?.[0];
       if (fixedEarlyStakeData) {
         if (
@@ -276,20 +275,11 @@ export default function AddLiquidity({
     } catch (error) {
       notification.error({ description: 'getPool failed' });
       return;
-    } finally {
-      closeLoading();
     }
-  }, [
-    closeLoading,
-    curChain,
-    lpToken.rate,
-    lpToken?.symbol,
-    notification,
-    showLoading,
-    wallet?.address,
-  ]);
+  }, [curChain, lpToken.rate, lpToken?.symbol, notification, wallet?.address]);
 
   const handleSupply = useCallback(async () => {
+    setLoading(true);
     const stakeData = await checkStakeData();
     if (!stakeData) return;
     const typeIsAdd = !BigNumber(stakeData?.staked || 0).isZero();
@@ -444,6 +434,7 @@ export default function AddLiquidity({
         onSuccess?.();
       },
     };
+    setLoading(false);
     onNext?.(stakeProps);
   }, [
     checkStakeData,
@@ -501,6 +492,7 @@ export default function AddLiquidity({
     return (
       <Button
         type="primary"
+        loading={loading}
         onClick={handleSupply}
         disabled={isTokenBInsufficient}
         className="!rounded-lg mt-[48px] mx-auto !min-w-[260px]"
@@ -508,7 +500,7 @@ export default function AddLiquidity({
         {btnText}
       </Button>
     );
-  }, [btnText, handleSupply, isTokenBInsufficient]);
+  }, [btnText, handleSupply, isTokenBInsufficient, loading]);
 
   return (
     <section className="p-8 bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder">

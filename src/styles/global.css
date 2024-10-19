@@ -89,6 +89,18 @@ code {
 	}
 }
 
+.etransfer-ant-modal.etransfer-ui-global-loading-modal {
+	width: 130px !important;
+	height: 130px !important;
+}
+
+@media (max-width: 1024px) {
+	.etransfer-ant-modal.etransfer-ui-global-loading-modal {
+		width: 130px !important;
+		height: 130px !important;
+	}
+}
+
 .portkey-trade-ant-tooltip {
 	@apply rounded-lg;
 }

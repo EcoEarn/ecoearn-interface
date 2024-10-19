@@ -11,8 +11,15 @@ import { formatTokenSymbol } from 'utils/format';
 import { useRouter } from 'next/navigation';
 import { useTimeout } from 'ahooks';
 import RewardsPoolName from '../RewardsPoolName';
+import Loading from 'components/Loading';
 
-export default forwardRef(function PoolsAmount({ currentType }: { currentType: RewardsTypeEnum }) {
+export default forwardRef(function PoolsAmount({
+  currentType,
+  initData,
+}: {
+  currentType: RewardsTypeEnum;
+  initData: Array<IPoolRewardsItem>;
+}) {
   const {
     earlyStake,
     onWithdraw,
@@ -25,11 +32,13 @@ export default forwardRef(function PoolsAmount({ currentType }: { currentType: R
     confirmModalOnClose,
     confirmModalErrorTip,
     dataSource,
+    loading,
     handleDetail,
     confirmModalOnConfirm,
     onClickEmptyBtn,
   } = useRewardsAggregation({
     currentType,
+    initData,
   });
 
   const renderEmpty = useMemo(() => {
@@ -43,6 +52,14 @@ export default forwardRef(function PoolsAmount({ currentType }: { currentType: R
   }, [onClickEmptyBtn]);
 
   const router = useRouter();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[211px]">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <>

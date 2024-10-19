@@ -6,7 +6,7 @@ import {
   withdraw,
   withdrawSign,
 } from 'api/request';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import StakeModal from 'components/StakeModalWithConfirm';
 import { useModal } from '@ebay/nice-modal-react';
 import { PoolType, StakeType } from 'types/stake';
@@ -50,7 +50,13 @@ export interface IRewardsListDataSource extends IPoolRewardsItem {
   amount: any;
 }
 
-export default function useRewardsAggregation({ currentType }: { currentType: RewardsTypeEnum }) {
+export default function useRewardsAggregation({
+  currentType = RewardsTypeEnum.All,
+  initData,
+}: {
+  currentType: RewardsTypeEnum;
+  initData?: Array<IPoolRewardsItem>;
+}) {
   const [data, setData] = useState<Array<IPoolRewardsItem>>();
   const [earlyStakeData, setEarlyStakeData] = useState<Array<IEarlyStakeInfo>>();
   const stakeModal = useModal(StakeModal);
@@ -73,6 +79,8 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
   const [curItem, setCurItem] = useState<IRewardsListDataSource>();
   const router = useRouter();
   const notification = useNotification();
+  const isReadInitData = useRef(false);
+  const [loading, setLoading] = useState(false);
 
   const poolType = useMemo(() => {
     if (currentType === RewardsTypeEnum.Points) return PoolType.POINTS;
@@ -84,44 +92,36 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
   const fetchData = useCallback(
     async (props?: { needLoading?: boolean }) => {
       const { needLoading = true } = props || {};
-      if (!isLogin || !curChain) return;
-      needLoading && showLoading();
+      if (!wallet?.address) return;
+      if (poolType === PoolType.ALL && initData && !isReadInitData.current) {
+        setData(initData);
+        isReadInitData.current = true;
+        return;
+      }
+      if (needLoading) {
+        // showLoading();
+        setLoading(true);
+      }
       try {
         const data = await getPoolRewards({
-          address: wallet?.address || '',
+          address: wallet.address,
           poolType,
         });
         if (data && data?.length > 0) {
           setData(data);
-          try {
-            const earlyStakeData = await getEarlyStakeInfo({
-              tokenName: '',
-              address: wallet?.address || '',
-              chainId: curChain!,
-              rate: 0,
-              poolType: PoolType.TOKEN,
-            });
-            needLoading && closeLoading();
-            const fixedEarlyStakeData = fixEarlyStakeData(
-              earlyStakeData || [],
-            ) as Array<IEarlyStakeInfo>;
-            setEarlyStakeData(fixedEarlyStakeData);
-          } catch (error) {
-            console.error('getEarlyStakeInfo error', error);
-          } finally {
-            needLoading && closeLoading();
-          }
         } else {
           setData([]);
         }
-        closeLoading();
+        // closeLoading();
+        setLoading(false);
       } catch (error) {
         console.error('getPoolRewards error', error);
       } finally {
-        needLoading && closeLoading();
+        // needLoading && closeLoading();
+        setLoading(false);
       }
     },
-    [closeLoading, curChain, isLogin, poolType, showLoading, wallet?.address],
+    [initData, poolType, wallet?.address],
   );
 
   useEffect(() => {
@@ -633,6 +633,7 @@ export default function useRewardsAggregation({ currentType }: { currentType: Re
     confirmModalType,
     fetchData,
     dataSource,
+    loading,
     handleDetail,
     onWithdraw,
     onWithDrawConfirm,

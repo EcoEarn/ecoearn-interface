@@ -5,11 +5,20 @@ import styles from './index.module.css';
 
 export default function RewardsListMobile({
   rewardsTypeList,
+  initData,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
+  initData?: IRewardListItem[];
 }) {
-  const { currentSelect, handleChange, selectOptions, dataSource, loading } =
-    useRewardsListMobileService({ rewardsTypeList });
+  const {
+    currentSelect,
+    handleChange,
+    selectOptions,
+    dataSource,
+    loading,
+    isLoadingList,
+    isLoadingMore,
+  } = useRewardsListMobileService({ rewardsTypeList, initData });
 
   return (
     <div>
@@ -21,7 +30,11 @@ export default function RewardsListMobile({
         options={selectOptions}
       />
       <div className="mt-4">
-        <ScrollContent dataList={dataSource || []} loading={loading} />
+        <ScrollContent
+          dataList={dataSource || []}
+          loading={isLoadingList}
+          loadingMore={isLoadingMore}
+        />
       </div>
     </div>
   );

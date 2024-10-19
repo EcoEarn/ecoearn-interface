@@ -7,9 +7,13 @@ import { useGetToken } from './useGetToken';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 
 const useUpdateLoginStatus = () => {
-  const { isConnected, walletInfo } = useConnectWallet();
+  const { isConnected, walletInfo, connecting } = useConnectWallet();
   const { hasToken } = useGetLoginStatus();
   const { checkTokenValid } = useGetToken();
+
+  useEffect(() => {
+    dispatch(setLoginStatus({ isLoadingConnectWallet: connecting }));
+  }, [connecting]);
 
   useEffect(() => {
     const accountInfo = JSON.parse(localStorage.getItem(storages.accountInfo) || '{}');

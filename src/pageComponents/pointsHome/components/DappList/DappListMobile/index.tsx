@@ -14,8 +14,6 @@ import styles from './style.module.css';
 
 export default function DappListMobile({
   items,
-  handleGainPoints,
-  handleStake,
   loading,
 }: {
   items: Array<IStakingItem>;
@@ -23,20 +21,9 @@ export default function DappListMobile({
   handleStake: (item: IStakingItem) => void;
   loading: boolean;
 }) {
-  const { showLoading, closeLoading } = useLoading();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (loading) {
-      showLoading();
-    } else {
-      closeLoading();
-    }
-  }, [closeLoading, loading, showLoading]);
-
   return (
     <div className="grid grid-cols-1 gap-[16px] lg:grid-cols-auto-fill-400">
-      {items?.length > 0 ? (
+      {!loading && items?.length > 0 ? (
         items?.map((item, index) => {
           return (
             <Flex

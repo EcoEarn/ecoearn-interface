@@ -32,6 +32,7 @@ import { GetBalance } from 'contract/multiToken';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import useLoading from 'hooks/useLoading';
 import useNotification from 'hooks/useNotification';
+import { matchErrorMsg } from 'utils/formatError';
 
 const FormItem = Form.Item;
 const { Text } = Typography;
@@ -63,6 +64,7 @@ interface IStakeModalProps {
   balance?: string;
   noteList?: Array<string>;
   stakeData: IStakePoolData;
+  loading?: boolean;
   fetchBalance?: () => Promise<string | undefined>;
   onConfirm?: (amount: string, period: string) => void;
   onClose?: () => void;
@@ -85,6 +87,7 @@ function StakeModal({
   balance: defaultBalance,
   noteList,
   stakeData,
+  loading,
   fetchBalance,
   onClose,
   onConfirm,
@@ -165,17 +168,15 @@ function StakeModal({
   const fetchElfBalance = useCallback(async () => {
     if (!walletInfo?.address || !canSwapToken) return;
     try {
-      showLoading();
       const elfBalance = await GetBalance({
         symbol: 'ELF',
         owner: walletInfo?.address,
       });
       elfBalance && setElfBalance(elfBalance?.balance);
-      closeLoading;
-    } finally {
-      closeLoading();
+    } catch (err) {
+      console.error(err);
     }
-  }, [canSwapToken, closeLoading, showLoading, walletInfo?.address]);
+  }, [canSwapToken, walletInfo?.address]);
 
   useEffect(() => {
     fetchElfBalance();
@@ -522,13 +523,14 @@ function StakeModal({
       <Button
         className="!rounded-lg w-[260px]"
         disabled={btnDisabled}
+        loading={loading}
         type="primary"
         onClick={onStake}
       >
         Confirm
       </Button>
     );
-  }, [btnDisabled, onStake]);
+  }, [btnDisabled, loading, onStake]);
 
   const onCancel = useCallback(() => {
     onClose?.();
@@ -727,7 +729,9 @@ function StakeModal({
           },
         });
       } catch (error) {
-        notification.error({ description: error as string });
+        const { matchedErrorMsg, title } = matchErrorMsg((error as Error).message);
+        matchedErrorMsg &&
+          notification.error({ description: matchedErrorMsg, message: title || '' });
       }
       return;
     }

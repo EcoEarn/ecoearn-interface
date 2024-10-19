@@ -9,6 +9,7 @@ import { useWalletService } from 'hooks/useWallet';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { setConfirmInfo } from 'redux/reducer/info';
 import { store } from 'redux/store';
 import { ICMSInfo } from 'redux/types/reducerTypes';
@@ -41,6 +42,8 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
   const [data, setData] = useState<Array<IPointsPoolItem>>();
   const router = useRouter();
   const notification = useNotification();
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const { isLogin } = useGetLoginStatus();
 
   const segmentedOptions: Array<{ label: ReactNode; value: string }> = [
     { label: 'All', value: ListTypeEnum.All },
@@ -79,7 +82,8 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
       return;
     }
     try {
-      showLoading();
+      // showLoading();
+      setIsLoadingData(true);
       const data = await getPointsPoolList({
         type: currentList,
         sorting: '',
@@ -93,9 +97,11 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     } catch (err) {
       console.error('getPointsPoolList err', err);
     } finally {
-      closeLoading();
+      // closeLoading();
+      setIsLoadingData(false);
     }
-  }, [closeLoading, currentList, dappId, showLoading, wallet?.address]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentList, dappId, isLogin]);
 
   const onClaim = useCallback(
     async (item: IPointsPoolItem) => {
@@ -157,7 +163,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     async (curItem: IPointsPoolItem) => {
       if (!curItem) return;
       setLoading(true);
-      showLoading();
+      showLoading({ type: 'block' });
       try {
         const transactionId = await onClaim(curItem);
         return transactionId;
@@ -247,5 +253,6 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     handleClaim,
     handleGain,
     status,
+    isLoadingData,
   };
 }
