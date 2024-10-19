@@ -4,6 +4,7 @@ import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { ReactComponent as WalletSVG } from 'assets/img/wallet.svg';
 import { ReactComponent as EmptySVG } from 'assets/img/wallet.svg';
 import clsx from 'clsx';
+import { useMemo } from 'react';
 
 export default function Empty({
   emptyText,
@@ -17,7 +18,11 @@ export default function Empty({
   onClick?: () => void;
 }) {
   const { checkLogin } = useCheckLoginAndToken();
-  const { isLogin } = useGetLoginStatus();
+  const { isLogin, isLoadingConnectWallet, isLoadingToken } = useGetLoginStatus();
+
+  const isLoading = useMemo(() => {
+    return isLoadingToken || isLoadingConnectWallet;
+  }, [isLoadingConnectWallet, isLoadingToken]);
 
   return (
     <div
@@ -39,6 +44,7 @@ export default function Empty({
           type="primary"
           size="large"
           className="!rounded-lg mt-4 !min-w-[186px]"
+          loading={!isLogin ? isLoading : false}
           onClick={() => {
             if (!isLogin) {
               checkLogin();

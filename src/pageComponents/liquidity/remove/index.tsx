@@ -15,6 +15,7 @@ import RemoveLiquidity, { IRemoveLiquidityProps } from 'components/RemoveLiquidi
 import Receive, { IReceiveProps } from 'components/Receive';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import Loading from 'components/Loading';
 
 export default function RemoveLiquidityPage() {
   const { rate } = useParams() as { rate: number | string };
@@ -29,6 +30,7 @@ export default function RemoveLiquidityPage() {
   const router = useRouter();
   const { isConnected } = useConnectWallet();
   const [isPriceLoaded, setIsPriceLoaded] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const { data: rewardsData } = useRequest(
     async () => {
@@ -166,6 +168,7 @@ export default function RemoveLiquidityPage() {
         lpAmount: lpAmount || '0',
         onSuccess: () => {
           console.log('===onSuccess');
+          setIsPending(true);
         },
         onNext: (data) => {
           setReceiveProps(data);
@@ -210,6 +213,14 @@ export default function RemoveLiquidityPage() {
       router.replace('/staking');
     }
   }, [isLogin, router]);
+
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center w-full h-full">
+        <Loading />
+      </div>
+    );
+  }
 
   return removeLiquidityProps ? (
     <div className="flex flex-col gap-6 max-w-[672px] mx-auto mt-6 md:mt-[48px]">

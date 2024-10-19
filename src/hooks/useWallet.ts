@@ -20,6 +20,9 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did-ui-react';
 import { matchErrorMsg } from 'utils/formatError';
 import useNotification from './useNotification';
+import { ETransferConfig, unsubscribeUserOrderRecord } from '@etransfer/ui-react';
+
+export const ETRANSFER_TOKEN_KEY = 'etransfer_access_token';
 
 export const useWalletInit = () => {
   const [, setLocalWalletInfo] = useLocalStorage<WalletInfoType>(storages.walletInfo);
@@ -37,8 +40,12 @@ export const useWalletInit = () => {
 
   const resetAccount = useCallback(() => {
     backToHomeByRoute();
+    const walletInfo = localStorage.getItem(storages.walletInfo);
+    const address = walletInfo ? JSON.parse(walletInfo).address : '';
+    address && unsubscribeUserOrderRecord(address);
     localStorage.removeItem(storages.accountInfo);
     localStorage.removeItem(storages.walletInfo);
+    localStorage.removeItem(ETRANSFER_TOKEN_KEY);
     dispatch(
       setWalletInfo({
         address: '',

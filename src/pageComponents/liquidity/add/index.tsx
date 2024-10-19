@@ -22,6 +22,7 @@ import StakeWithConfirm, { IStakeWithConfirmProps } from 'components/StakeWithCo
 import AmountInfo from 'pageComponents/poolDetail/components/AmountInfo';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import Loading from 'components/Loading';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -44,6 +45,7 @@ export default function AddLiquidityPage() {
   const router = useRouter();
   const [priceLoaded, setPriceLoaded] = useState(false);
   const { isConnected } = useConnectWallet();
+  const [isPending, setIsPending] = useState(false);
 
   const { data: rewardsData } = useRequest(
     async () => {
@@ -254,6 +256,7 @@ export default function AddLiquidityPage() {
         longestReleaseTime,
         onSuccess: () => {
           console.log('===onSuccess');
+          setIsPending(true);
         },
         onNext: (data) => {
           setStakeProps(data);
@@ -365,6 +368,14 @@ export default function AddLiquidityPage() {
     20000,
     { immediate: false },
   );
+
+  if (isPending) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
 
   return addLiquidityProps ? (
     <div className="flex flex-col gap-6 max-w-[672px] mx-auto mt-6 md:mt-[48px]">
