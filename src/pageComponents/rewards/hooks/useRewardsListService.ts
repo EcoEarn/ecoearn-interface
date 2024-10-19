@@ -1,12 +1,14 @@
 import { getRewardsList } from 'api/request';
 import useLoading from 'hooks/useLoading';
 import { useWalletService } from 'hooks/useWallet';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export default function useRewardsListService({
   rewardsTypeList,
+  initData,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
+  initData?: IRewardListItem[];
 }) {
   const [dataList, setDataList] = useState<Array<IRewardListItem>>([]);
   const [page, setPage] = useState(1);
@@ -18,6 +20,7 @@ export default function useRewardsListService({
   const { showLoading, closeLoading } = useLoading();
   const [hasHistoryData, setHasHistoryData] = useState(false);
   const [rewardsTypeId, setRewardsTypeId] = useState('');
+  const isReadInitData = useRef(false);
 
   const searchParams: IRewardListParams = useMemo(() => {
     const params = {
@@ -32,9 +35,14 @@ export default function useRewardsListService({
 
   const fetchData = useCallback(async () => {
     if (!wallet?.address) return;
+    if (searchParams.poolType === 'All' && initData && !isReadInitData.current) {
+      setDataList(initData);
+      isReadInitData.current = true;
+      return;
+    }
     try {
       setLoading(true);
-      showLoading();
+      // showLoading();
       const { items, totalCount } = await getRewardsList(searchParams);
       setDataList(items || []);
       setTotalCount(totalCount || 0);
@@ -45,9 +53,9 @@ export default function useRewardsListService({
       console.error('getRewardsList error', error);
     } finally {
       setLoading(false);
-      closeLoading();
+      // closeLoading();
     }
-  }, [closeLoading, page, poolType, searchParams, showLoading, wallet?.address]);
+  }, [initData, page, poolType, searchParams, wallet?.address]);
 
   useEffect(() => {
     fetchData();

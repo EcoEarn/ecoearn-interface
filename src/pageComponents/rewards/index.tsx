@@ -8,13 +8,14 @@ import clsx from 'clsx';
 import React from 'react';
 import { Segmented, Select } from 'antd';
 import styles from './styles.module.css';
-import { getRewardsList, getRewardsType } from 'api/request';
+import { getPoolRewards, getRewardsList, getRewardsType, liquidityMarket } from 'api/request';
 import { useWalletService } from 'hooks/useWallet';
 import useLoading from 'hooks/useLoading';
 import ComingSoon from './components/ComingSoon';
 import LiquidityList from 'pageComponents/liquidity/components/LiquidityList';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import Empty from 'components/Empty';
+import { PoolType } from 'types/stake';
 
 export enum RewardsTypeEnum {
   'All' = 'all',
@@ -25,48 +26,62 @@ export enum RewardsTypeEnum {
 
 export default function Rewards() {
   const { isLogin } = useGetLoginStatus();
-  const [initData, setInitData] = useState<Array<IRewardListItem>>();
+  const [claimData, setClaimData] = useState<Array<IRewardListItem>>();
   const { isMD } = useResponsive();
   const { wallet } = useWalletService();
   const { showLoading, closeLoading, visible } = useLoading();
   const [currentType, setCurrentType] = useState<RewardsTypeEnum>(RewardsTypeEnum.All);
   const [rewardsTypeList, setRewardsTypeList] = useState<Array<IRewardsTypeItem>>();
   const { showLiquidityModule } = useGetCmsInfo() || {};
+  const [loading, setLoading] = useState(false);
+  const [rewardsData, setRewardsData] = useState<Array<IPoolRewardsItem>>();
+  const [liquidityData, setLiquidityData] = useState<Array<ILiquidityItem>>();
 
   console.log('====showLiquidityModule', showLiquidityModule);
 
   const fetchInitData = useCallback(async () => {
-    if (!wallet?.address) return;
+    if (!isLogin) return;
     try {
       showLoading();
-      const [rewardsList, rewardsTypeList] = await Promise.all([
+      setLoading(true);
+      const [rewardsList, rewardsTypeList, rewardsData, liquidityData] = await Promise.all([
         getRewardsList({
           poolType: 'All',
           id: 'all',
-          address: wallet.address,
+          address: wallet?.address || '',
           skipCount: 0,
           maxResultCount: 10,
         }),
         getRewardsType(),
+        getPoolRewards({
+          address: wallet?.address || '',
+          poolType: PoolType.ALL,
+        }),
+        liquidityMarket({ address: wallet?.address || '' }),
       ]);
       closeLoading();
+      setLoading(false);
       const { items } = rewardsList || {};
       if (items && items?.length) {
-        setInitData(items);
+        setClaimData(items);
       }
       if (rewardsTypeList && rewardsTypeList?.length) {
         setRewardsTypeList(rewardsTypeList);
       }
+      setRewardsData(rewardsData || []);
+      setLiquidityData(liquidityData);
     } catch (err) {
       console.error(err);
     } finally {
       closeLoading();
+      setLoading(false);
     }
-  }, [closeLoading, showLoading, wallet?.address]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeLoading, showLoading, isLogin]);
 
   const hasHistoryData = useMemo(() => {
-    return initData && initData?.length > 0;
-  }, [initData]);
+    return claimData && claimData?.length > 0;
+  }, [claimData]);
 
   useEffect(() => {
     fetchInitData();
@@ -87,48 +102,50 @@ export default function Rewards() {
     <>
       <h2 className="text-4xl lg:text-5xl font-[600] text-neutralTitle pt-8 lg:pt-10">Rewards</h2>
       {isLogin ? (
-        <div>
-          <div className="text-[16px] font-[600] mt-[48px]">My Rewards</div>
-          {!isMD ? (
-            <Segmented
-              className={clsx('mt-8 lg:mt-[24px]', styles.segmented)}
-              size="large"
-              value={currentType}
-              defaultValue={RewardsTypeEnum.All}
-              onChange={handleChange}
-              options={options}
-            />
-          ) : (
-            <Select
-              className={clsx(styles.select, 'mt-[24px] min-w-[164px]')}
-              popupClassName={styles.selectOverlay}
-              value={currentType}
-              onChange={handleChange}
-              options={options}
-            />
-          )}
-          <div className="mt-6">
-            <PoolsAmount currentType={currentType} />
-          </div>
-          {showLiquidityModule && (
-            <div className="mt-8">
-              <div className="mb-6 text-base font-[600] text-neutralTitle">
-                Rewards Liquidity Pools
+        loading ? null : (
+          <div>
+            <div className="text-[16px] font-[600] mt-[48px]">My Rewards</div>
+            {!isMD ? (
+              <Segmented
+                className={clsx('mt-8 lg:mt-[24px]', styles.segmented)}
+                size="large"
+                value={currentType}
+                defaultValue={RewardsTypeEnum.All}
+                onChange={handleChange}
+                options={options}
+              />
+            ) : (
+              <Select
+                className={clsx(styles.select, 'mt-[24px] min-w-[164px]')}
+                popupClassName={styles.selectOverlay}
+                value={currentType}
+                onChange={handleChange}
+                options={options}
+              />
+            )}
+            <div className="mt-6">
+              <PoolsAmount currentType={currentType} initData={rewardsData || []} />
+            </div>
+            {showLiquidityModule && (
+              <div className="mt-8">
+                <div className="mb-6 text-base font-[600] text-neutralTitle">
+                  Rewards Liquidity Pools
+                </div>
+                <LiquidityList initData={liquidityData} />
               </div>
-              <LiquidityList />
-            </div>
-          )}
-          {hasHistoryData && (
-            <div className="mt-8">
-              <div className="mb-6 text-base font-[600] text-neutralTitle">Claim History</div>
-              {isMD ? (
-                <RewardsListMobile rewardsTypeList={rewardsTypeList || []} />
-              ) : (
-                <RewardListPC rewardsTypeList={rewardsTypeList || []} />
-              )}
-            </div>
-          )}
-        </div>
+            )}
+            {hasHistoryData && (
+              <div className="mt-8">
+                <div className="mb-6 text-base font-[600] text-neutralTitle">Claim History</div>
+                {isMD ? (
+                  <RewardsListMobile rewardsTypeList={rewardsTypeList || []} initData={claimData} />
+                ) : (
+                  <RewardListPC rewardsTypeList={rewardsTypeList || []} initData={claimData} />
+                )}
+              </div>
+            )}
+          </div>
+        )
       ) : (
         <Empty emptyText="" />
       )}

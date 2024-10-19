@@ -95,7 +95,7 @@ export default function StakeWithConfirm({
     async (content: TConfirmModalContentType) => {
       try {
         setLoading(true);
-        showLoading();
+        // showLoading();
         const { amount, period } = content as TStakeExtendContent;
         const res = await onStake(amount || '', period || '', poolId);
         if (res?.TransactionId) {
@@ -110,10 +110,10 @@ export default function StakeWithConfirm({
         console.error('===stake error', errorTip);
       } finally {
         setLoading(false);
-        closeLoading();
+        // closeLoading();
       }
     },
-    [closeLoading, onStake, onSuccess, poolId, router, showLoading],
+    [onStake, onSuccess, poolId, router],
   );
 
   const setConfirmContent = useCallback(
@@ -199,6 +199,7 @@ export default function StakeWithConfirm({
         fetchBalance={fetchBalance}
         onConfirm={onStakeModalConfirm}
         stakeData={stakeData}
+        loading={loading}
       />
       <ConfirmModal
         type={confirmType}

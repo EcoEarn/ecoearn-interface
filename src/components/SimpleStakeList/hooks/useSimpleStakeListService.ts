@@ -46,11 +46,13 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const { getAddress } = useGetAwakenContract();
   const operationAmount = useRef('0');
   const notification = useNotification();
+  const [loading, setLoading] = useState(false);
 
   const goLiquidity = useCallback(() => {
     if (!isLogin) {
       checkLogin({
         onSuccess: () => {
+          //FIXME: web-login
           router.push('/liquidity');
         },
       });
@@ -62,7 +64,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const getStakeData = useCallback(
     async (props?: IFetchDataProps) => {
       const { withLoading = true } = props || {};
-      // withLoading && showLoading();
+      withLoading && setLoading(true);
       try {
         const { pools, textNodes } =
           (await fetchStakingPoolsData({
@@ -89,10 +91,11 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       } catch (error) {
         console.error('getStakeData error', error);
       } finally {
-        withLoading && closeLoading();
+        withLoading && setLoading(false);
       }
     },
-    [closeLoading, curChain, poolType, wallet?.address],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [curChain, poolType, isLogin],
   );
 
   useInterval(
@@ -472,5 +475,6 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     renewText,
     earlyStake,
     goLiquidity,
+    loading,
   };
 }

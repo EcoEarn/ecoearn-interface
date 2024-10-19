@@ -31,6 +31,7 @@ import { GetBalance } from 'contract/multiToken';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import useLoading from 'hooks/useLoading';
 import useNotification from 'hooks/useNotification';
+import { matchErrorMsg } from 'utils/formatError';
 
 const FormItem = Form.Item;
 function StakeTitle({ text, rate }: { text: string; rate?: string | number }) {
@@ -59,6 +60,7 @@ export interface IStakeProps {
   balance?: string;
   noteList?: Array<string>;
   stakeData: IStakePoolData;
+  loading?: boolean;
   fetchBalance?: () => Promise<string | undefined>;
   onConfirm?: (amount: string, period: string) => void;
 }
@@ -79,6 +81,7 @@ function Stake({
   balance: defaultBalance,
   noteList,
   stakeData,
+  loading,
   fetchBalance,
   onConfirm,
 }: IStakeProps) {
@@ -401,12 +404,13 @@ function Stake({
         block
         disabled={btnDisabled}
         type="primary"
+        loading={loading}
         onClick={onStake}
       >
         {`Stake ${formatTokenSymbol(stakeSymbol || '')}`}
       </Button>
     );
-  }, [btnDisabled, onStake, stakeSymbol]);
+  }, [btnDisabled, loading, onStake, stakeSymbol]);
 
   const getMaxAmount = useCallback(() => {
     console.log('getMaxAmount');
@@ -621,7 +625,9 @@ function Stake({
           },
         });
       } catch (error) {
-        notification.error({ description: error as string });
+        const { matchedErrorMsg, title } = matchErrorMsg((error as Error).message);
+        matchedErrorMsg &&
+          notification.error({ description: matchedErrorMsg, message: title || '' });
       }
       return;
     }

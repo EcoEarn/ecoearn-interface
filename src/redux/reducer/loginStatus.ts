@@ -8,6 +8,8 @@ const initialState: TLoginStatusType = {
     isConnectWallet: false,
     hasToken: false,
     isLogin: false,
+    isLoadingToken: false,
+    isLoadingConnectWallet: false,
   },
 };
 

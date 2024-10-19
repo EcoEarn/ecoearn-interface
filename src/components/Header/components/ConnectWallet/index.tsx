@@ -14,12 +14,16 @@ import { OmittedType, addPrefixSuffix, getOmittedStr } from 'utils/addressFormat
 import clsx from 'clsx';
 
 export default function ConnectWallet({ isOpen }: { isOpen?: boolean }) {
-  const { isLogin } = useGetLoginStatus();
+  const { isLogin, isLoadingToken, isLoadingConnectWallet } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
   const { isLG } = useResponsive();
   const { isInTelegram } = useTelegram();
   const { wallet, walletType } = useWalletService();
   const { curChain } = useGetCmsInfo() || {};
+
+  const isLoading = useMemo(() => {
+    return isLoadingToken || isLoadingConnectWallet;
+  }, [isLoadingConnectWallet, isLoadingToken]);
 
   const fullAddress = useMemo(() => {
     return addPrefixSuffix(wallet?.address || '', curChain);
@@ -36,8 +40,6 @@ export default function ConnectWallet({ isOpen }: { isOpen?: boolean }) {
   const isInTG = useMemo(() => {
     return isInTelegram();
   }, [isInTelegram]);
-
-  console.log('isLG', isLG);
 
   return isLogin ? (
     <div className="text-[12px] px-[8px] py-[6px] rounded-sm gap-1 lg:gap-2  lg:text-[16px] lg:px-[28px] lg:py-[12px] lg:rounded-[12px] flex hover:text-brandHover hover:border-brandHover items-center border-[1px] justify-center text-brandDefault  border-solid border-brandDefault cursor-pointer">
@@ -61,6 +63,7 @@ export default function ConnectWallet({ isOpen }: { isOpen?: boolean }) {
         checkLogin();
       }}
       type="primary"
+      loading={isLoading}
       className="!rounded-sm lg:!rounded-lg"
     >
       Connect Wallet

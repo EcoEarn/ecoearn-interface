@@ -36,7 +36,7 @@ export const useGetToken = () => {
   }) => Promise<string | undefined> = useCallback(
     async (props: { params: ITokenParams; needLoading?: boolean; retryCount?: number }) => {
       const { params, needLoading = false, retryCount = 3 } = props;
-      needLoading && showLoading();
+      // needLoading && showLoading({ type: 'block' });
       try {
         const res = await fetchToken(params);
         needLoading && closeLoading();
@@ -65,19 +65,19 @@ export const useGetToken = () => {
         if (retryCount) {
           await sleep(1000);
           const retry = retryCount - 1;
-          getTokenFromServer({
+          await getTokenFromServer({
             ...props,
             retryCount: retry,
           });
         } else {
           notification.error({ description: LoginFailed });
           isConnectWallet && disConnectWallet();
-          needLoading && closeLoading();
+          // needLoading && closeLoading();
           return '';
         }
       }
     },
-    [closeLoading, disConnectWallet, isConnectWallet, notification, showLoading, walletInfo],
+    [closeLoading, disConnectWallet, isConnectWallet, notification, walletInfo],
   );
 
   const checkTokenValid = useCallback(() => {
@@ -99,7 +99,6 @@ export const useGetToken = () => {
 
   const getToken: (params?: { needLoading?: boolean }) => Promise<undefined | string> = useCallback(
     async (params?: { needLoading?: boolean }) => {
-      console.log('======getToken');
       const { needLoading } = params || {};
       if (!isConnected || !walletInfo) return;
 
@@ -160,6 +159,7 @@ export const useGetToken = () => {
           source = 'portkey';
         }
       }
+      store.dispatch(setLoginStatus({ isLoadingToken: true }));
       const res = await getTokenFromServer({
         params: {
           grant_type: 'signature',
@@ -173,7 +173,7 @@ export const useGetToken = () => {
         } as ITokenParams,
         needLoading,
       });
-
+      store.dispatch(setLoginStatus({ isLoadingToken: false }));
       return res;
     },
     [
