@@ -13,7 +13,7 @@ import useLoading from 'hooks/useLoading';
 import useNotification from 'hooks/useNotification';
 import { useWalletService } from 'hooks/useWallet';
 import { useRouter } from 'next/navigation';
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import { PoolType } from 'types/stake';
 import { divDecimals, getTargetUnlockTimeStamp } from 'utils/calculate';
@@ -25,7 +25,7 @@ export enum LiquidityListTypeEnum {
   Market = 'Market',
 }
 
-export default function useLiquidityListService() {
+export default function useLiquidityListService({ initData }: { initData?: ILiquidityItem[] }) {
   const [data, setData] = useState<Array<ILiquidityItem>>([]);
   const { isLG } = useResponsive();
   const [currentList, setCurrentList] = useState<LiquidityListTypeEnum>(
@@ -37,6 +37,8 @@ export default function useLiquidityListService() {
   const notification = useNotification();
   const router = useRouter();
   const [rewardsPoolInfo, setRewardsPoolInfo] = useState<IStakePoolData>();
+  const isReadInitData = useRef(false);
+  const [loading, setLoading] = useState(false);
 
   const rewardsSymbol = useMemo(() => {
     //FIXME:
@@ -44,11 +46,10 @@ export default function useLiquidityListService() {
   }, []);
 
   const initPoolData = useCallback(async () => {
-    if (!curChain) {
+    if (!curChain || !wallet?.address) {
       return;
     }
     try {
-      showLoading();
       const { pools } = await fetchStakingPoolsData({
         poolType: PoolType.TOKEN,
         maxResultCount: 20,
@@ -58,7 +59,6 @@ export default function useLiquidityListService() {
         sorting: '',
         name: '',
       });
-      closeLoading();
       const poolInfo = (pools || [])
         ?.filter?.((i) => i?.stakeSymbol == rewardsSymbol)
         ?.map((item, index) => {
@@ -78,10 +78,8 @@ export default function useLiquidityListService() {
       }
     } catch (error) {
       notification.error({ description: (error as Error)?.message });
-    } finally {
-      closeLoading();
     }
-  }, [closeLoading, curChain, notification, rewardsSymbol, showLoading, wallet?.address]);
+  }, [curChain, notification, rewardsSymbol, wallet?.address]);
 
   useEffect(() => {
     initPoolData();
@@ -186,7 +184,10 @@ export default function useLiquidityListService() {
 
   const isTotalStakeAmountNotEnough = useCallback(
     (index: number) => {
-      return BigNumber(totalStakeAmount).lt(getRewardsMinStakeAmount(index));
+      return (
+        BigNumber(totalStakeAmount || 0).isZero() ||
+        BigNumber(totalStakeAmount).lt(getRewardsMinStakeAmount(index))
+      );
     },
     [getRewardsMinStakeAmount, totalStakeAmount],
   );
@@ -194,17 +195,20 @@ export default function useLiquidityListService() {
   const isAddBtnDisabled = useCallback(
     ({ index }: { index: number }) => {
       return (
+        !rewardsPoolInfo ||
+        !earlyStakeInfos?.[index] ||
         isTotalStakeAmountNotEnough(index) ||
         (!BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
           dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs()))
       );
     },
-    [earlyStakeInfos, isTotalStakeAmountNotEnough],
+    [earlyStakeInfos, isTotalStakeAmountNotEnough, rewardsPoolInfo],
   );
 
   const isStakeBtnDisabled = useCallback(
     ({ index }: { index: number }) => {
       return (
+        !earlyStakeInfos?.[index] ||
         BigNumber(data?.[index]?.banlance || 0).isZero() ||
         (!BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
           dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs()))
@@ -225,6 +229,7 @@ export default function useLiquidityListService() {
       const bigValue = BigNumber(totalStakeAmount || 0);
       const rewardsTokenSymbol = formatTokenSymbol(rewardsSymbol);
       const min = getRewardsMinStakeAmount(index) || 0;
+      if (!earlyStakeInfos?.[index] || !rewardsPoolInfo) return '';
       return bigValue.isZero()
         ? `You currently have no ${rewardsTokenSymbol} rewards available for adding liquidity.`
         : bigValue.lt(min)
@@ -234,7 +239,7 @@ export default function useLiquidityListService() {
         ? 'Your staking has expired and cannot be added. Please proceed to "Farms(LP Staking)" for renewal.'
         : '';
     },
-    [earlyStakeInfos, getRewardsMinStakeAmount, rewardsSymbol, totalStakeAmount],
+    [earlyStakeInfos, getRewardsMinStakeAmount, rewardsPoolInfo, rewardsSymbol, totalStakeAmount],
   );
 
   const getStakeBtnTip = useCallback(
@@ -242,6 +247,7 @@ export default function useLiquidityListService() {
       if (BigNumber(data?.[index]?.banlance || 0).isZero()) {
         return 'No LP amount available for staking.';
       }
+      if (!earlyStakeInfos?.[index]) return '';
       return !BigNumber(earlyStakeInfos?.[index]?.staked || 0).isZero() &&
         dayjs(earlyStakeInfos?.[index]?.unlockTime || 0).isBefore(dayjs())
         ? 'Your staking has expired and cannot be added. Please proceed to "Farms(LP Staking)" for renewal.'
@@ -288,22 +294,29 @@ export default function useLiquidityListService() {
       const { needLoading = true } = props || {};
       let list: Array<ILiquidityItem>;
       if (!wallet?.address) return;
+      if (initData && currentList === LiquidityListTypeEnum.Market && !isReadInitData.current) {
+        setData(initData);
+        isReadInitData.current = true;
+        return;
+      }
       try {
-        needLoading && showLoading();
+        // needLoading && showLoading();
+        needLoading && setLoading(true);
         if (currentList === LiquidityListTypeEnum.My) {
           list = await myLiquidity({ address: wallet.address });
         } else {
           list = await liquidityMarket({ address: wallet.address });
         }
-        needLoading && closeLoading();
+        // needLoading && closeLoading();
         setData(list || []);
       } catch (error) {
         console.error('getLiquidityList error', error);
       } finally {
-        needLoading && closeLoading();
+        // needLoading && closeLoading();
+        needLoading && setLoading(false);
       }
     },
-    [closeLoading, currentList, showLoading, wallet?.address],
+    [currentList, initData, wallet?.address],
   );
 
   const onAddAndStake = useCallback(
@@ -374,5 +387,6 @@ export default function useLiquidityListService() {
     isRemoveBtnDisabled,
     totalEarlyStakeAmount,
     mobileDataList,
+    loading,
   };
 }

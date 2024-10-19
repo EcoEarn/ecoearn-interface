@@ -15,8 +15,9 @@ import { theme } from './config';
 import { AELFDProviderTheme } from 'provider/config';
 import { APP_PREFIX } from 'constants/index';
 import { ColumnsType } from 'antd/es/table';
+import Loading from 'components/Loading';
 
-export default function LiquidityList() {
+export default function LiquidityList({ initData }: { initData?: ILiquidityItem[] }) {
   const {
     isLG,
     currentList,
@@ -24,6 +25,7 @@ export default function LiquidityList() {
     mobileDataList,
     handleSegmentChange,
     segmentedOptions,
+    loading,
     handleAddLiquidity,
     onAddAndStake,
     onRemove,
@@ -34,7 +36,7 @@ export default function LiquidityList() {
     getRemoveBtnTip,
     isRemoveBtnDisabled,
     onStake,
-  } = useLiquidityListService();
+  } = useLiquidityListService({ initData });
 
   const columns: ColumnsType<ILiquidityItem> = useMemo(() => {
     const allColumns: ColumnsType<ILiquidityItem> = [
@@ -276,7 +278,11 @@ export default function LiquidityList() {
         onChange={handleSegmentChange}
         options={segmentedOptions}
       />
-      {data?.length && data.length > 0 ? (
+      {loading ? (
+        <div className="w-full h-full py-[80px] flex items-center justify-center">
+          <Loading />
+        </div>
+      ) : data?.length && data.length > 0 ? (
         !isLG ? (
           <CommonTable
             columns={columns as any}

@@ -19,6 +19,7 @@ import MyRanking from '../MyRanking';
 import { getLeaderboardInfo } from 'api/request';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import useLoading from 'hooks/useLoading';
+import Loading from 'components/Loading';
 
 const pageSize = 20;
 
@@ -42,6 +43,7 @@ export default function RankingTable({ className }: { className?: string }) {
   const [dataSource, setDataSource] = useState<Array<IRankingItem>>();
   const [ownerInfo, setOwnerInfo] = useState<IRankingOwnerInfo>();
   const { showLoading, closeLoading } = useLoading();
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   const columns: ColumnsType<IRankingItem> = useMemo(() => {
     return [
@@ -117,7 +119,9 @@ export default function RankingTable({ className }: { className?: string }) {
   const getList = useCallback(
     async (page = 1) => {
       setLoading(true);
-      showLoading();
+      if (page === 1) {
+        setIsPageLoading(true);
+      }
       try {
         const data = await getLeaderboardInfo({
           address: wallet?.address || '',
@@ -125,7 +129,6 @@ export default function RankingTable({ className }: { className?: string }) {
           maxResultCount: pageSize,
         });
 
-        console.log('datadatadatadata', data);
         const list = data?.rankingInfo?.list || [];
         const ownerInfo = data?.ownerPointsInfo || {};
         setTotal(data?.rankingInfo?.totalRecord || 0);
@@ -139,15 +142,24 @@ export default function RankingTable({ className }: { className?: string }) {
         console.error(err);
       } finally {
         setLoading(false);
-        closeLoading();
+        setIsPageLoading(false);
       }
     },
-    [wallet?.address],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isLogin],
   );
 
   useEffect(() => {
     getList(1);
   }, [getList]);
+
+  useEffect(() => {
+    if (isPageLoading) {
+      showLoading();
+    } else {
+      closeLoading();
+    }
+  }, [closeLoading, isPageLoading, showLoading]);
 
   const onScrollCapture = useCallback(() => {
     if (loading || !hasMore) return;
@@ -160,9 +172,13 @@ export default function RankingTable({ className }: { className?: string }) {
     }
   }, [getList, hasMore, loading, page]);
 
+  if (isPageLoading) {
+    return null;
+  }
+
   return (
     <>
-      {isLogin && (
+      {isLogin && wallet?.address && (
         <>{ownerInfo?.address && <MyRanking className="mt-8 md:mt-12" data={ownerInfo} />}</>
       )}
       <AELFDProvider

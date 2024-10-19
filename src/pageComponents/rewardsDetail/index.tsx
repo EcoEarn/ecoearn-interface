@@ -41,6 +41,7 @@ import { setConfirmInfo } from 'redux/reducer/info';
 import { TradeConfirmTypeEnum } from 'components/TradeConfrim';
 import { ISendResult } from 'types';
 import SkeletonImage from 'components/SkeletonImage';
+import Loading from 'components/Loading';
 export default function RewardsDetailPage() {
   const router = useRouter();
   const { isConnected, walletInfo, walletType } = useConnectWallet();
@@ -63,6 +64,7 @@ export default function RewardsDetailPage() {
   const [confirmModalType, setConfirmModalType] = useState<ConfirmModalTypeEnum>();
   const { isMD } = useResponsive();
   const notification = useNotification();
+  const [isPending, setIsPending] = useState(false);
 
   const poolId = useMemo(() => {
     return searchParams.get('poolId') || '';
@@ -76,104 +78,115 @@ export default function RewardsDetailPage() {
     return searchParams.get('dappId') || '';
   }, [searchParams]);
 
-  const initRewardsData = useCallback(async () => {
-    if (!walletInfo?.address || !poolId || !poolType || (poolType === PoolType.POINTS && !dappId))
-      return;
-    try {
-      showLoading();
-      const rewardsList = await getPoolRewards({
-        address: walletInfo?.address || '',
-        poolType: PoolType.ALL,
-      });
-      if (rewardsList && rewardsList?.length > 0) {
-        const rewardsData = rewardsList?.find((item) => {
-          if (poolType === PoolType.POINTS) {
-            return item.dappId === dappId && item.poolType === poolType;
-          } else {
-            return item.poolId === poolId && item.poolType === poolType;
+  const initEarlyStakeInfo = useCallback(
+    async (props?: { rewardsInfo: IPoolRewardsItem; needLoading?: boolean }) => {
+      const { needLoading = true, rewardsInfo } = props || {};
+      if (!rewardsInfo || !walletInfo?.address || !curChain) return;
+      try {
+        needLoading && showLoading();
+        const earlyStakeInfoList = await getEarlyStakeInfo({
+          tokenName: rewardsInfo?.rewardsTokenName,
+          address: walletInfo?.address || '',
+          chainId: curChain,
+          poolType: PoolType.TOKEN,
+          rate: 0,
+        });
+        if (earlyStakeInfoList) {
+          const fixedEarlyStakeData = (
+            fixEarlyStakeData(earlyStakeInfoList) as Array<IEarlyStakeInfo>
+          )?.[0];
+          if (fixedEarlyStakeData) setEarlyStakeInfo(fixedEarlyStakeData);
+        }
+      } catch (err) {
+        notification.error({ description: (err as Error)?.message });
+        console.error(err);
+      } finally {
+        needLoading && closeLoading();
+      }
+    },
+    [closeLoading, curChain, notification, showLoading, walletInfo?.address],
+  );
+
+  const initRewardsData = useCallback(
+    async (props?: { needLoading?: boolean }) => {
+      const { needLoading = true } = props || {};
+      if (!walletInfo?.address || !poolId || !poolType || (poolType === PoolType.POINTS && !dappId))
+        return;
+      try {
+        needLoading && showLoading();
+        const rewardsList = await getPoolRewards({
+          address: walletInfo?.address || '',
+          poolType: PoolType.ALL,
+        });
+        if (rewardsList && rewardsList?.length > 0) {
+          const rewardsData = rewardsList?.find((item) => {
+            if (poolType === PoolType.POINTS) {
+              return item.dappId === dappId && item.poolType === poolType;
+            } else {
+              return item.poolId === poolId && item.poolType === poolType;
+            }
+          });
+          if (rewardsData) {
+            setRewardsInfo(rewardsData);
+            initEarlyStakeInfo({ needLoading, rewardsInfo: rewardsData });
           }
-        });
-        if (rewardsData) setRewardsInfo(rewardsData);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        needLoading && closeLoading();
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      closeLoading();
-    }
-  }, [closeLoading, dappId, poolId, poolType, showLoading, walletInfo?.address]);
+    },
+    [closeLoading, dappId, initEarlyStakeInfo, poolId, poolType, showLoading, walletInfo?.address],
+  );
 
-  const initPoolData = useCallback(async () => {
-    if (poolType === PoolType.POINTS) return;
-    if (!curChain || !poolId || !poolType) {
-      return;
-    }
-    try {
-      showLoading();
-      const { pools } = await fetchStakingPoolsData({
-        poolType: poolType == PoolType.LP ? 'Lp' : 'Token',
-        maxResultCount: 20,
-        skipCount: 0,
-        address: walletInfo?.address || '',
-        chainId: curChain,
-        sorting: '',
-        name: '',
-      });
-      const poolInfo = (pools || [])
-        ?.filter?.((i) => i?.poolId === poolId)
-        ?.map((item, index) => {
-          return {
-            ...item,
-            unlockTime: getTargetUnlockTimeStamp(
-              item?.stakingPeriod || 0,
-              item?.lastOperationTime || 0,
-              item?.unlockWindowDuration || 0,
-            ).unlockTime,
-          };
+  const initPoolData = useCallback(
+    async (props?: { needLoading?: boolean }) => {
+      const { needLoading = true } = props || {};
+      if (poolType === PoolType.POINTS) return;
+      if (!curChain || !poolId || !poolType) {
+        return;
+      }
+      try {
+        needLoading && showLoading();
+        const { pools } = await fetchStakingPoolsData({
+          poolType: poolType == PoolType.LP ? 'Lp' : 'Token',
+          maxResultCount: 20,
+          skipCount: 0,
+          address: walletInfo?.address || '',
+          chainId: curChain,
+          sorting: '',
+          name: '',
         });
-      if (poolInfo?.length === 1) {
-        setPoolInfo(poolInfo?.[0]);
-      } else {
-        throw new Error('Pool not found');
+        const poolInfo = (pools || [])
+          ?.filter?.((i) => i?.poolId === poolId)
+          ?.map((item, index) => {
+            return {
+              ...item,
+              unlockTime: getTargetUnlockTimeStamp(
+                item?.stakingPeriod || 0,
+                item?.lastOperationTime || 0,
+                item?.unlockWindowDuration || 0,
+              ).unlockTime,
+            };
+          });
+        if (poolInfo?.length === 1) {
+          setPoolInfo(poolInfo?.[0]);
+        } else {
+          throw new Error('Pool not found');
+        }
+      } catch (error) {
+        notification.error({ description: (error as Error)?.message });
+      } finally {
+        needLoading && closeLoading();
       }
-    } catch (error) {
-      notification.error({ description: (error as Error)?.message });
-    } finally {
-      closeLoading();
-    }
-  }, [closeLoading, curChain, notification, poolId, poolType, showLoading, walletInfo?.address]);
-
-  const initEarlyStakeInfo = useCallback(async () => {
-    if (!rewardsInfo || !walletInfo?.address || !curChain) return;
-    try {
-      showLoading();
-      const earlyStakeInfoList = await getEarlyStakeInfo({
-        tokenName: rewardsInfo?.rewardsTokenName,
-        address: walletInfo?.address || '',
-        chainId: curChain,
-        poolType: PoolType.TOKEN,
-        rate: 0,
-      });
-      if (earlyStakeInfoList) {
-        const fixedEarlyStakeData = (
-          fixEarlyStakeData(earlyStakeInfoList) as Array<IEarlyStakeInfo>
-        )?.[0];
-        if (fixedEarlyStakeData) setEarlyStakeInfo(fixedEarlyStakeData);
-      }
-    } catch (err) {
-      notification.error({ description: (err as Error)?.message });
-      console.error(err);
-    } finally {
-      closeLoading();
-    }
-  }, [closeLoading, curChain, notification, rewardsInfo, showLoading, walletInfo?.address]);
+    },
+    [closeLoading, curChain, notification, poolId, poolType, showLoading, walletInfo?.address],
+  );
 
   useEffect(() => {
     initRewardsData();
   }, [initRewardsData]);
-
-  useEffect(() => {
-    initEarlyStakeInfo();
-  }, [initEarlyStakeInfo]);
 
   useEffect(() => {
     initPoolData();
@@ -187,9 +200,8 @@ export default function RewardsDetailPage() {
 
   useInterval(
     () => {
-      initRewardsData();
-      initPoolData();
-      initEarlyStakeInfo();
+      initRewardsData({ needLoading: false });
+      initPoolData({ needLoading: false });
     },
     30000,
     { immediate: false },
@@ -405,7 +417,7 @@ export default function RewardsDetailPage() {
     const { withdrawable: amount } = data?.rewardsInfo || {};
     try {
       setConfirmModalLoading(true);
-      showLoading();
+      showLoading({ type: 'block' });
       const claimParams = claimInfosData;
       const signParams: IWithdrawSignParams = {
         amount: Number(amount || 0),
@@ -455,6 +467,7 @@ export default function RewardsDetailPage() {
       });
       closeLoading();
       if (TransactionId) {
+        setIsPending(true);
         store.dispatch(
           setConfirmInfo({
             backPath: '/rewards',
@@ -664,6 +677,7 @@ export default function RewardsDetailPage() {
           }
         },
         onSuccess: () => {
+          setIsPending(true);
           initRewardsData();
           initEarlyStakeInfo();
           initPoolData();
@@ -706,17 +720,23 @@ export default function RewardsDetailPage() {
     }
   }, [earlyStake, earlyStakeInfo?.staked, toPoolDetail]);
 
-  const [showInfo, setShowInfo] = useState(false);
+  const showInfo = useMemo(() => {
+    return poolType === PoolType.POINTS
+      ? rewardsInfo && (rewardsInfo?.supportEarlyStake ? earlyStakeInfo : true)
+      : rewardsInfo && poolInfo && (rewardsInfo?.supportEarlyStake ? earlyStakeInfo : true);
+  }, [earlyStakeInfo, poolInfo, poolType, rewardsInfo]);
 
-  useLayoutEffect(() => {
-    setShowInfo(false);
-  }, []);
-
-  useTimeout(() => setShowInfo(true), 600);
+  if (isPending) {
+    return (
+      <div className="flex w-full h-full items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <>
-      {showInfo && (
+      {!showInfo ? null : (
         <Flex vertical gap={24} className="max-w-[672px] mx-auto mt-6 md:mt-[64px]">
           <div className="bg-white px-4 py-6 md:p-8 rounded-2xl border-[1px] border-solid border-neutralBorder flex flex-col gap-6">
             {poolType === PoolType.POINTS ? (

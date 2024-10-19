@@ -8,10 +8,16 @@ export default function useLoading() {
   modalRef.current = modal;
 
   const showLoading = useCallback(
-    (props?: { showClose?: boolean; content?: string; onClose?: () => void }) => {
+    (props?: {
+      showClose?: boolean;
+      content?: string;
+      type?: 'block' | 'default';
+      onClose?: () => void;
+    }) => {
       modalRef.current?.show({
         showClose: props?.showClose,
         content: props?.content,
+        type: props?.type,
         onClose: props?.onClose,
       });
     },

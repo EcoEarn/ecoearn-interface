@@ -17,6 +17,7 @@ import { ZERO } from 'constants/index';
 import CommonTooltip from 'components/CommonTooltip';
 import { useRouter } from 'next/navigation';
 import TextEllipsis from 'components/TextEllipsis';
+import Loading from 'components/Loading';
 
 const formatMin = 1000000;
 
@@ -208,6 +209,7 @@ export default function PointsStakingList({ dappName }: { dappName: string }) {
     fetchData,
     curItem,
     loading,
+    isLoadingData,
     modalVisible,
     setModalVisible,
     transactionId,
@@ -261,7 +263,11 @@ export default function PointsStakingList({ dappName }: { dappName: string }) {
         options={segmentedOptions}
       />
 
-      {data?.length && data.length > 0 ? (
+      {isLoadingData ? (
+        <div className="w-full h-full py-[80px] flex items-center justify-center">
+          <Loading />
+        </div>
+      ) : data?.length && data.length > 0 ? (
         <div className="grid xl:grid-cols-2 grid-cols-1 gap-4 lg:gap-6 mt-4 lg:mt-6">
           {data.map((item, index) => {
             return (

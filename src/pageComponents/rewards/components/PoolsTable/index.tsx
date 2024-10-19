@@ -20,12 +20,14 @@ export default function PoolsTable({
   dataList,
   totalCount,
   rewardsTypeList,
+  loading,
   onPaginationChange,
   onChange,
 }: {
   page: number;
   pageSize: number;
   totalCount: number;
+  loading: boolean;
   dataList: Array<IRewardListItem>;
   rewardsTypeList: Array<IRewardsTypeItem>;
   onPaginationChange: (params: { page?: number; pageSize?: number }) => void;
@@ -130,6 +132,7 @@ export default function PoolsTable({
         scroll={{ x: 'max-content' }}
         dataSource={dataList}
         onChange={onChange}
+        loading={loading}
       />
       <div className="py-4">
         <Pagination

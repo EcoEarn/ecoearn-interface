@@ -79,6 +79,7 @@ export default function usePoolDetailService() {
   const [earlyStakeInfo, setEarlyStakeInfo] = useState<IEarlyStakeInfo>();
   const [rewardsInfo, setRewardsInfo] = useState<IPoolRewardsItem>();
   const notification = useNotification();
+  const [isPending, setIsPending] = useState(false);
 
   console.log('====rewardsInfo', rewardsInfo);
 
@@ -250,13 +251,15 @@ export default function usePoolDetailService() {
       stakeSymbol,
       rate,
       decimal,
+      loadingStyle = 'default',
     }: {
       stakeSymbol: string;
       rate: number | string;
       decimal: number;
+      loadingStyle?: 'block' | 'default';
     }): Promise<string | undefined> => {
       try {
-        showLoading();
+        showLoading({ type: loadingStyle });
         let balance = 0;
         const balanceParams = {
           symbol: stakeSymbol,
@@ -436,6 +439,7 @@ export default function usePoolDetailService() {
         }
       },
       onSuccess: () => {
+        setIsPending(true);
         saveTransaction({
           transactionType:
             poolType === PoolType.TOKEN ? TransactionType.TokenStake : TransactionType.LpStake,
@@ -482,6 +486,7 @@ export default function usePoolDetailService() {
           stakeSymbol,
           rate,
           decimal,
+          loadingStyle: 'block',
         });
         if (!symbolBalance) return;
       }
@@ -501,7 +506,7 @@ export default function usePoolDetailService() {
             decimal,
           }),
         onStake: async (amount, period) => {
-          const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
+          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
           if (type === StakeType.RENEW) {
             store.dispatch(
               setConfirmInfo({
@@ -601,6 +606,7 @@ export default function usePoolDetailService() {
           initPoolData();
         },
         onSuccess: () => {
+          setIsPending(true);
           saveTransaction({
             transactionType:
               poolType === PoolType.TOKEN
@@ -660,9 +666,10 @@ export default function usePoolDetailService() {
       } = stakeData;
       try {
         if (!poolId) return;
-        showLoading();
+        showLoading({ type: 'block' });
         const { TransactionId } = await tokenClaim(poolId);
         if (TransactionId) {
+          setIsPending(true);
           saveTransaction({
             address: wallet?.address || '',
             amount: String(earned || ''),
@@ -717,7 +724,7 @@ export default function usePoolDetailService() {
         return;
       }
       try {
-        showLoading();
+        showLoading({ type: 'block' });
         const { rewardInfos } = await GetReward({
           stakeIds: [String(stakeData.stakeId)],
         });
@@ -733,6 +740,7 @@ export default function usePoolDetailService() {
           }
           const { TransactionId } = await tokenUnlock(poolId);
           if (TransactionId) {
+            setIsPending(true);
             saveTransaction({
               address: wallet?.address || '',
               amount: String(staked || ''),
@@ -812,6 +820,7 @@ export default function usePoolDetailService() {
     if (!isLogin) {
       checkLogin({
         onSuccess: () => {
+          //FIXME: web-login
           router.push('/liquidity');
         },
       });
@@ -844,5 +853,6 @@ export default function usePoolDetailService() {
     loading: visible,
     poolType,
     onBack,
+    isPending,
   };
 }

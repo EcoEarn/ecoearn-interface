@@ -33,8 +33,12 @@ export default function StakeTokenTitle({
   rate,
   isAdd = false,
 }: IStakeTokenTitleProps) {
-  const { isLogin } = useGetLoginStatus();
+  const { isLogin, isLoadingConnectWallet, isLoadingToken } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
+
+  const isLoading = useMemo(() => {
+    return isLoadingToken || isLoadingConnectWallet;
+  }, [isLoadingConnectWallet, isLoadingToken]);
 
   const formattedTokenName = useMemo(() => {
     return formatTokenSymbol(tokenSymbol);
@@ -105,6 +109,7 @@ export default function StakeTokenTitle({
           <Button
             className="!rounded-lg mt-6"
             block
+            loading={isLoading}
             type="primary"
             onClick={() => {
               checkLogin();
