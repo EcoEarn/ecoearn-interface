@@ -1,4 +1,4 @@
-FROM node:18.17.0
+FROM node:18.18.0
 
 ARG web=/opt/workspace/dapp
 ARG NODE_ENV
