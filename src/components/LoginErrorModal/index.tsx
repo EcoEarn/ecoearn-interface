@@ -1,7 +1,7 @@
 import { Button } from 'aelf-design';
 import CommonModal from 'components/CommonModal';
 import styles from './style.module.css';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import useTelegram from 'hooks/useTelegram';
 import useGetStoreInfo from 'redux/hooks/useGetStoreInfo';
 import { store } from 'redux/store';
@@ -13,14 +13,24 @@ export default function LoginErrorModal() {
   const { showLoginErrorModal } = useGetStoreInfo();
   const { logout } = useWalletService();
 
+  const isInTG = useMemo(() => {
+    return isInTelegram();
+  }, [isInTelegram]);
+
   const handleConfirm = useCallback(() => {
     store.dispatch(setShowLoginErrorModal(false));
-    if (isInTelegram()) {
+    if (isInTG) {
       return;
     }
     logout();
     window.location.reload();
-  }, [isInTelegram, logout]);
+  }, [isInTG, logout]);
+
+  const tipText = useMemo(() => {
+    return isInTG
+      ? 'Due to network issues, you need to reconnect your wallet. Please close the mini program and click "Stake" again to retry.'
+      : 'Due to network issues, the wallet will log out. Please click “Connect Wallet” to reconnect.';
+  }, [isInTG]);
 
   return (
     <CommonModal
@@ -36,9 +46,7 @@ export default function LoginErrorModal() {
         </Button>
       }
     >
-      <p className="text-base font-normal text-neutralPrimary">
-        Due to network issues, the wallet will log out. Please click “Connect Wallet” to reconnect.
-      </p>
+      <p className="text-base font-normal text-neutralPrimary">{tipText}</p>
     </CommonModal>
   );
 }
