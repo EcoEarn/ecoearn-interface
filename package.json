@@ -35,7 +35,7 @@
     "@portkey/services": "^2.7.1-alpha.0",
     "@portkey/trader-core": "0.0.1-alpha.17",
     "@portkey/trader-react-ui": "0.0.1-alpha.17",
-    "@portkey/types": "^2.7.1-alpha.0",
+    "@portkey/types": "^2.13.2",
     "@portkey/utils": "^2.7.1-alpha.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@sentry/nextjs": "^7.19.0",
