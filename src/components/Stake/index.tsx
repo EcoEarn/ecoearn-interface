@@ -32,6 +32,9 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import useLoading from 'hooks/useLoading';
 import useNotification from 'hooks/useNotification';
 import { matchErrorMsg } from 'utils/formatError';
+import { checkLoginSuccess } from 'utils/loginUtils';
+import { useWalletService } from 'hooks/useWallet';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
 const FormItem = Form.Item;
 function StakeTitle({ text, rate }: { text: string; rate?: string | number }) {
@@ -131,6 +134,9 @@ function Stake({
   const [elfBalance, setElfBalance] = useState<number | string>('0');
   const { walletInfo } = useConnectWallet();
   const { showLoading, closeLoading } = useLoading();
+  const { walletType } = useWalletService();
+
+  const isPortkeySdk = useMemo(() => walletType === WalletTypeEnum.aa, [walletType]);
 
   console.log('===elfBalance', elfBalance);
 
@@ -616,6 +622,7 @@ function Stake({
   const onGetToken = useCallback(async () => {
     if (needTransfer) {
       try {
+        if (isPortkeySdk && !checkLoginSuccess()) return;
         await getETransferAuthToken();
         depositModal.show({
           defaultReceiveToken: stakeSymbol,
@@ -639,6 +646,7 @@ function Stake({
     fetchBalance,
     gainUrl,
     getETransferAuthToken,
+    isPortkeySdk,
     needTransfer,
     notification,
     stakeSymbol,
@@ -649,6 +657,7 @@ function Stake({
   }, [canSwapToken, elfBalance]);
 
   const onSwap = useCallback(() => {
+    if (isPortkeySdk && !checkLoginSuccess()) return;
     swapModal.show({
       selectTokenInSymbol: 'ELF',
       selectTokenOutSymbol: stakeSymbol,
@@ -658,7 +667,7 @@ function Stake({
         curBalance && setBalance(curBalance);
       },
     });
-  }, [fetchBalance, stakeSymbol, swapModal]);
+  }, [fetchBalance, isPortkeySdk, stakeSymbol, swapModal]);
 
   const getTotalStaked = useCallback(async () => {
     try {

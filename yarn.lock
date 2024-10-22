@@ -2332,6 +2332,11 @@
   resolved "https://registry.npmjs.org/@portkey/types/-/types-2.12.0.tgz#82976081440ef3a88d340d16c9e726ae28da786b"
   integrity sha512-5TDbqe+qTnW3jOxyt5XQjsIYaRKb+rBvaBmkOy/H0IEZ6eZAwAfIuS0XlEG/vzJfz2xRBgcQB2QDw0+tCywqcg==
 
+"@portkey/types@^2.13.2":
+  version "2.13.2"
+  resolved "https://registry.npmjs.org/@portkey/types/-/types-2.13.2.tgz#e5c12016e996a195c82b08b2a314c2b2f0853bb3"
+  integrity sha512-DGDCOzTEiDrO6+cRqYjOB3xq27KVtsM3UlHK+EsAmbJ2TaZvaMvDCxORYX/EXTxvmFt+ki7qk4A0sXP4ktBf8Q==
+
 "@portkey/utils@2.6.6":
   version "2.6.6"
   resolved "https://registry.npmjs.org/@portkey/utils/-/utils-2.6.6.tgz#8fa5eb93a4ca43baa14345a75876a8701de2c1f6"
