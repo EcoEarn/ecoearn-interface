@@ -770,7 +770,7 @@ function StakeModal({
         curBalance && setBalance(curBalance);
       },
     });
-  }, [fetchBalance, stakeSymbol, swapModal]);
+  }, [fetchBalance, isPortkeySdk, stakeSymbol, swapModal]);
 
   const getTotalStaked = useCallback(async () => {
     try {
