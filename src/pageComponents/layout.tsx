@@ -18,6 +18,7 @@ import { useGetToken } from 'hooks/useGetToken';
 import useResponsive from 'utils/useResponsive';
 import VConsole from 'vconsole';
 import { useScroll } from 'ahooks';
+import LoginErrorModal from 'components/LoginErrorModal';
 
 const needCustomBackgroundPath = ['/referral', '/invitee'];
 
@@ -151,6 +152,7 @@ const Layout = dynamic(
           ) : (
             <>{children}</>
           )}
+          <LoginErrorModal />
           <div
             className={clsx(
               'w-[100vw] h-[100vh] absolute top-0 left-0 !bg-cover bg-center bg-no-repeat z-[-1000] invisible',

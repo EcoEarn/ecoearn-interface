@@ -36,6 +36,7 @@ export default function Rewards() {
   const [loading, setLoading] = useState(false);
   const [rewardsData, setRewardsData] = useState<Array<IPoolRewardsItem>>();
   const [liquidityData, setLiquidityData] = useState<Array<ILiquidityItem>>();
+  const [total, setTotal] = useState(0);
 
   console.log('====showLiquidityModule', showLiquidityModule);
 
@@ -61,10 +62,10 @@ export default function Rewards() {
       ]);
       closeLoading();
       setLoading(false);
-      const { items } = rewardsList || {};
-      if (items && items?.length) {
-        setClaimData(items);
-      }
+      const { items, totalCount } = rewardsList || {};
+      setClaimData(items || []);
+      const total = totalCount || 0;
+      setTotal(total > 10000 ? 10000 : total);
       if (rewardsTypeList && rewardsTypeList?.length) {
         setRewardsTypeList(rewardsTypeList);
       }
@@ -77,7 +78,7 @@ export default function Rewards() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeLoading, showLoading, isLogin]);
+  }, [isLogin, showLoading, closeLoading]);
 
   const hasHistoryData = useMemo(() => {
     return claimData && claimData?.length > 0;
@@ -138,9 +139,17 @@ export default function Rewards() {
               <div className="mt-8">
                 <div className="mb-6 text-base font-[600] text-neutralTitle">Claim History</div>
                 {isMD ? (
-                  <RewardsListMobile rewardsTypeList={rewardsTypeList || []} initData={claimData} />
+                  <RewardsListMobile
+                    rewardsTypeList={rewardsTypeList || []}
+                    initData={claimData}
+                    total={total}
+                  />
                 ) : (
-                  <RewardListPC rewardsTypeList={rewardsTypeList || []} initData={claimData} />
+                  <RewardListPC
+                    rewardsTypeList={rewardsTypeList || []}
+                    initData={claimData}
+                    total={total}
+                  />
                 )}
               </div>
             )}

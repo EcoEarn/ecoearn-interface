@@ -7,14 +7,18 @@ const PAGE_CONTAINER_ID = 'pageContainer';
 
 const pageSize = 10;
 
+const maxPage = 10000 / pageSize;
+
 export default function useRewardsListMobileService({
   rewardsTypeList,
   initData,
+  initTotal,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
   initData?: IRewardListItem[];
+  initTotal?: number;
 }) {
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(initTotal || 0);
   const [dataSource, setDataSource] = useState<IRewardListItem[]>([]);
   const loading = useRef(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -101,11 +105,11 @@ export default function useRewardsListMobileService({
   );
 
   const loadMoreData = useCallback(() => {
-    if (loading.current || !hasMore) return;
+    if (loading.current || !hasMore || current >= maxPage) return;
     setCurrent((current) => {
       return current + 1;
     });
-  }, [hasMore]);
+  }, [current, hasMore]);
 
   const { run } = useDebounceFn(loadMoreData, {
     wait: 100,

@@ -33,6 +33,9 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import useLoading from 'hooks/useLoading';
 import useNotification from 'hooks/useNotification';
 import { matchErrorMsg } from 'utils/formatError';
+import { checkLoginSuccess } from 'utils/loginUtils';
+import { useWalletService } from 'hooks/useWallet';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
 const FormItem = Form.Item;
 const { Text } = Typography;
@@ -122,6 +125,7 @@ function StakeModal({
   const [balance, setBalance] = useState<string>(defaultBalance || '0');
   const { getETransferAuthToken } = useETransferAuthToken();
   const notification = useNotification();
+  const { walletType } = useWalletService();
 
   const typeIsExtend = useMemo(() => type === StakeType.EXTEND, [type]);
   const typeIsStake = useMemo(() => type === StakeType.STAKE, [type]);
@@ -134,6 +138,7 @@ function StakeModal({
   const [elfBalance, setElfBalance] = useState<number | string>('0');
   const { walletInfo } = useConnectWallet();
   const { showLoading, closeLoading } = useLoading();
+  const isPortkeySdk = useMemo(() => walletType === WalletTypeEnum.aa, [walletType]);
 
   const minStakeAmount = useMemo(
     () => divDecimals(minimalStakeAmount || 0, decimal).toString(),
@@ -720,6 +725,7 @@ function StakeModal({
   const onGetToken = useCallback(async () => {
     if (needTransfer) {
       try {
+        if (isPortkeySdk && !checkLoginSuccess()) return;
         await getETransferAuthToken();
         depositModal.show({
           defaultReceiveToken: stakeSymbol,
@@ -743,6 +749,7 @@ function StakeModal({
     fetchBalance,
     gainUrl,
     getETransferAuthToken,
+    isPortkeySdk,
     needTransfer,
     notification,
     stakeSymbol,
@@ -753,6 +760,7 @@ function StakeModal({
   }, [canSwapToken, elfBalance]);
 
   const onSwap = useCallback(() => {
+    if (isPortkeySdk && !checkLoginSuccess()) return;
     swapModal.show({
       selectTokenInSymbol: 'ELF',
       selectTokenOutSymbol: stakeSymbol,
@@ -762,7 +770,7 @@ function StakeModal({
         curBalance && setBalance(curBalance);
       },
     });
-  }, [fetchBalance, stakeSymbol, swapModal]);
+  }, [fetchBalance, isPortkeySdk, stakeSymbol, swapModal]);
 
   const getTotalStaked = useCallback(async () => {
     try {

@@ -19,9 +19,10 @@ import MyRanking from '../MyRanking';
 import { getLeaderboardInfo } from 'api/request';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import useLoading from 'hooks/useLoading';
-import Loading from 'components/Loading';
 
 const pageSize = 20;
+
+const maxPage = 10000 / pageSize;
 
 export interface IRankingListItem {
   rank: number;
@@ -118,6 +119,7 @@ export default function RankingTable({ className }: { className?: string }) {
 
   const getList = useCallback(
     async (page = 1) => {
+      if (page > maxPage) return;
       setLoading(true);
       if (page === 1) {
         setIsPageLoading(true);
