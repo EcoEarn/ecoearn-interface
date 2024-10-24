@@ -6,6 +6,7 @@ const useGetStoreInfo = () => {
   return {
     cmsInfo: info.cmsInfo,
     dappList: info.dappList,
+    showLoginErrorModal: info.showLoginErrorModal,
   };
 };
 

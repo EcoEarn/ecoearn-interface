@@ -11,6 +11,7 @@ const initialState: InfoStateType = {
     rpcUrl: '',
   },
   theme: 'light',
+  showLoginErrorModal: false,
 };
 
 // Actual Slice
@@ -35,6 +36,9 @@ export const infoSlice = createSlice({
     ) {
       state.confirmInfo = action.payload;
     },
+    setShowLoginErrorModal(state, action) {
+      state.showLoginErrorModal = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -48,6 +52,7 @@ export const infoSlice = createSlice({
   },
 });
 
-export const { setIsMobile, setCmsInfo, setDappList, setConfirmInfo } = infoSlice.actions;
+export const { setIsMobile, setCmsInfo, setDappList, setConfirmInfo, setShowLoginErrorModal } =
+  infoSlice.actions;
 export const selectInfo = (state: AppState) => state.info;
 export default infoSlice.reducer;

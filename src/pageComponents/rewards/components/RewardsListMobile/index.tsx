@@ -6,9 +6,11 @@ import styles from './index.module.css';
 export default function RewardsListMobile({
   rewardsTypeList,
   initData,
+  total: initTotal,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
   initData?: IRewardListItem[];
+  total?: number;
 }) {
   const {
     currentSelect,
@@ -18,7 +20,7 @@ export default function RewardsListMobile({
     loading,
     isLoadingList,
     isLoadingMore,
-  } = useRewardsListMobileService({ rewardsTypeList, initData });
+  } = useRewardsListMobileService({ rewardsTypeList, initData, initTotal });
 
   return (
     <div>
