@@ -17,12 +17,12 @@ export default function LoginErrorModal() {
     return isInTelegram();
   }, [isInTelegram]);
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
     store.dispatch(setShowLoginErrorModal(false));
     if (isInTG) {
       return;
     }
-    logout();
+    await logout();
     window.location.reload();
   }, [isInTG, logout]);
 
