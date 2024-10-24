@@ -49,7 +49,7 @@ export default function useWebLoginConfig() {
         referralCode: '',
         projectCode: '13025',
       },
-      customNetworkType: networkTypeV2 === 'TESTNET' ? 'offline' : 'online',
+      // customNetworkType: networkTypeV2 === 'TESTNET' ? 'offline' : 'online',
     };
   }, [connectUrlV2, graphqlServerV2, networkTypeV2, portkeyServerV2, telegramBotId]);
 

@@ -135,9 +135,15 @@ export const Approve = async (
   options?: IContractOptions,
 ): Promise<any> => {
   try {
-    const res = (await lpTokenContractRequest('Approve', contractAddress, params, {
-      ...options,
-    })) as any;
+    const networkType = store?.getState()?.info?.cmsInfo?.networkTypeV2;
+    const res = (await lpTokenContractRequest(
+      'Approve',
+      contractAddress,
+      { ...params, networkType },
+      {
+        ...options,
+      },
+    )) as any;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);

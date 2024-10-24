@@ -133,9 +133,14 @@ export const GetAllowance = async (
 
 export const Approve = async (params: IApproveParams, options?: IContractOptions): Promise<any> => {
   try {
-    const res = (await multiTokenContractRequest('Approve', params, {
-      ...options,
-    })) as any;
+    const networkType = store?.getState()?.info?.cmsInfo?.networkTypeV2;
+    const res = (await multiTokenContractRequest(
+      'Approve',
+      { ...params, networkType },
+      {
+        ...options,
+      },
+    )) as any;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);
