@@ -1,0 +1,15 @@
+.login-error-modal{
+  @apply w-[630px];
+  
+  :global{
+    .earn-modal-footer {
+      @apply !px-5 lg:!px-8 !mt-0 !py-8;
+    }
+    .earn-modal-content .earn-modal-body {
+      @apply !py-4;
+      p {
+        @apply !m-0;
+      }
+    }
+  }
+}

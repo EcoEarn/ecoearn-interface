@@ -6,14 +6,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 export default function useRewardsListService({
   rewardsTypeList,
   initData,
+  initTotal,
 }: {
   rewardsTypeList: Array<IRewardsTypeItem>;
   initData?: IRewardListItem[];
+  initTotal?: number;
 }) {
   const [dataList, setDataList] = useState<Array<IRewardListItem>>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(initTotal || 0);
   const [poolType, setPoolType] = useState<'Points' | 'Token' | 'Lp' | 'All'>('All');
   const [loading, setLoading] = useState(false);
   const { wallet } = useWalletService();
@@ -45,7 +47,8 @@ export default function useRewardsListService({
       // showLoading();
       const { items, totalCount } = await getRewardsList(searchParams);
       setDataList(items || []);
-      setTotalCount(totalCount || 0);
+      const total = totalCount || 0;
+      setTotalCount(total > 10000 ? 10000 : total);
       if (page === 1 && poolType === 'All' && items?.length) {
         setHasHistoryData(true);
       }

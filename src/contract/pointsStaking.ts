@@ -11,6 +11,7 @@ import { store } from 'redux/store';
 import { getTxResultRetry } from 'utils/getTxResult';
 import { sleep } from '@portkey/utils';
 import { IClaimParams, IEarlyStakeParams, IWithdrawParams } from './type';
+import { checkLoginSuccess } from 'utils/loginUtils';
 
 const pointsStakingContractRequest = async <T, R>(
   method: string,
@@ -51,6 +52,7 @@ const pointsStakingContractRequest = async <T, R>(
 
       return Promise.resolve(res.data);
     } else {
+      if (!checkLoginSuccess()) return Promise.reject();
       const res: R = await webLoginInstance.callSendMethod(curChain, {
         contractAddress: address,
         methodName: method,

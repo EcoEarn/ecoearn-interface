@@ -14,6 +14,7 @@ export type InfoStateType = {
   cmsInfo?: ICMSInfo;
   dappList?: Array<IStakingItem>;
   confirmInfo?: ITradeConfirmProps;
+  showLoginErrorModal?: boolean;
 };
 
 export interface ICMSInfo {
