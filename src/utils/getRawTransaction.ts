@@ -2,6 +2,7 @@ import { getRawTransactionPortkey } from './getRawTransactionPortkey';
 import { getRawTransactionDiscover } from './getRawTransactionDiscover';
 import { getRawTransactionNightELF } from './getRawTransactionNightELF';
 import { TWalletInfo, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { checkLoginSuccess } from './loginUtils';
 
 export interface IRowTransactionPrams<T> {
   walletInfo: TWalletInfo;
@@ -34,6 +35,7 @@ export const getRawTransaction: <T>(
   try {
     switch (walletType) {
       case WalletTypeEnum.aa:
+        if (!checkLoginSuccess()) return Promise.reject('');
         if (!walletInfo?.extraInfo?.portkeyInfo) return Promise.reject('');
         res = await getRawTransactionPortkey({
           caHash: walletInfo?.extraInfo?.portkeyInfo.caInfo.caHash,

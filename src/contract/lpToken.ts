@@ -18,6 +18,7 @@ import {
   IGetBalanceParams,
   IGetLpAllowanceResponse,
 } from './type';
+import { checkLoginSuccess } from 'utils/loginUtils';
 
 const lpTokenContractRequest = async <T, R>(
   method: string,
@@ -52,6 +53,7 @@ const lpTokenContractRequest = async <T, R>(
 
       return Promise.resolve(res.data);
     } else {
+      if (!checkLoginSuccess()) return Promise.reject();
       const res: R = await webLoginInstance.callSendMethod(curChain, {
         contractAddress: address,
         methodName: method,
@@ -133,9 +135,15 @@ export const Approve = async (
   options?: IContractOptions,
 ): Promise<any> => {
   try {
-    const res = (await lpTokenContractRequest('Approve', contractAddress, params, {
-      ...options,
-    })) as any;
+    const networkType = store?.getState()?.info?.cmsInfo?.networkTypeV2;
+    const res = (await lpTokenContractRequest(
+      'Approve',
+      contractAddress,
+      { ...params, networkType },
+      {
+        ...options,
+      },
+    )) as any;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);
