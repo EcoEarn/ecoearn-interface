@@ -11,6 +11,8 @@ WORKDIR ${web}
 
 COPY . ${web}
 
+RUN yarn cache clean
+
 RUN yarn
 
 RUN yarn list --depth=0
