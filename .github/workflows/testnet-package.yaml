@@ -37,7 +37,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            NODE_ENV=test
             NEXT_PUBLIC_APP_ENV=test
             BUILD_ENV=test
   dispatch:
