@@ -570,8 +570,8 @@ export default function RewardsDetailPage() {
           longestReleaseTime: longestReleaseTime || 0,
         },
         onStake: async (amount, period = 0, poolId) => {
-          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-          // const periodInSeconds = 5 * 60;
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 5 * 60;
           const stakeAmount = freeAmount;
           const signParams: IEarlyStakeSignParams = {
             amount: Number(stakeAmount),

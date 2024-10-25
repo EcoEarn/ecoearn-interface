@@ -371,10 +371,10 @@ export default function usePoolDetailService() {
             period,
           });
         }
-        const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
-        // const periodInSeconds = stakeRewards
-        //   ? 5 * 60
-        //   : dayjs.duration(Number(period || 0), 'day').asSeconds();
+        // const periodInSeconds = dayjs.duration(Number(period || 0), 'day').asSeconds();
+        const periodInSeconds = stakeRewards
+          ? 5 * 60
+          : dayjs.duration(Number(period || 0), 'day').asSeconds();
         await checkApproveParams(poolInfo?.rate as TFeeType);
         let checked = false;
         try {
