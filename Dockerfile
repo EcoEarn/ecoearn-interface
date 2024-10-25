@@ -11,7 +11,11 @@ WORKDIR ${web}
 
 COPY . ${web}
 
-RUN yarn && yarn build:${BUILD_ENV}
+RUN yarn
+
+RUN yarn list --depth=0
+
+RUN yarn build:${BUILD_ENV}
 
 ENTRYPOINT yarn start
 
