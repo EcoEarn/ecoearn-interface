@@ -31,6 +31,5 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            NODE_ENV=production
             NEXT_PUBLIC_APP_ENV=production
             BUILD_ENV=production
