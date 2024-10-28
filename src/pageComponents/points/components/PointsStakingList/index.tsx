@@ -133,11 +133,9 @@ export function PointsStakeItem({
           gap={4}
           justify={isMD ? 'space-between' : 'start'}
         >
-          <span className="text-sm font-medium text-brandDefault">
-            Rewards for 10k Points / Month:{' '}
-          </span>
+          <span className="text-sm font-medium text-brandDefault">Pool reward/day: </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
-            <span className="mr-1">{dailyRewards}</span>{' '}
+            <span className="mr-1">{poolDailyRewards}</span>{' '}
             <TextEllipsis text={displayRewardsTokenName} />
             <CommonTooltip
               title="It indicates monthly rewards obtained by staking 10,000 points."
