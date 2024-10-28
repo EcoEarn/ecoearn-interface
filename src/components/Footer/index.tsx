@@ -4,7 +4,7 @@ import { DocsDomainName, EcoearnDomainName } from 'constants/common';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { ReactComponent as XSVG } from 'assets/img/x_logo.svg';
-import { ReactComponent as TelegramSVG } from 'assets/img/Telegram.svg';
+import { ReactComponent as TelegramSVG } from 'assets/img/telegram.svg';
 import { ReactComponent as SmallXSVG } from 'assets/img/x_logo_s.svg';
 import { ReactComponent as SmallTelegramSVG } from 'assets/img/telegram_s.svg';
 
