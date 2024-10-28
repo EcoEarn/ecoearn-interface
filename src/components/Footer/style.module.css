@@ -1,0 +1,7 @@
+.footer-link svg path {
+  fill: var(--neutral-secondary);
+}
+
+.footer-link:hover svg path {
+  fill: var(--brand-default);
+}

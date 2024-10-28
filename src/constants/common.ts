@@ -15,4 +15,7 @@ export const PrimaryDomainName =
 
 export const EcoearnDomainName = env === 'test' ? 'https://test.ecoearn.io' : 'https://ecoearn.io';
 
+export const DocsDomainName =
+  env === 'test' ? 'https://test-docs.ecoearn.io/' : 'https://docs.ecoearn.io/';
+
 export const PORTKEY_LOGIN_CHAIN_ID_KEY = 'PortkeyOriginChainId';
