@@ -1,111 +1,130 @@
 /* eslint-disable @next/next/no-img-element */
 import clsx from 'clsx';
-import { EcoearnDomainName } from 'constants/common';
+import { DocsDomainName, EcoearnDomainName } from 'constants/common';
 import Link from 'next/link';
-import { useCallback, useMemo } from 'react';
-import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
+import { useMemo } from 'react';
+import { ReactComponent as XSVG } from 'assets/img/x_logo.svg';
+import { ReactComponent as TelegramSVG } from 'assets/img/telegram.svg';
+import { ReactComponent as SmallXSVG } from 'assets/img/x_logo_s.svg';
+import { ReactComponent as SmallTelegramSVG } from 'assets/img/telegram_s.svg';
 
+import styles from './style.module.css';
 export interface ILinkItem {
   label?: string;
   icon?: string;
   url?: string;
   path?: string;
   target?: '_blank' | '_self';
+  children?: Array<ILinkItem>;
 }
 
 export default function Footer({
-  className,
   isCustomBg = false,
 }: {
   className?: string;
   isCustomBg?: boolean;
 }) {
-  const { socialList } = useGetCmsInfo() || {};
-
-  const linkList: Array<ILinkItem> = useMemo(() => {
+  const socialList: Array<ILinkItem> = useMemo(() => {
     return [
       {
-        label: 'Terms of Service',
-        path: `${EcoearnDomainName}/terms-of-service`,
+        label: 'Resources',
+        children: [
+          {
+            label: 'Terms of Service',
+            path: `${EcoearnDomainName}/terms-of-service`,
+            target: '_blank',
+          },
+          {
+            label: 'Privacy Policy',
+            path: `${EcoearnDomainName}/privacy-policy`,
+            target: '_blank',
+          },
+          {
+            label: 'Docs',
+            path: DocsDomainName,
+            target: '_blank',
+          },
+        ],
       },
       {
-        label: 'Privacy Policy',
-        path: `${EcoearnDomainName}/privacy-policy`,
-      },
-      {
-        label: 'Docs',
-        url: 'https://docs.ecoearn.io/',
-        target: '_blank',
+        label: 'Community',
+        children: [
+          {
+            label: 'X (Twitter)',
+            path: 'https://x.com/ecoearn_web3',
+            target: '_blank',
+          },
+          {
+            label: 'TG Group',
+            path: 'https://t.me/ecoearnx',
+            target: '_blank',
+          },
+          {
+            label: 'TG Channel',
+            path: 'https://t.me/ecoearn_web3',
+            target: '_blank',
+          },
+        ],
       },
     ];
   }, []);
 
-  const onItemClick = useCallback((item: ILinkItem) => {
-    if (item?.path || !item?.url) return;
-    window.open(item.url, item?.target || '_blank');
-  }, []);
-
-  const renderLinkList = useMemo(() => {
-    return (
-      <div className="text-sm font-normal text-neutralTertiary flex items-center lg:ml-16">
-        {linkList.map((item, index) => {
-          return (
-            <div key={index} className="flex items-center">
-              {item.path ? (
-                <Link
-                  target="_blank"
-                  className="text-neutralTertiary hover:text-neutralTertiary"
-                  href={item.path}
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <span
-                  className="cursor-pointer"
-                  onClick={() => {
-                    onItemClick(item);
-                  }}
-                >
-                  {item.label}
-                </span>
-              )}
-              {index !== linkList.length - 1 && (
-                <div className="w-[1px] h-[22px] mx-4 lg:mx-12 bg-neutralBorder"></div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }, [linkList, onItemClick]);
-
   return (
     <section className={clsx(!isCustomBg && 'bg-brandFooterBg')}>
-      <div className=" py-12 lg:py-8 mx-4 lg:mx-10">
-        <div className="flex items-center">
-          <img
-            src={require('assets/img/logo.svg').default}
-            alt="logo"
-            className="w-[127px] lg:w-[138px] lg:h-[22px]"
-          />
-          <div className="hidden lg:block">{renderLinkList}</div>
-          <div className="flex items-center gap-8 lg:gap-6 ml-auto">
-            {socialList?.map((item, index) => {
-              return (
-                <img
-                  onClick={() => {
-                    onItemClick(item);
-                  }}
-                  key={index}
-                  src={require(`assets/img/${item.icon}.svg`).default}
-                  alt={item.icon}
-                  className="w-6 h-6 cursor-pointer"
-                />
-              );
-            })}
+      <div className="py-[22px] lg:py-8">
+        <div className="flex items-stretch justify-between w-full max-w-[1440px] px-[22px] lg:px-10 mx-auto">
+          <div>
+            <img
+              src={require('assets/img/logo.svg').default}
+              alt="logo"
+              className="hidden w-auto h-[27px] md:block"
+            />
+            <img
+              src={require('assets/img/logo.png').default.src}
+              alt="logo"
+              className="w-[28px] h-auto md:hidden"
+            />
+            <div className="hidden mt-[21px] text-neutralSecondary font-normal text-[14px] md:block !font-poppinsRegular">
+              Elevate Your Earnings: Advanced Staking and Farming Solutions
+            </div>
+          </div>
+          <div className="flex items-stretch gap-[24px] md:gap-[100px] ml-auto flex-">
+            {socialList.map((item, index) => (
+              <div key={index} className="flex flex-col">
+                <div className="mb-[6px] text-[12px] md:text-[16px] md:mb-[27px] md:leading-[24px] font-medium text-neutralTitle !font-poppinsRegular">
+                  {item.label}
+                </div>
+                <div className="flex flex-col">
+                  {item.children?.map?.((link, idx) => (
+                    <Link
+                      target={link.target}
+                      href={link.path || link.url || ''}
+                      key={idx + '_child'}
+                      className={clsx(
+                        styles['footer-link'],
+                        '!font-poppinsRegular inline-flex items-center gap-[16px] mb-[5px] text-[12px] mb-[6px] font-normal leading-[21px] text-neutralSecondary hover:text-brandDefault md:mb-[19px] md:text-[16px] md:leading-[24px] md:font-medium',
+                      )}
+                    >
+                      {link.label?.includes('Twitter') ? (
+                        <XSVG className="hidden md:block" />
+                      ) : null}
+                      {link.label?.includes('TG') ? (
+                        <TelegramSVG className="hidden md:block" />
+                      ) : null}
+                      {link.label?.includes('Twitter') ? (
+                        <SmallXSVG className="block md:hidden" />
+                      ) : null}
+                      {link.label?.includes('TG') ? (
+                        <SmallTelegramSVG className="block md:hidden" />
+                      ) : null}
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="block lg:hidden mt-8">{renderLinkList}</div>
       </div>
     </section>
   );
