@@ -133,7 +133,7 @@ export function PointsStakeItem({
           gap={4}
           justify={isMD ? 'space-between' : 'start'}
         >
-          <span className="text-sm font-medium text-brandDefault">Pool reward/day: </span>
+          <span className="text-sm font-medium text-brandDefault">Pool Rewards / Day: </span>
           <span className="flex items-center text-sm font-medium text-brandDefault">
             <span className="mr-1">{poolDailyRewards}</span>{' '}
             <TextEllipsis text={displayRewardsTokenName} />
