@@ -84,14 +84,14 @@ export default function Footer({
               alt="logo"
               className="w-[28px] h-auto md:hidden"
             />
-            <div className="hidden mt-[21px] text-neutralSecondary font-normal text-[14px] md:block">
+            <div className="hidden mt-[21px] text-neutralSecondary font-normal text-[14px] md:block !font-poppinsRegular">
               Elevate Your Earnings: Advanced Staking and Farming Solutions
             </div>
           </div>
           <div className="flex items-stretch gap-[24px] md:gap-[100px] ml-auto flex-">
             {socialList.map((item, index) => (
               <div key={index} className="flex flex-col">
-                <div className="mb-[6px] text-[12px] md:text-[16px] md:mb-[27px] md:leading-[24px] font-medium text-neutralTitle">
+                <div className="mb-[6px] text-[12px] md:text-[16px] md:mb-[27px] md:leading-[24px] font-medium text-neutralTitle !font-poppinsRegular">
                   {item.label}
                 </div>
                 <div className="flex flex-col">
@@ -102,7 +102,7 @@ export default function Footer({
                       key={idx + '_child'}
                       className={clsx(
                         styles['footer-link'],
-                        'inline-flex items-center gap-[16px] mb-[5px] text-[12px] mb-[6px] font-normal leading-[21px] text-neutralSecondary hover:text-brandDefault md:mb-[19px] md:text-[16px] md:leading-[24px] md:font-medium',
+                        '!font-poppinsRegular inline-flex items-center gap-[16px] mb-[5px] text-[12px] mb-[6px] font-normal leading-[21px] text-neutralSecondary hover:text-brandDefault md:mb-[19px] md:text-[16px] md:leading-[24px] md:font-medium',
                       )}
                     >
                       {link.label?.includes('Twitter') ? (
