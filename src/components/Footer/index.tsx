@@ -77,7 +77,7 @@ export default function Footer({
             <img
               src={require('assets/img/logo.svg').default}
               alt="logo"
-              className="hidden w-[127px] lg:w-[138px] lg:h-[22px] md:block"
+              className="hidden w-auto h-[27px] md:block"
             />
             <img
               src={require('assets/img/logo.png').default.src}
@@ -88,7 +88,7 @@ export default function Footer({
               Elevate Your Earnings: Advanced Staking and Farming Solutions
             </div>
           </div>
-          <div className="flex items-stretch gap-8 lg:gap-6 ml-auto flex-">
+          <div className="flex items-stretch gap-[24px] md:gap-[100px] ml-auto flex-">
             {socialList.map((item, index) => (
               <div key={index} className="flex flex-col">
                 <div className="mb-[6px] text-[12px] md:text-[16px] md:mb-[27px] md:leading-[24px] font-medium text-neutralTitle">
