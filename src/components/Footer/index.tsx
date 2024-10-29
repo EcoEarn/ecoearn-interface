@@ -71,8 +71,8 @@ export default function Footer({
 
   return (
     <section className={clsx(!isCustomBg && 'bg-brandFooterBg')}>
-      <div className=" py-[22px] lg:py-8 mx-[24px] lg:mx-10">
-        <div className="flex items-stretch justify-between max-w-[1080px] mx-auto">
+      <div className="py-[22px] lg:py-8 lg:mx-10">
+        <div className="flex items-stretch justify-between max-w-[1440px] px-[22px] md:px-10 mx-auto">
           <div>
             <img
               src={require('assets/img/logo.svg').default}
