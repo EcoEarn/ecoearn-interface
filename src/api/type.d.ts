@@ -53,6 +53,7 @@ interface IStakePoolData {
   stakedInUsd?: string;
   decimal?: number;
   rate?: number | string;
+  mergeInterval?: number;
   fixedBoostFactor?: number | string;
   unlockWindowDuration?: number | string;
   boostedAmount?: number | string;

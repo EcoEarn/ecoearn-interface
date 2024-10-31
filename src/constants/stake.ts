@@ -15,3 +15,5 @@ export const MIN_STAKE_AMOUNT = 10;
 export const MAX_STAKE_PERIOD = 360;
 
 export const MIN_STAKE_PERIOD = 7;
+
+export const ALLOWED_MERGE_PERIOD = 5;

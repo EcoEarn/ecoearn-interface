@@ -701,6 +701,7 @@ function Stake({
   }, [displayOriginText, originAprKText, stakeApr]);
 
   const aprK = useMemo(() => {
+    console.log('aprK');
     const inputPeriod = period?.replaceAll(',', '');
     const amountValue = amount?.replaceAll(',', '');
     const stakeAmount = isFreezeAmount
