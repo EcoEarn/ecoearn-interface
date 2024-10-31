@@ -138,7 +138,7 @@ export function PointsStakeItem({
             <span className="mr-1">{poolDailyRewards}</span>{' '}
             <TextEllipsis text={displayRewardsTokenName} />
             <CommonTooltip
-              title="It indicates monthly rewards obtained by staking 10,000 points."
+              title="The total amount of rewards distributed to all users by the pool each day."
               className="ml-1 fill-brandDefault"
             />
           </span>
