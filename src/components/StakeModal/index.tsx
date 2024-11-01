@@ -967,20 +967,30 @@ function StakeModal({
           .minus(boostedAmountTotal)
           .plus(newBoostedAmount)
           .toString();
-        const aprValues = curStakeInfos.map((item) => {
+        let aprValues = curStakeInfos.map((item) => {
           const newAprK = getAprK(dayjs.duration(item.period, 'second').asDays(), fixedBoostFactor);
           return getOwnerAprKValue(yearlyRewards, currentTotal, newAprK);
         });
+        console.log('================ isInMergeInterval', isInMergeInterval);
         if (!isInMergeInterval) {
           const aprK = getAprK(Number(remainingTime || 0) + Number(inputPeriod), fixedBoostFactor);
           const curBoostedAmount = ZERO.plus(stakeAmount || 0)
             .times(aprK)
             .toString();
+          console.log('================ curBoostedAmount', curBoostedAmount);
           currentTotal = ZERO.plus(currentTotal || 0)
             .plus(curBoostedAmount)
             .toString();
+          aprValues = curStakeInfos.map((item) => {
+            const newAprK = getAprK(
+              dayjs.duration(item.period, 'second').asDays(),
+              fixedBoostFactor,
+            );
+            return getOwnerAprKValue(yearlyRewards, currentTotal, newAprK);
+          });
           aprValues.push(getOwnerAprKValue(yearlyRewards, currentTotal, aprK));
         }
+        console.log('================ aprValues', aprValues);
         apr = aprValues
           .reduce((acc, cur) => acc.plus(cur), ZERO)
           .div(curStakeInfos.length)
