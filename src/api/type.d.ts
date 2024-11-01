@@ -127,6 +127,7 @@ interface IPointsPoolItem {
   rewardsTokenName: string;
   stakeTokenName: string;
   releasePeriod: number;
+  highRewards: boolean;
 }
 
 interface IStakingClaimParams {

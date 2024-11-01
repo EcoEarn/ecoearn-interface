@@ -24,11 +24,9 @@ const formatMin = 1000000;
 export function PointsStakeItem({
   item,
   onClaim,
-  showHighYieldTag = false,
 }: {
   item: IPointsPoolItem;
   onClaim: (item: IPointsPoolItem) => void;
-  showHighYieldTag?: boolean;
 }) {
   const { isMD, width } = useResponsive();
   const { isLogin } = useGetLoginStatus();
@@ -105,7 +103,7 @@ export function PointsStakeItem({
           className="w-full md:w-fit"
         >
           <span className="text-xl font-semibold text-neutralTitle">{item.poolName}</span>
-          {showHighYieldTag && (
+          {item.highRewards && (
             <span className="rounded-[4px] border-brandDisable bg-brandFooterBg border-solid border-[1px] text-brandDefault text-xs font-medium px-[6px]">
               High Rewards
             </span>
@@ -268,14 +266,7 @@ export default function PointsStakingList({ dappName }: { dappName: string }) {
       ) : data?.length && data.length > 0 ? (
         <div className="grid xl:grid-cols-2 grid-cols-1 gap-4 lg:gap-6 mt-4 lg:mt-6">
           {data.map((item, index) => {
-            return (
-              <PointsStakeItem
-                key={index}
-                item={item}
-                onClaim={handleClaim}
-                showHighYieldTag={index < 3}
-              />
-            );
+            return <PointsStakeItem key={index} item={item} onClaim={handleClaim} />;
           })}
         </div>
       ) : (
