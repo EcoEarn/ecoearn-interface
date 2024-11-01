@@ -20,7 +20,7 @@ export default function useAPRK() {
   const getAprKAve = useCallback(
     (stakeInfo: Array<IStakeInfoItem>, fixedBoostFactor: number | string, newAprK?: number) => {
       const aprKArr: Array<number> = [];
-      stakeInfo.forEach((stakeInfo, index) => {
+      stakeInfo.forEach((stakeInfo) => {
         const { period = 0 } = stakeInfo;
         const periodDays = dayjs.duration(+period, 'second').asDays();
         const realPeriod = ZERO.plus(periodDays).gt(MAX_STAKE_PERIOD)
@@ -72,7 +72,7 @@ export default function useAPRK() {
           .plus(newStake.stakeAmount || 0)
           .toString();
       }
-      stakeInfo.forEach((stakeInfo, index) => {
+      stakeInfo.forEach((stakeInfo) => {
         const { period = 0 } = stakeInfo;
         const periodDays = dayjs.duration(+period, 'second').asDays();
         const realPeriod = ZERO.plus(periodDays).gt(MAX_STAKE_PERIOD)

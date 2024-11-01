@@ -844,7 +844,7 @@ function StakeModal({
         });
         return getNewAprKAve(curStakeInfos, fixedBoostFactor, {
           stakeAmount,
-          period: Number(remainingTime || 0) + Number(inputPeriod) * ONE_DAY_IN_SECONDS,
+          period: Number(remainingTime || 0) + Number(inputPeriod),
           mergeInterval,
         });
       }
