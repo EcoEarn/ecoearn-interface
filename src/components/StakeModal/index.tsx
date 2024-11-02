@@ -145,7 +145,6 @@ function StakeModal({
   const swapModal = useModal(SwapModal);
   const [elfBalance, setElfBalance] = useState<number | string>('0');
   const { walletInfo } = useConnectWallet();
-  const { showLoading, closeLoading } = useLoading();
   const isPortkeySdk = useMemo(() => walletType === WalletTypeEnum.aa, [walletType]);
 
   const minStakeAmount = useMemo(
@@ -1070,7 +1069,9 @@ function StakeModal({
       } else {
         const aprK = getAprK(inputPeriod, fixedBoostFactor);
         currentStakeAmount = ZERO.plus(stakeAmount).times(aprK).toString();
+        console.log('= currentStakeAmount', currentStakeAmount);
         currentTotal = ZERO.plus(totalStaked || 0)
+          .minus(boostedAmountTotal)
           .plus(currentStakeAmount)
           .toString();
       }
@@ -1091,6 +1092,7 @@ function StakeModal({
           (acc, obj) => ZERO.plus(acc).plus(obj?.boostedAmount || 0),
           ZERO,
         );
+        console.log('= newBoostedAmount', newBoostedAmount);
         currentStakeAmount = newBoostedAmount.toString();
         currentTotal = ZERO.plus(totalStaked || 0)
           .minus(boostedAmountTotal)
