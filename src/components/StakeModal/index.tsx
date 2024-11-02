@@ -993,7 +993,7 @@ function StakeModal({
         console.log('================ aprValues', aprValues);
         apr = aprValues
           .reduce((acc, cur) => acc.plus(cur), ZERO)
-          .div(curStakeInfos.length)
+          .div(aprValues.length)
           .times(100)
           .toFixed(2);
       }
