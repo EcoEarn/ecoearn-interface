@@ -20,7 +20,13 @@ import clsx from 'clsx';
 import { getPoolTotalStaked } from 'api/request';
 import useAPRK from 'hooks/useAPRK';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
-import { getTotalStakedWithAdd, getOwnerAprK, divDecimals, timesDecimals } from 'utils/calculate';
+import {
+  getTotalStakedWithAdd,
+  getOwnerAprK,
+  divDecimals,
+  timesDecimals,
+  getOwnerAprKValue,
+} from 'utils/calculate';
 import RateTag from 'components/RateTag';
 import BigNumber from 'bignumber.js';
 import { useModal } from '@ebay/nice-modal-react';
@@ -35,16 +41,9 @@ import { matchErrorMsg } from 'utils/formatError';
 import { checkLoginSuccess } from 'utils/loginUtils';
 import { useWalletService } from 'hooks/useWallet';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 const FormItem = Form.Item;
-function StakeTitle({ text, rate }: { text: string; rate?: string | number }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span>{text}</span>
-      {!!rate && <RateTag value={Number(rate) * 100} />}
-    </div>
-  );
-}
 
 export interface IStakeProps {
   type?: StakeType;
@@ -73,16 +72,11 @@ function Stake({
   isFreezeAmount = false,
   isFreezePeriod = false,
   isStakeRewards = false,
-  isAddLiquidityAndStake = false,
-  poolType = PoolType.TOKEN,
   freezeAmount,
   earlyAmount,
   isEarlyStake,
-  balanceDec,
-  modalTitle,
   customAmountModule,
   balance: defaultBalance,
-  noteList,
   stakeData,
   loading,
   fetchBalance,
@@ -94,7 +88,6 @@ function Stake({
     unlockTime,
     stakeApr,
     poolId = '',
-    period: originPeriod = 0,
     yearlyRewards = 0,
     decimal = 8,
     rate,
@@ -104,7 +97,7 @@ function Stake({
     earnedSymbol,
     usdRate,
     longestReleaseTime,
-    earlyStakedAmount,
+    mergeInterval,
     minimalExtendStakeAmount,
     minimalStakeAmount,
     extendStakePeriod,
@@ -114,7 +107,7 @@ function Stake({
   const [amount, setAmount] = useState<string>('');
   const [period, setPeriod] = useState('');
   const [totalStaked, setTotalStaked] = useState<string>();
-  const { getAprK, getAprKAve } = useAPRK();
+  const { getAprK, getAprKAve, getNewAprKAve } = useAPRK();
   const [balance, setBalance] = useState<string>('0');
   const { getETransferAuthToken } = useETransferAuthToken();
   const notification = useNotification();
@@ -349,11 +342,6 @@ function Stake({
     typeIsStake,
     unlockTime,
   ]);
-
-  const minDuration = useMemo(
-    () => (typeIsStake || typeIsRenew ? MIN_STAKE_PERIOD : 0),
-    [typeIsRenew, typeIsStake],
-  );
 
   const amountLabel = useMemo(() => {
     const _balance = typeIsExtend
@@ -701,7 +689,6 @@ function Stake({
   }, [displayOriginText, originAprKText, stakeApr]);
 
   const aprK = useMemo(() => {
-    console.log('aprK');
     const inputPeriod = period?.replaceAll(',', '');
     const amountValue = amount?.replaceAll(',', '');
     const stakeAmount = isFreezeAmount
@@ -715,10 +702,7 @@ function Stake({
         return getAprK(inputPeriod, fixedBoostFactor);
       }
     } else if (typeIsAdd) {
-      if (stakeAmount && !period) {
-        const newAprK = getAprK(remainingTime || 0, fixedBoostFactor);
-        return getAprKAve(stakeInfos || [], fixedBoostFactor, Number(newAprK));
-      } else if (!stakeAmount && period) {
+      if (!stakeAmount && period) {
         const curStakeInfos = (stakeInfos || []).map((item) => {
           return {
             ...item,
@@ -729,14 +713,17 @@ function Stake({
       } else if (!stakeAmount && !period) {
         return getAprKAve(stakeInfos, fixedBoostFactor);
       } else {
-        const newAprK = getAprK(Number(remainingTime || 0) + Number(inputPeriod), fixedBoostFactor);
         const curStakeInfos = (stakeInfos || []).map((item) => {
           return {
             ...item,
             period: Number(item.period) + Number(inputPeriod) * ONE_DAY_IN_SECONDS,
           };
         });
-        return getAprKAve(curStakeInfos, fixedBoostFactor, Number(newAprK));
+        return getNewAprKAve(curStakeInfos, fixedBoostFactor, {
+          stakeAmount,
+          period: Number(remainingTime || 0) + Number(inputPeriod),
+          mergeInterval,
+        });
       }
     } else {
       //typeIsExtend
@@ -759,7 +746,9 @@ function Stake({
     freezeAmount,
     getAprK,
     getAprKAve,
+    getNewAprKAve,
     isFreezeAmount,
+    mergeInterval,
     period,
     remainingTime,
     stakeInfos,
@@ -769,7 +758,7 @@ function Stake({
   ]);
 
   const aprText = useMemo(() => {
-    let currentTotal;
+    let currentTotal: string | BigNumber;
     let apr;
     const amountValue = amount?.replaceAll(',', '');
     const inputPeriod = period?.replaceAll(',', '');
@@ -791,15 +780,18 @@ function Stake({
         apr = getOwnerAprK(yearlyRewards, currentTotal, aprK);
       }
     } else if (typeIsAdd) {
-      if (stakeAmount && !period) {
-        const aprK = getAprK(remainingTime || 0, fixedBoostFactor);
-        const aprKAve = getAprKAve(stakeInfos, fixedBoostFactor, Number(aprK));
-        const boostAmount = ZERO.plus(stakeAmount).times(aprK);
-        currentTotal = ZERO.plus(totalStaked || 0)
-          .plus(boostAmount)
-          .toString();
-        apr = getOwnerAprK(yearlyRewards, currentTotal, aprKAve);
-      } else if (!stakeAmount && period) {
+      let isInMergeInterval = false;
+      if (mergeInterval && stakeInfos.length > 0 && stakeInfos[stakeInfos.length - 1].stakedTime) {
+        const lastStakeTime = stakeInfos[stakeInfos.length - 1].stakedTime;
+        const now = Date.now();
+
+        isInMergeInterval =
+          !!mergeInterval &&
+          ZERO.plus(lastStakeTime || 0)
+            .plus(mergeInterval * 1000 || 0)
+            .gte(now);
+      }
+      if (!stakeAmount && period) {
         const curStakeInfos = (stakeInfos || []).map((item) => {
           const newPeriod = Number(item.period) + Number(inputPeriod) * ONE_DAY_IN_SECONDS;
           const newAprK = getAprK(dayjs.duration(newPeriod, 'second').asDays(), fixedBoostFactor);
@@ -825,22 +817,25 @@ function Stake({
         const aprKAve = getAprKAve(stakeInfos, fixedBoostFactor);
         apr = getOwnerAprK(yearlyRewards, totalStaked || 0, aprKAve);
       } else {
-        const aprK = getAprK(Number(remainingTime || 0) + Number(inputPeriod), fixedBoostFactor);
-        const curBoostedAmount = ZERO.plus(stakeAmount || 0)
-          .times(aprK)
-          .toString();
-        const curStakeInfos = (stakeInfos || []).map((item) => {
+        const lastStakeInfos = cloneDeep(stakeInfos);
+        if (isInMergeInterval) {
+          const lastState = lastStakeInfos[lastStakeInfos.length - 1];
+          lastState.stakedAmount = ZERO.plus(lastState.stakedAmount || 0)
+            .plus(stakeAmount || 0)
+            .toString();
+        }
+        const curStakeInfos = (lastStakeInfos || []).map((item) => {
           const newPeriod = Number(item.period) + Number(inputPeriod) * ONE_DAY_IN_SECONDS;
           const newAprK = getAprK(dayjs.duration(newPeriod, 'second').asDays(), fixedBoostFactor);
+          const boostedAmount = ZERO.plus(newAprK)
+            .times(item?.stakedAmount || 0)
+            .toString();
           return {
             ...item,
             period: newPeriod,
-            boostedAmount: ZERO.plus(newAprK)
-              .times(item?.stakedAmount || 0)
-              .toString(),
+            boostedAmount,
           };
         });
-        const aprKAve = getAprKAve(curStakeInfos, fixedBoostFactor, Number(aprK));
         const newBoostedAmount = curStakeInfos.reduce(
           (acc, obj) => ZERO.plus(acc).plus(obj?.boostedAmount || 0),
           ZERO,
@@ -848,9 +843,36 @@ function Stake({
         currentTotal = ZERO.plus(totalStaked || 0)
           .minus(boostedAmountTotal)
           .plus(newBoostedAmount)
-          .plus(curBoostedAmount)
           .toString();
-        apr = getOwnerAprK(yearlyRewards, currentTotal, aprKAve);
+        let aprValues = curStakeInfos.map((item) => {
+          const newAprK = getAprK(dayjs.duration(item.period, 'second').asDays(), fixedBoostFactor);
+          return getOwnerAprKValue(yearlyRewards, currentTotal, newAprK);
+        });
+        console.log('================ isInMergeInterval', isInMergeInterval);
+        if (!isInMergeInterval) {
+          const aprK = getAprK(Number(remainingTime || 0) + Number(inputPeriod), fixedBoostFactor);
+          const curBoostedAmount = ZERO.plus(stakeAmount || 0)
+            .times(aprK)
+            .toString();
+          console.log('================ curBoostedAmount', curBoostedAmount);
+          currentTotal = ZERO.plus(currentTotal || 0)
+            .plus(curBoostedAmount)
+            .toString();
+          aprValues = curStakeInfos.map((item) => {
+            const newAprK = getAprK(
+              dayjs.duration(item.period, 'second').asDays(),
+              fixedBoostFactor,
+            );
+            return getOwnerAprKValue(yearlyRewards, currentTotal, newAprK);
+          });
+          aprValues.push(getOwnerAprKValue(yearlyRewards, currentTotal, aprK));
+        }
+        console.log('================ aprValues', aprValues);
+        apr = aprValues
+          .reduce((acc, cur) => acc.plus(cur), ZERO)
+          .div(aprValues.length)
+          .times(100)
+          .toFixed(2);
       }
     } else {
       //typeIsExtend
@@ -898,6 +920,7 @@ function Stake({
     getAprK,
     getAprKAve,
     isFreezeAmount,
+    mergeInterval,
     period,
     remainingTime,
     stakeInfos,
@@ -955,6 +978,17 @@ function Stake({
         currentTotal = totalStaked;
       }
     } else {
+      let isInMergeInterval = false;
+      if (mergeInterval && stakeInfos.length > 0 && stakeInfos[stakeInfos.length - 1].stakedTime) {
+        const lastStakeTime = stakeInfos[stakeInfos.length - 1].stakedTime;
+        const now = Date.now();
+
+        isInMergeInterval =
+          !!mergeInterval &&
+          ZERO.plus(lastStakeTime || 0)
+            .plus(mergeInterval * 1000 || 0)
+            .gte(now);
+      }
       if (stakeAmount && !period) {
         const aprK = getAprK(Number(remainingTime || 0), fixedBoostFactor);
         const boostedAmount = ZERO.plus(stakeAmount).times(aprK).toString();
@@ -987,11 +1021,14 @@ function Stake({
         currentStakeAmount = boostedAmountTotal;
         currentTotal = totalStaked;
       } else {
-        const aprK = getAprK(Number(remainingTime || 0) + Number(inputPeriod), fixedBoostFactor);
-        const boostedAmount = ZERO.plus(stakeAmount || 0)
-          .times(aprK)
-          .toString();
-        const curStakeInfos = (stakeInfos || []).map((item) => {
+        const lastStakeInfos = cloneDeep(stakeInfos);
+        if (isInMergeInterval) {
+          const lastState = lastStakeInfos[lastStakeInfos.length - 1];
+          lastState.stakedAmount = ZERO.plus(lastState.stakedAmount || 0)
+            .plus(stakeAmount || 0)
+            .toString();
+        }
+        const curStakeInfos = (lastStakeInfos || []).map((item) => {
           const newPeriod = Number(item.period) + Number(inputPeriod) * ONE_DAY_IN_SECONDS;
           const newAprK = getAprK(dayjs.duration(newPeriod, 'second').asDays(), fixedBoostFactor);
           return {
@@ -1006,7 +1043,14 @@ function Stake({
           (acc, obj) => ZERO.plus(acc).plus(obj?.boostedAmount || 0),
           ZERO,
         );
-        currentStakeAmount = ZERO.plus(newBoostedAmount).plus(boostedAmount).toString();
+        currentStakeAmount = ZERO.plus(newBoostedAmount).toString();
+        if (!isInMergeInterval) {
+          const aprK = getAprK(Number(remainingTime || 0) + Number(inputPeriod), fixedBoostFactor);
+          const boostedAmount = ZERO.plus(stakeAmount || 0)
+            .times(aprK)
+            .toString();
+          currentStakeAmount = ZERO.plus(currentStakeAmount).plus(boostedAmount).toString();
+        }
         currentTotal = ZERO.plus(totalStaked || 0)
           .minus(boostedAmountTotal)
           .plus(currentStakeAmount)
