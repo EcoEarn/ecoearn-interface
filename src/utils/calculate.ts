@@ -86,6 +86,15 @@ export function getOwnerAprK(
   return ZERO.plus(yearlyRewards).div(totalStaked).times(aprK).times(100).toFixed(2);
 }
 
+export function getOwnerAprKValue(
+  yearlyRewards: number,
+  totalStaked: string | number | BigNumber,
+  aprK: string | number,
+) {
+  if (!yearlyRewards || !totalStaked || !aprK) return '';
+  return ZERO.plus(yearlyRewards).div(totalStaked).times(aprK).toString();
+}
+
 export function getTargetUnlockTimeStamp(
   stakingPeriod: string | number,
   lastOperationTime: string | number,
