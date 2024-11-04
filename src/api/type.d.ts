@@ -53,6 +53,7 @@ interface IStakePoolData {
   stakedInUsd?: string;
   decimal?: number;
   rate?: number | string;
+  mergeInterval?: number;
   fixedBoostFactor?: number | string;
   unlockWindowDuration?: number | string;
   boostedAmount?: number | string;
@@ -126,6 +127,7 @@ interface IPointsPoolItem {
   rewardsTokenName: string;
   stakeTokenName: string;
   releasePeriod: number;
+  highRewards: boolean;
 }
 
 interface IStakingClaimParams {
