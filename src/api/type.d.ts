@@ -132,6 +132,7 @@ interface IStakingClaimParams {
   amount: number;
   poolId: string;
   address: string;
+  domain: string;
 }
 
 interface ICreateTradeParams {
