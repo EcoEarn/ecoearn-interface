@@ -9,6 +9,7 @@ import { Join } from 'contract/rewards';
 import { useWalletService } from './useWallet';
 import { store } from 'redux/store';
 import useNotification from './useNotification';
+import { getDomain } from 'utils/common';
 
 export default function useJoin() {
   const joinModal = useModal(JoinModal);
@@ -45,7 +46,8 @@ export default function useJoin() {
     if (isJoin) return false;
     try {
       setLoading(true);
-      await Join();
+      const domain = getDomain();
+      await Join({ domain });
       return true;
     } catch (error) {
       console.log('=====error', error);
