@@ -45,6 +45,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         />
       </Head>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-JER8ZTSQ19" />
+      <Script src="https://telegram.org/js/telegram-web-app.js" />
       <Script id="google-analytics">
         {`
           window.dataLayer = window.dataLayer || [];
