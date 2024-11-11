@@ -25,6 +25,7 @@ import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import { ZERO } from 'constants/index';
 import { message } from 'antd';
 import useNotification from 'hooks/useNotification';
+import { getDomain } from 'utils/common';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -371,6 +372,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
             }
             if (checked) {
               try {
+                const domain = getDomain();
                 operationAmount.current =
                   type !== StakeType.EXTEND
                     ? timesDecimals(amount, decimal).toFixed(0)
@@ -379,6 +381,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
                   poolId: stakeData?.poolId || '',
                   amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
                   period: periodInSeconds,
+                  domain,
                 });
                 return stakeRes;
               } catch (error) {
@@ -420,8 +423,8 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
     [
       poolType,
       stakeModal,
-      getSymbolBalance,
       notification,
+      getSymbolBalance,
       checkApproveParams,
       tokensContractAddress,
       wallet?.address,

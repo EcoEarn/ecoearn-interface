@@ -16,6 +16,7 @@ import { ICMSInfo } from 'redux/types/reducerTypes';
 import { PoolType } from 'types/stake';
 import { getTxResult } from 'utils/aelfUtils';
 import { timesDecimals } from 'utils/calculate';
+import { getDomain } from 'utils/common';
 import { matchErrorMsg } from 'utils/formatError';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import { useResponsive } from 'utils/useResponsive';
@@ -107,11 +108,13 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
     async (item: IPointsPoolItem) => {
       if (!wallet?.address) return;
       const amount = timesDecimals(item.earned, item?.decimal || 8).toNumber();
+      const domain = getDomain();
       const { signature, seed, expirationTime } =
         (await stakingClaim({
           amount,
           poolId: String(item.poolId),
           address: wallet?.address || '',
+          domain,
         })) || {};
       if (!signature || !seed || !expirationTime) throw Error();
       try {
@@ -131,6 +134,7 @@ export default function usePointsPoolService({ dappName }: { dappName: string })
               seed,
               signature,
               expirationTime,
+              domain,
             },
             rpcUrl,
             chainId: curChain!,

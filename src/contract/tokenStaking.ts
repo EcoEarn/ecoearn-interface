@@ -101,6 +101,7 @@ export const tokenStake = async (
     poolId: string;
     amount?: number | string;
     period?: number | string;
+    domain: string;
   },
   options?: IContractOptions,
 ): Promise<ISendResult> => await tokenStakingContractRequest('Stake', params, options);
