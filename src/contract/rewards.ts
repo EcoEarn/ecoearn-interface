@@ -121,9 +121,14 @@ export const StakeLiquidity = async (
   options?: IContractOptions,
 ): Promise<ISendResult> => await rewardsContractRequest('StakeLiquidity', params, options);
 
-export const Join = async (options?: IContractOptions): Promise<IContractError> => {
+export const Join = async (
+  params: {
+    domain: string;
+  },
+  options?: IContractOptions,
+): Promise<IContractError> => {
   try {
-    const res = (await rewardsContractRequest('Join', '', options)) as IContractError;
+    const res = (await rewardsContractRequest('Join', params, options)) as IContractError;
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);

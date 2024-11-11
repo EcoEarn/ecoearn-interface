@@ -32,6 +32,7 @@ import { store } from 'redux/store';
 import { setConfirmInfo } from 'redux/reducer/info';
 import { TradeConfirmTypeEnum } from 'components/TradeConfrim';
 import useNotification from 'hooks/useNotification';
+import { getDomain } from 'utils/common';
 
 interface IFetchDataProps {
   withLoading?: boolean;
@@ -408,11 +409,13 @@ export default function usePoolDetailService() {
             }),
           );
           try {
+            const domain = getDomain();
             operationAmount.current = timesDecimals(amount, poolInfo?.decimal).toFixed(0);
             const stakeRes = await tokenStake({
               poolId: poolInfo?.poolId || '',
               amount: timesDecimals(amount, poolInfo?.decimal).toFixed(0),
               period: periodInSeconds,
+              domain,
             });
             return stakeRes;
           } catch (error) {
@@ -580,6 +583,7 @@ export default function usePoolDetailService() {
                 }),
               );
               try {
+                const domain = getDomain();
                 operationAmount.current =
                   type !== StakeType.EXTEND
                     ? timesDecimals(amount, decimal).toFixed(0)
@@ -588,6 +592,7 @@ export default function usePoolDetailService() {
                   poolId: stakeData?.poolId || '',
                   amount: type !== StakeType.EXTEND ? timesDecimals(amount, decimal).toFixed(0) : 0,
                   period: periodInSeconds,
+                  domain,
                 });
                 return stakeRes;
               } catch (error) {
@@ -634,8 +639,8 @@ export default function usePoolDetailService() {
       stakeModal,
       poolType,
       getBalanceDec,
-      getSymbolBalance,
       notification,
+      getSymbolBalance,
       checkApproveParams,
       tokensContractAddress,
       wallet?.address,
