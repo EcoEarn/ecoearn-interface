@@ -1,22 +1,12 @@
 import { useMemo } from 'react';
-import { Button, ToolTip } from 'aelf-design';
+import { Button } from 'aelf-design';
 import Description from 'components/StakeCardDescription';
 import StakeToken, { PoolType } from 'components/StakeToken';
-import { ZERO, DEFAULT_DATE_FORMAT } from 'constants/index';
-import {
-  formatNumber,
-  formatNumberWithDecimalPlaces,
-  formatTokenSymbol,
-  formatUSDPrice,
-} from 'utils/format';
-import styles from './style.module.css';
-import dayjs from 'dayjs';
+import { ZERO } from 'constants/index';
+import { formatNumberWithDecimalPlaces, formatTokenSymbol, formatUSDPrice } from 'utils/format';
 import BigNumber from 'bignumber.js';
 import { divDecimals } from 'utils/calculate';
-import { MAX_STAKE_PERIOD } from 'constants/stake';
-import Renewal from 'components/Renewal';
 import useUnlockCount from './hooks/useUnlockCount';
-import TextEllipsis from 'components/TextEllipsis';
 import { useRouter } from 'next/navigation';
 
 import { ReactComponent as Lock } from 'assets/img/lock.svg';
@@ -25,7 +15,6 @@ import { ReactComponent as UnLock } from 'assets/img/unLock.svg';
 interface IStakeCardProps {
   type: PoolType;
   data: IStakePoolData;
-  renewText: Array<IRenewText>;
   isLogin: boolean;
   onClaim?: (data: IStakePoolData) => void;
   onAdd?: (data: IStakePoolData) => void;

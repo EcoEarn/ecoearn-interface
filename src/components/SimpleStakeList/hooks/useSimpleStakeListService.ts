@@ -9,7 +9,7 @@ import { PoolType, StakeType, TransactionType } from 'types/stake';
 import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
 import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
-import { fetchStakingPoolsData, saveTransaction } from 'api/request';
+import { fetchStakingPoolsInfoData, saveTransaction } from 'api/request';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import dayjs from 'dayjs';
 import { GetBalance } from 'contract/multiToken';
@@ -35,7 +35,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const { isLogin } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
   const [stakeData, setStakeData] = useState<Array<IStakePoolData>>([]);
-  const [renewText, setRenewText] = useState<Array<IRenewText>>();
+  const [renewText, setRenewText] = useState<Array<IRenewText>>([]);
   const stakeModal = useModal(StakeModalWithConfirm);
   const claimModal = useModal(ClaimModal);
   const unlockModal = useModal(UnlockModal);
@@ -67,8 +67,8 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       const { withLoading = true } = props || {};
       withLoading && setLoading(true);
       try {
-        const { pools, textNodes } =
-          (await fetchStakingPoolsData({
+        const pools =
+          (await fetchStakingPoolsInfoData({
             poolType,
             sorting: '',
             name: '',
@@ -88,7 +88,6 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           };
         });
         setStakeData(stakeData);
-        setRenewText(textNodes || []);
       } catch (error) {
         console.error('getStakeData error', error);
       } finally {
