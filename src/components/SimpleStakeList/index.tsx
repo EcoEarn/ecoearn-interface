@@ -51,7 +51,6 @@ export default function SimpleStakeList({ title, description, poolType }: IStake
                   onUnlock={onUnlock}
                   onExtend={onExtend}
                   onRenewal={onRenewal}
-                  renewText={renewText || []}
                 />
               );
             })}

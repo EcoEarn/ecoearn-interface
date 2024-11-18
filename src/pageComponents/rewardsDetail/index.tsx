@@ -11,7 +11,7 @@ import { earlyStake as earlyStakeApi } from 'api/request';
 import {
   cancelSign,
   earlyStakeSign,
-  fetchStakingPoolsData,
+  fetchStakingPoolsInfoData,
   getEarlyStakeInfo,
   getPoolRewards,
   withdraw,
@@ -149,7 +149,7 @@ export default function RewardsDetailPage() {
       }
       try {
         needLoading && showLoading();
-        const { pools } = await fetchStakingPoolsData({
+        const pools = await fetchStakingPoolsInfoData({
           poolType: poolType == PoolType.LP ? 'Lp' : 'Token',
           maxResultCount: 20,
           skipCount: 0,

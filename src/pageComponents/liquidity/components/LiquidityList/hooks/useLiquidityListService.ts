@@ -1,6 +1,6 @@
 import { useInterval, useRequest } from 'ahooks';
 import {
-  fetchStakingPoolsData,
+  fetchStakingPoolsInfoData,
   getEarlyStakeInfo,
   getPoolRewards,
   liquidityMarket,
@@ -50,7 +50,7 @@ export default function useLiquidityListService({ initData }: { initData?: ILiqu
       return;
     }
     try {
-      const { pools } = await fetchStakingPoolsData({
+      const pools = await fetchStakingPoolsInfoData({
         poolType: PoolType.TOKEN,
         maxResultCount: 20,
         skipCount: 0,
