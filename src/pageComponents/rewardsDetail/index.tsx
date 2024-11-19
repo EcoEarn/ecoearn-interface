@@ -1,9 +1,9 @@
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import { Flex, message } from 'antd';
+import { Flex } from 'antd';
 import FaqList from 'components/FaqList';
 import StakeTokenTitle from 'components/StakeTokenTitle';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import RewardsTotalItem from './components/RewardsTotalItem';
 import { Button, ToolTip } from 'aelf-design';
 import RewardsSingleItem from './components/RewardsSingleItem';
@@ -11,7 +11,7 @@ import { earlyStake as earlyStakeApi } from 'api/request';
 import {
   cancelSign,
   earlyStakeSign,
-  fetchStakingPoolsInfoData,
+  fetchStakingPoolsData,
   getEarlyStakeInfo,
   getPoolRewards,
   withdraw,
@@ -27,7 +27,7 @@ import BigNumber from 'bignumber.js';
 import { DEFAULT_DATE_FORMAT, ZERO } from 'constants/index';
 import dayjs from 'dayjs';
 import ConfirmModal, { ConfirmModalTypeEnum, IWithDrawContent } from 'components/ConfirmModal';
-import { useInterval, useTimeout } from 'ahooks';
+import { useInterval } from 'ahooks';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import { matchErrorMsg } from 'utils/formatError';
@@ -149,7 +149,7 @@ export default function RewardsDetailPage() {
       }
       try {
         needLoading && showLoading();
-        const pools = await fetchStakingPoolsInfoData({
+        const { pools } = await fetchStakingPoolsData({
           poolType: poolType == PoolType.LP ? 'Lp' : 'Token',
           maxResultCount: 20,
           skipCount: 0,

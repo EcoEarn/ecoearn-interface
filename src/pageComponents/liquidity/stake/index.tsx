@@ -1,7 +1,7 @@
 import { useInterval, useRequest } from 'ahooks';
 import {
   cancelSign,
-  fetchStakingPoolsInfoData,
+  fetchStakingPoolsData,
   getEarlyStakeInfo,
   getPoolRewards,
   liquidityStake,
@@ -267,7 +267,7 @@ export default function StakeLiquidityPage() {
       }
       try {
         withLoading && showLoading();
-        const pools = await fetchStakingPoolsInfoData({
+        const { pools } = await fetchStakingPoolsData({
           poolType: PoolType.LP,
           maxResultCount: 20,
           skipCount: 0,

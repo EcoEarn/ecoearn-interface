@@ -1,5 +1,5 @@
 import { useInterval, useRequest } from 'ahooks';
-import { fetchStakingPoolsInfoData, getPoolRewards, liquidityMarket } from 'api/request';
+import { fetchStakingPoolsData, getPoolRewards, liquidityMarket } from 'api/request';
 import useLoading from 'hooks/useLoading';
 import { useWalletService } from 'hooks/useWallet';
 import { useParams, useRouter } from 'next/navigation';
@@ -299,7 +299,7 @@ export default function AddLiquidityPage() {
       }
       try {
         withLoading && showLoading();
-        const pools = await fetchStakingPoolsInfoData({
+        const { pools } = await fetchStakingPoolsData({
           poolType: PoolType.LP,
           maxResultCount: 20,
           skipCount: 0,
