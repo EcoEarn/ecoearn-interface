@@ -1,15 +1,14 @@
 import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
 import { useModal } from '@ebay/nice-modal-react';
 import ClaimModal from 'components/ClaimModal';
-import { singleMessage } from '@portkey/did-ui-react';
 import { PoolType, StakeType, TransactionType } from 'types/stake';
 import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
 import UnlockModal from 'components/UnlockModal';
 import { IContractError } from 'types';
-import { fetchStakingPoolsInfoData, saveTransaction } from 'api/request';
+import { fetchStakingPoolsData, saveTransaction } from 'api/request';
 import useGetCmsInfo from 'redux/hooks/useGetCmsInfo';
 import dayjs from 'dayjs';
 import { GetBalance } from 'contract/multiToken';
@@ -23,7 +22,6 @@ import { useRouter } from 'next/navigation';
 import { formatTokenSymbol } from 'utils/format';
 import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import { ZERO } from 'constants/index';
-import { message } from 'antd';
 import useNotification from 'hooks/useNotification';
 import { getDomain } from 'utils/common';
 
@@ -67,8 +65,8 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       const { withLoading = true } = props || {};
       withLoading && setLoading(true);
       try {
-        const pools =
-          (await fetchStakingPoolsInfoData({
+        const { pools } =
+          (await fetchStakingPoolsData({
             poolType,
             sorting: '',
             name: '',

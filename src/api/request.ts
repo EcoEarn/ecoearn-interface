@@ -20,12 +20,6 @@ export const fetchStakingPoolsData = async (
   return request.post('/app/simple/staking/pools', data);
 };
 
-export const fetchStakingPoolsInfoData = async (
-  data: IFetchStakeParams,
-): Promise<Array<IStakePoolData>> => {
-  return request.post('/app/simple/staking/pool/infos', data);
-};
-
 export const getStakingItems = async (): Promise<Array<IStakingItem>> => {
   return request.get('/app/points/staking/items');
 };

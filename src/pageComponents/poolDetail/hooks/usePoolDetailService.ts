@@ -1,7 +1,7 @@
 import { useModal } from '@ebay/nice-modal-react';
 import { useInterval } from 'ahooks';
 import {
-  fetchStakingPoolsInfoData,
+  fetchStakingPoolsData,
   getEarlyStakeInfo,
   getPoolRewards,
   saveTransaction,
@@ -159,7 +159,7 @@ export default function usePoolDetailService() {
       }
       try {
         withLoading && showLoading();
-        const pools = await fetchStakingPoolsInfoData({
+        const { pools } = await fetchStakingPoolsData({
           poolType: poolType == PoolType.TOKEN ? 'Token' : 'Lp',
           maxResultCount: 20,
           skipCount: 0,
