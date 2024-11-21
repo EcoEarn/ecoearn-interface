@@ -2,8 +2,9 @@
 import { Modal } from 'antd';
 import styles from './style.module.css';
 import { useMount } from 'ahooks';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Loading from 'components/Loading';
+import useTelegram from 'hooks/useTelegram';
 
 export interface ILoadingProps {
   content?: string;
@@ -11,12 +12,17 @@ export interface ILoadingProps {
 
 export default function PageLoading({ content }: ILoadingProps) {
   const [isMount, setIsMount] = useState(false);
+  const { isInTelegram } = useTelegram();
+
+  const isInTG = useMemo(() => {
+    return isInTelegram();
+  }, [isInTelegram]);
 
   useMount(() => {
     setIsMount(true);
   });
 
-  if (!isMount) return null;
+  if (!isMount || isInTG) return null;
 
   return (
     <Modal

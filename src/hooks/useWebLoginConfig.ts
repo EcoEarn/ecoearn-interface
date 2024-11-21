@@ -64,6 +64,7 @@ export default function useWebLoginConfig() {
       titleForSocialDesign: 'Crypto wallet',
       // iconSrcForSocialDesign: 'url or base64',
       enableAcceleration: false,
+      sideChainId: curChain as TChainId,
     };
   }, [curChain, networkTypeV2]);
 

@@ -11,6 +11,9 @@ const initialState: TLoginStatusType = {
     isLoadingToken: false,
     isLoadingConnectWallet: false,
   },
+  showIndexLoading: false,
+  percentFinish: false,
+  connectWalletError: '',
 };
 
 // Actual Slice
@@ -27,6 +30,15 @@ export const loginStatusSlice = createSlice({
     resetLoginStatus(state) {
       state.loginStatus = initialState.loginStatus;
     },
+    setShowIndexLoading(state, action) {
+      state.showIndexLoading = action.payload;
+    },
+    setPercentFinish(state, action) {
+      state.percentFinish = action.payload;
+    },
+    setConnectWalletError(state, action) {
+      state.connectWalletError = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -40,7 +52,16 @@ export const loginStatusSlice = createSlice({
   },
 });
 
-export const { setLoginStatus, resetLoginStatus } = loginStatusSlice.actions;
+export const {
+  setLoginStatus,
+  resetLoginStatus,
+  setPercentFinish,
+  setShowIndexLoading,
+  setConnectWalletError,
+} = loginStatusSlice.actions;
 export const getLoginStatus = (state: AppState) => state.loginStatus.loginStatus;
+
+export const getConnectWalletErrorInfo = (state: AppState) => state.loginStatus.connectWalletError;
+export const getShowIndexLoadings = (state: AppState) => state.loginStatus.showIndexLoading;
 
 export default loginStatusSlice.reducer;
