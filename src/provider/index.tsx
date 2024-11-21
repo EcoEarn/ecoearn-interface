@@ -17,6 +17,7 @@ import ETransferLayout from './ETransferLayout';
 import { AElfReactProvider } from '@aelf-react/core';
 import React from 'react';
 import { NotificationInstance } from 'antd/es/notification/interface';
+import IndexLoading, { showIndexLoading } from 'components/IndexLoading';
 
 const Updater = dynamic(() => import('components/Updater'), { ssr: false });
 
@@ -39,6 +40,7 @@ function Provider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    showIndexLoading();
     fetchGlobalConfig();
   }, [fetchGlobalConfig]);
 
@@ -53,6 +55,7 @@ function Provider({ children }: { children: React.ReactNode }) {
             autoInsertSpaceInButton={false}
             prefixCls={APP_PREFIX}
           >
+            <IndexLoading />
             {loading ? (
               <Loading content="Enrollment in progress" />
             ) : (

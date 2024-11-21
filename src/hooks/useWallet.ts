@@ -5,7 +5,7 @@ import { dispatch, store } from 'redux/store';
 import { setWalletInfo } from 'redux/reducer/userInfo';
 import { useLocalStorage } from 'react-use';
 import { cloneDeep } from 'lodash-es';
-import { IContractError, WalletInfoType } from 'types';
+import { WalletInfoType } from 'types';
 import { storages } from 'storages';
 import useBackToHomeByRoute from './useBackToHomeByRoute';
 import { useSelector } from 'react-redux';
@@ -13,14 +13,15 @@ import { ChainId } from '@portkey/types';
 import useDiscoverProvider from './useDiscoverProvider';
 import { MethodsWallet } from '@portkey/provider-types';
 import { mainChain } from 'constants/index';
-import { resetLoginStatus, setLoginStatus } from 'redux/reducer/loginStatus';
+import { resetLoginStatus, setConnectWalletError, setLoginStatus } from 'redux/reducer/loginStatus';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did-ui-react';
 import { matchErrorMsg } from 'utils/formatError';
 import useNotification from './useNotification';
-import { ETransferConfig, unsubscribeUserOrderRecord } from '@etransfer/ui-react';
+import { unsubscribeUserOrderRecord } from '@etransfer/ui-react';
+import { hideIndexLoading } from 'components/IndexLoading';
 
 export const ETRANSFER_TOKEN_KEY = 'etransfer_access_token';
 
@@ -46,6 +47,7 @@ export const useWalletInit = () => {
     localStorage.removeItem(storages.accountInfo);
     localStorage.removeItem(storages.walletInfo);
     localStorage.removeItem(ETRANSFER_TOKEN_KEY);
+    localStorage.removeItem(storages.currentLoginWalletType);
     dispatch(
       setWalletInfo({
         address: '',
@@ -81,18 +83,35 @@ export const useWalletInit = () => {
       if (walletType === WalletTypeEnum.aa) {
         walletInfoToLocal.portkeyInfo = walletInfo?.extraInfo?.portkeyInfo || {};
       }
-      getToken({
-        needLoading: true,
-      });
+      if (walletType !== WalletTypeEnum.aa) {
+        getToken({
+          needLoading: true,
+        });
+      }
       dispatch(setWalletInfo(cloneDeep(walletInfo)));
       setLocalWalletInfo(cloneDeep(walletInfo as any));
     }
-  }, [getToken, setLocalWalletInfo, walletInfo, walletType]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setLocalWalletInfo, walletInfo, walletType]);
+
+  useEffect(() => {
+    const publicKey = walletInfo?.extraInfo?.publicKey || '';
+    console.log('=====publicKey', publicKey);
+
+    const token = localStorage.getItem(storages.accountInfo);
+
+    if (publicKey && !token && walletType === WalletTypeEnum.aa) {
+      getToken({
+        needLoading: false,
+      });
+    }
+  }, [getToken, walletInfo?.extraInfo?.publicKey, walletType]);
 
   useEffect(() => {
     if (loginError) {
       const resError = loginError as any;
       console.log('loginError', resError);
+      store.dispatch(setConnectWalletError(loginError));
       const { matchedErrorMsg, title } = matchErrorMsg(
         resError?.nativeError?.message || resError?.message || '',
       );
@@ -103,6 +122,13 @@ export const useWalletInit = () => {
         });
     }
   }, [loginError, notification]);
+
+  useEffect(() => {
+    if (isConnected && walletInfo?.address) {
+      hideIndexLoading();
+      localStorage.setItem(storages.currentLoginWalletType, walletType);
+    }
+  }, [isConnected, walletInfo?.address, walletType]);
 };
 
 export const useWalletService = () => {

@@ -102,4 +102,7 @@ export type TLoginStatusType = {
     isLoadingToken: boolean;
     isLoadingConnectWallet: boolean;
   };
+  showIndexLoading?: boolean;
+  percentFinish?: boolean;
+  connectWalletError?: string;
 };

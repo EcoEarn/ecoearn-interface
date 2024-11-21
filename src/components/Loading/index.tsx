@@ -1,9 +1,4 @@
-import Lottie from 'lottie-react';
-import LoadingAnimation from 'assets/img/loading-animation.json';
-import { useMemo } from 'react';
 import React from 'react';
-import { LoadingOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
 
 import { ReactComponent as LoadingIcon } from 'assets/img/loading.svg';
 import clsx from 'clsx';
