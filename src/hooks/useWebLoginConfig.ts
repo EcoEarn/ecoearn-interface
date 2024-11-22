@@ -63,7 +63,8 @@ export default function useWebLoginConfig() {
       design: SignInDesignEnum.CryptoDesign,
       titleForSocialDesign: 'Crypto wallet',
       // iconSrcForSocialDesign: 'url or base64',
-      enableAcceleration: false,
+      enableAcceleration: true,
+      sideChainId: curChain as TChainId,
     };
   }, [curChain, networkTypeV2]);
 
@@ -74,7 +75,7 @@ export default function useWebLoginConfig() {
         chainId: curChain as TChainId,
         autoShowUnlock: true,
         noNeedForConfirm: true,
-        enableAcceleration: false,
+        enableAcceleration: true,
       }),
       new PortkeyDiscoverWallet({
         networkType: networkTypeV2 as NetworkEnum,
