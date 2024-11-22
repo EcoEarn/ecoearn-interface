@@ -91,13 +91,13 @@ function IndexLoading() {
             </div>
           </div>
         ) : (
-          <div className="absolute w-full h-max top-[100px] flex flex-col justify-center px-[30px]">
+          <div className="absolute w-full h-max top-1/2 flex flex-col justify-center px-[30px] translate-y-[-50%]">
             <img
               src={require('assets/img/telegram/loading-imgs.png').default.src}
               className="w-full object-cover"
               alt=""
             />
-            <div className="w-full mt-[54px]">
+            <div className="w-full mt-[24px]">
               <CommonProgress percent={percent} />
             </div>
           </div>
