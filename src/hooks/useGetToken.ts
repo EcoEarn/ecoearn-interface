@@ -159,6 +159,7 @@ export const useGetToken = () => {
           source = 'portkey';
         }
       }
+      if (!publicKey) return;
       store.dispatch(setLoginStatus({ isLoadingToken: true }));
       const res = await getTokenFromServer({
         params: {
