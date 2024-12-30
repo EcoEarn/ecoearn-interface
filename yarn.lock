@@ -1746,58 +1746,58 @@
     "@ethersproject/bytes" "^5.7.0"
     "@ethersproject/logger" "^5.7.0"
 
-"@etransfer/core@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/core/-/core-1.8.0.tgz#86e62c8ebf6b4faa651abadaaef170a8309b1c2c"
-  integrity sha512-hEod6qaxu56ITG3aTl2+1aEZLEEK9gFBpgfjvxp/X0ufSeBfjHSqjvvxV16yaRUUedD7qdCnnRzcBPagmtiZfw==
+"@etransfer/core@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/core/-/core-1.12.0.tgz#f59689fbf677242a1fa90b5163ce15cc1b846beb"
+  integrity sha512-qw/tpPTpAxZ6YbiEEfsuADWOrlWWcXncxq7ty8Oat/okaUz2hfbL+ldrpAFyCG7j3EqLGkHDTaAZqIOhHvVwWg==
   dependencies:
-    "@etransfer/services" "^1.8.0"
-    "@etransfer/socket" "^1.8.0"
-    "@etransfer/types" "^1.8.0"
-    "@etransfer/utils" "^1.8.0"
+    "@etransfer/services" "^1.12.0"
+    "@etransfer/socket" "^1.12.0"
+    "@etransfer/types" "^1.12.0"
+    "@etransfer/utils" "^1.12.0"
 
-"@etransfer/request@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/request/-/request-1.8.0.tgz#d8f29f4a14df4e9889e35385fbfb6a4b59a693da"
-  integrity sha512-rSoaOOfHqdYrJ+rGhvmG9vbz2McYfgAa4TzfNoKmcH+Gj1WUOdXCXWw7uxwLU4VLA/kJksKWcHRP1ZBnvHlBYA==
+"@etransfer/request@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/request/-/request-1.12.0.tgz#2b278d383dc9fae38d6725867cc6884dbc37d92d"
+  integrity sha512-5oyI5DJzS4Mifp+tMZG1ktrVHXFaJT/823sfNm9ITCIQvr3sawDkLw5vYRpB6I4nIZ+lGrndISguOw/nLmmbmw==
   dependencies:
-    "@etransfer/types" "^1.8.0"
-    "@etransfer/utils" "^1.8.0"
+    "@etransfer/types" "^1.12.0"
+    "@etransfer/utils" "^1.12.0"
     axios "^0.24.0"
 
-"@etransfer/services@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/services/-/services-1.8.0.tgz#8e9363b6e71e881aa9a2325b4e574856a60d9fbc"
-  integrity sha512-SkIhKjaybfLOJjLEVLc/KOH+VIg6ByZSut48CloSpiG49yaV35Cc2umgxTKSnicqpb19tzVRi4NK/VJCsYGO5g==
+"@etransfer/services@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/services/-/services-1.12.0.tgz#c0bd3a41bae34be02df01867483d9169ade65481"
+  integrity sha512-l0ofnHoN4narXWDNXEwyV2QWLrinVhRRDxl9Qvn8bv1baWjrLcBoRGe2Xw3xVC0wszNqrEeLRzfBxXCDvc5UGQ==
   dependencies:
-    "@etransfer/request" "^1.8.0"
-    "@etransfer/types" "^1.8.0"
-    "@etransfer/utils" "^1.8.0"
-    "@portkey/types" "2.6.6"
+    "@etransfer/request" "^1.12.0"
+    "@etransfer/types" "^1.12.0"
+    "@etransfer/utils" "^1.12.0"
+    "@portkey/types" "2.15.10"
 
-"@etransfer/socket@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/socket/-/socket-1.8.0.tgz#e7d108969b457e080ec9a29f78ffbde3d68ac188"
-  integrity sha512-ELCRCzaXOz4kNBVSHmxxGjQLXsJOu4IkTdv8EXWtkz6EfU6PTte+IeCy/hfaE0eR4BRjXKLoD1hXn/UKlQ3tqQ==
+"@etransfer/socket@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/socket/-/socket-1.12.0.tgz#7922884cefb4b77c6693086056d78b7880db2c95"
+  integrity sha512-GfZO6COJccBXdgLRW4j+6NgyAQfw57yZrMNIfsmmNN8DXsPB2s7Vo0+zeEemRQC9r2QW0pnS4bQ0zL22OGUKrw==
   dependencies:
     "@abp/signalr" "^7.0.0"
-    "@etransfer/utils" "^1.8.0"
+    "@etransfer/utils" "^1.12.0"
 
-"@etransfer/types@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/types/-/types-1.8.0.tgz#4404fccf9e406cb520d0b379578b34e3d8bb3059"
-  integrity sha512-8ZBegEm1IO832LgzjsTJAtJq4FmACt44rDOel7n9nvCZ6mOSyi78JpR+6QAQM6XnQ0nYxfji4dwniIWtezORUw==
+"@etransfer/types@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/types/-/types-1.12.0.tgz#0f3ed2fb862e3dd9e348b5ed5d6844a5643f2b5f"
+  integrity sha512-N/BnGc7Jjcqj3sbfnKeorMEUtXcJswokCpLqfeqTetQZUs2hU8B1746mtNlN1npaPoVJixzh8tN26iIl96WgGA==
 
-"@etransfer/ui-react@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/ui-react/-/ui-react-1.8.0.tgz#a85e1499ee4bef510d0f7ef04da5a04ca1dafa5b"
-  integrity sha512-GH4Uu1DD3NkThiBc10QIhPkAvtrIKKVJ17TZ+6ZQJfXjGw/CB48SsiGOAFST2sECxLsJdBmBVZPlgwq3tHopDw==
+"@etransfer/ui-react@1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/ui-react/-/ui-react-1.12.0.tgz#42c05d0a2acc73101fafb9432102c00c7987283f"
+  integrity sha512-RmBPvvWbaFEPckfZMYgVSH/Hr7NNByGUFyIBnAtp7TFBA+m8HKjKglSuqX/HlDE/ddZmEGJ4gG6+Scil57I3jA==
   dependencies:
-    "@etransfer/core" "^1.8.0"
-    "@etransfer/types" "^1.8.0"
-    "@etransfer/utils" "^1.8.0"
-    "@portkey/types" "2.6.6"
-    "@portkey/utils" "2.6.6"
+    "@etransfer/core" "^1.12.0"
+    "@etransfer/types" "^1.12.0"
+    "@etransfer/utils" "^1.12.0"
+    "@portkey/types" "2.15.10"
+    "@portkey/utils" "2.15.10"
     antd "4.24.14"
     bignumber.js "^9.1.0"
     clsx "^1.2.1"
@@ -1809,13 +1809,13 @@
     react-use "^17.4.0"
     uuid "^8.3.2"
 
-"@etransfer/utils@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@etransfer/utils/-/utils-1.8.0.tgz#d9f55c11d2412b3678af0c1766e4251cbbf499f2"
-  integrity sha512-fTar9M9vFI6YILFoiSr5wMjsbFlUait7HoBYL5CPLSF50+x2/Zq4ozpi0VTC67r9Up0nZ8zob8/pu2uF9IqKgg==
+"@etransfer/utils@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@etransfer/utils/-/utils-1.12.0.tgz#0de21f021d9b2ccce76448354f45751b2bff8fc8"
+  integrity sha512-wC7f/CMYhZXu3gUF3/Xc0kZJtJ/DeO8ZDNsP/dPpdnRf6ypwDAMGsbC12jpotRI98ysaBrr4BypLY2G01j/mcA==
   dependencies:
-    "@etransfer/services" "^1.8.0"
-    "@etransfer/types" "^1.8.0"
+    "@etransfer/services" "^1.12.0"
+    "@etransfer/types" "^1.12.0"
     bn.js "^5.2.1"
 
 "@floating-ui/core@^1.6.0":
@@ -2372,47 +2372,37 @@
     "@portkey/trader-types" "^0.0.1-alpha.17"
     loadsh "^0.0.4"
 
+"@portkey/types@2.15.10", "@portkey/types@^2.15.10", "@portkey/types@^2.15.10-alpha.0":
+  version "2.15.10"
+  resolved "https://registry.yarnpkg.com/@portkey/types/-/types-2.15.10.tgz#35c37803ee4796fe15b7967bea59a6f0fd931fc9"
+  integrity sha512-RQddcR9AfWbapYM4ovAkCXOZGULuuYCbTwYkUTaqRf0WflG3IHB+sQvDMUSMJAw0fo4dPND7Qg0hS2mvHVVWRw==
+
 "@portkey/types@2.15.10-alpha.0":
   version "2.15.10-alpha.0"
   resolved "https://registry.npmjs.org/@portkey/types/-/types-2.15.10-alpha.0.tgz#c0944db165fad3cf54ed5b5d22d8a78c08c66e7d"
   integrity sha512-9deIi6QivnqRPwg/LGxlzGeatZnTGmR6lXifOxjAjHojAQ9I/eFup4djZBvEwa2+mr0rlqL6knIQqp52rfoLjA==
-
-"@portkey/types@2.6.6":
-  version "2.6.6"
-  resolved "https://registry.npmjs.org/@portkey/types/-/types-2.6.6.tgz#07af958da36f777aa68149a6bfd7bb0df1c9f992"
-  integrity sha512-oMsduRi2juBqQffhIgD5NSoVxnmmG+lL3W6RnJueyfh/itbaEZfIlC1g9o4NM4TVuxZPIf0ahfPaXGR9CriIYQ==
 
 "@portkey/types@^2.0.0-alpha.0", "@portkey/types@^2.7.1-alpha.0", "@portkey/types@^2.7.1-alpha.4", "@portkey/types@^2.8.1":
   version "2.8.1"
   resolved "https://registry.npmjs.org/@portkey/types/-/types-2.8.1.tgz#539ac7c8d776e10dc29271f1c2b699448c78a9b9"
   integrity sha512-8IQbqbNUF7khApxu7Us7cKBYmC96jJJwvSd//jReMTgB2z+dm5b2PSscZFZwLofQimZysd0DQErTaNggLwSMiQ==
 
-"@portkey/types@^2.15.10", "@portkey/types@^2.15.10-alpha.0":
-  version "2.15.10"
-  resolved "https://registry.npmjs.org/@portkey/types/-/types-2.15.10.tgz#35c37803ee4796fe15b7967bea59a6f0fd931fc9"
-  integrity sha512-RQddcR9AfWbapYM4ovAkCXOZGULuuYCbTwYkUTaqRf0WflG3IHB+sQvDMUSMJAw0fo4dPND7Qg0hS2mvHVVWRw==
-
 "@portkey/types@^2.15.9":
   version "2.15.9"
   resolved "https://registry.npmjs.org/@portkey/types/-/types-2.15.9.tgz#57d3c446737ab4d985ee5eacc99139d0276caec2"
   integrity sha512-8i5EdHGnXfRYyeoHeRR5TnSYM3dEUUE0n3rAkZO2+2mlpbJI2jFNUkcmOcBKCL9Jc9LE+mWddKt5Fc+48rFP3w==
 
+"@portkey/utils@2.15.10", "@portkey/utils@^2.15.10", "@portkey/utils@^2.15.10-alpha.0":
+  version "2.15.10"
+  resolved "https://registry.yarnpkg.com/@portkey/utils/-/utils-2.15.10.tgz#faaa1e2f239d728b202c226171f838fc22c14a19"
+  integrity sha512-2jV+gnfbavEcrAGndR9ePLMdR8V6I4gvRMo1d76m6hdTRRrFf5VpFOd2VN8624RgXUHon5WQocSQ/Pi++eWtdg==
+  dependencies:
+    node-forge "^1.3.1"
+
 "@portkey/utils@2.15.10-alpha.0":
   version "2.15.10-alpha.0"
   resolved "https://registry.npmjs.org/@portkey/utils/-/utils-2.15.10-alpha.0.tgz#1eb5b2ea3c206c3e32e3c50c83418d7a75d98e73"
   integrity sha512-M+u5P09Rz0XVb28kahMi/2sN06qBsQrgkj9ZQXszdU3e/GkCVlabENDY4JniyYuBC6P31EcYurRlJM5vrJ1IjA==
-  dependencies:
-    node-forge "^1.3.1"
-
-"@portkey/utils@2.6.6":
-  version "2.6.6"
-  resolved "https://registry.npmjs.org/@portkey/utils/-/utils-2.6.6.tgz#8fa5eb93a4ca43baa14345a75876a8701de2c1f6"
-  integrity sha512-1hooVcRxGafEyyD/TGqx9vsGwsl50RElCBz5hqTJ1mUDy3Q5OWFtSPU0dnTPpUwJlzJHUJCZMvO+wI2dCJHncA==
-
-"@portkey/utils@^2.15.10", "@portkey/utils@^2.15.10-alpha.0":
-  version "2.15.10"
-  resolved "https://registry.npmjs.org/@portkey/utils/-/utils-2.15.10.tgz#faaa1e2f239d728b202c226171f838fc22c14a19"
-  integrity sha512-2jV+gnfbavEcrAGndR9ePLMdR8V6I4gvRMo1d76m6hdTRRrFf5VpFOd2VN8624RgXUHon5WQocSQ/Pi++eWtdg==
   dependencies:
     node-forge "^1.3.1"
 
@@ -9357,7 +9347,16 @@ string-convert@^0.2.0:
   resolved "https://registry.npmjs.org/string-convert/-/string-convert-0.2.1.tgz#6982cc3049fbb4cd85f8b24568b9d9bf39eeff97"
   integrity sha512-u/1tdPl4yQnPBjnVrmdLo9gtuLvELKsAoRapekWggdiQNvvvum+jYF329d84NAa660KQw7pB2n36KrIKVoXa3A==
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -9456,7 +9455,14 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -10227,7 +10233,7 @@ word-wrap@^1.2.5:
   resolved "https://registry.npmjs.org/word-wrap/-/word-wrap-1.2.5.tgz#d2c45c6dd4fbce621a66f136cbe328afd0410b34"
   integrity sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
   version "7.0.0"
   resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -10240,6 +10246,15 @@ wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"

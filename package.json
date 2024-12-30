@@ -26,7 +26,7 @@
     "@aelf-web-login/wallet-adapter-portkey-discover": "^0.2.2-alpha.4",
     "@aelf-web-login/wallet-adapter-react": "^0.2.2-alpha.4",
     "@ebay/nice-modal-react": "^1.2.13",
-    "@etransfer/ui-react": "1.8.0",
+    "@etransfer/ui-react": "1.12.0",
     "@portkey/contracts": "2.15.10-alpha.0",
     "@portkey/detect-provider": "^2.1.0",
     "@portkey/did-ui-react": "2.15.10-alpha.0",
