@@ -1,10 +1,9 @@
 import { useCheckLoginAndToken, useWalletService } from 'hooks/useWallet';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useGetLoginStatus from 'redux/hooks/useGetLoginStatus';
 import StakeModalWithConfirm from 'components/StakeModalWithConfirm';
 import { useModal } from '@ebay/nice-modal-react';
 import ClaimModal from 'components/ClaimModal';
-import { singleMessage } from '@portkey/did-ui-react';
 import { PoolType, StakeType, TransactionType } from 'types/stake';
 import { GetReward, Renew, tokenStake } from 'contract/tokenStaking';
 import UnlockModal from 'components/UnlockModal';
@@ -23,7 +22,6 @@ import { useRouter } from 'next/navigation';
 import { formatTokenSymbol } from 'utils/format';
 import useGetAwakenContract, { TFeeType } from 'hooks/useGetAwakenContract';
 import { ZERO } from 'constants/index';
-import { message } from 'antd';
 import useNotification from 'hooks/useNotification';
 import { getDomain } from 'utils/common';
 
@@ -35,7 +33,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
   const { isLogin } = useGetLoginStatus();
   const { checkLogin } = useCheckLoginAndToken();
   const [stakeData, setStakeData] = useState<Array<IStakePoolData>>([]);
-  const [renewText, setRenewText] = useState<Array<IRenewText>>();
+  const [renewText, setRenewText] = useState<Array<IRenewText>>([]);
   const stakeModal = useModal(StakeModalWithConfirm);
   const claimModal = useModal(ClaimModal);
   const unlockModal = useModal(UnlockModal);
@@ -67,7 +65,7 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
       const { withLoading = true } = props || {};
       withLoading && setLoading(true);
       try {
-        const { pools, textNodes } =
+        const { pools } =
           (await fetchStakingPoolsData({
             poolType,
             sorting: '',
@@ -88,7 +86,6 @@ export default function useSimpleStakeListService({ poolType }: { poolType: 'Tok
           };
         });
         setStakeData(stakeData);
-        setRenewText(textNodes || []);
       } catch (error) {
         console.error('getStakeData error', error);
       } finally {

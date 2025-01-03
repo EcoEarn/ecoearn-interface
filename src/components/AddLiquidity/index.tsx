@@ -315,8 +315,8 @@ export default function AddLiquidity({
           throw new Error();
         }
         if (checked) {
-          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-          // const periodInSeconds = 5 * 60;
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 5 * 60;
           try {
             const tokenAMin = ZERO.plus(tokenA.balance)
               .times(1 - Number(tolerance || '0.5') / 100)

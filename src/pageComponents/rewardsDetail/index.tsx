@@ -1,9 +1,9 @@
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import { Flex, message } from 'antd';
+import { Flex } from 'antd';
 import FaqList from 'components/FaqList';
 import StakeTokenTitle from 'components/StakeTokenTitle';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import RewardsTotalItem from './components/RewardsTotalItem';
 import { Button, ToolTip } from 'aelf-design';
 import RewardsSingleItem from './components/RewardsSingleItem';
@@ -27,7 +27,7 @@ import BigNumber from 'bignumber.js';
 import { DEFAULT_DATE_FORMAT, ZERO } from 'constants/index';
 import dayjs from 'dayjs';
 import ConfirmModal, { ConfirmModalTypeEnum, IWithDrawContent } from 'components/ConfirmModal';
-import { useInterval, useTimeout } from 'ahooks';
+import { useInterval } from 'ahooks';
 import { ICMSInfo } from 'redux/types/reducerTypes';
 import { getRawTransaction } from 'utils/getRawTransaction';
 import { matchErrorMsg } from 'utils/formatError';
@@ -570,8 +570,8 @@ export default function RewardsDetailPage() {
           longestReleaseTime: longestReleaseTime || 0,
         },
         onStake: async (amount, period = 0, poolId) => {
-          const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
-          // const periodInSeconds = 5 * 60;
+          // const periodInSeconds = dayjs.duration(Number(period), 'day').asSeconds();
+          const periodInSeconds = 5 * 60;
           const stakeAmount = freeAmount;
           const signParams: IEarlyStakeSignParams = {
             amount: Number(stakeAmount),
